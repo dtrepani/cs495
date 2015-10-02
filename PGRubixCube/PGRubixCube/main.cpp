@@ -18,6 +18,7 @@ AxisRotation movingRotation[3];
 Quad quads[6][3][3];
 
 double rotX, rotY, rotZ, rotAmt;
+bool shift;
 
 float vertices[6][12] = {
 	// Top face
@@ -236,6 +237,9 @@ void checkKeys(SDL_Event &event, bool &running) {
 		case SDLK_6: // Left (4)
 			rotateFace(4, true);
 			break;
+		case SDL_KEYDOWN:
+			// on keydown + lshift or rshift, shift = true
+			// on keyup + lshift or rshift, shift = false
 		case SDLK_ESCAPE:
 			running = false;
 	}
@@ -395,7 +399,7 @@ void drawQuadsOnCube() {
 
 	for( int i = 0; i < 6; i++ ) {
 		rotateToFace(i);
-		glTranslatef( twoThirds * -1.0, twoThirds * -1.0, twoThirds ); // Start drawing the quads at the upper-left and front of the face
+		glTranslatef( twoThirds * -1.0, twoThirds * -1.0, 0 ); // Start drawing the quads at the upper-left and front of the face
 		drawQuadsOnFace(i, twoThirds);
 	}
 
@@ -441,7 +445,7 @@ void drawCubeFace(int face) {
 void drawQuad(int col, int row) {
 	double	oneThird = 1.0/3.0,
 			negOneThird = -1.0/3.0,
-			zWithOffset = oneThird + 0.005,
+			zWithOffset = 1.005,
 			colX = col/3.0,
 			rowY = row/3.0;
 	
