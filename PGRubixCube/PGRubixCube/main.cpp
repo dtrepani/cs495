@@ -9,9 +9,10 @@
 SDL_Window *mainWindow;
 SDL_Surface **textureSurface;
 GLuint *texture;
+GLuint underCube;
 
 double rotX, rotY, rotZ, rotVel, negRotVel;
-bool shift;
+bool shiftIsDown;
 
 Quad quads[6][3][3];
 double rotVelocityOf[3] = { 0.0 };
@@ -85,6 +86,7 @@ void init() {
 	initWindow();
 	initOpenGL();
 	initTextures();
+	initDisplayList();
 }
 
 // Initalize window
@@ -125,6 +127,7 @@ void initOpenGL() {
 				tan( 45.0/360*PI ) * 0.1,
 				0.1,
 				100 );
+
 }
 
 // Load the textures for later use when drawing the faces of the rubix cube.
@@ -140,6 +143,18 @@ void initTextures() {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+}
+
+// 
+void initDisplayList() {
+	underCube = glGenLists(1);
+
+	glNewList( underCube, GL_COMPILE );
+		glBegin(GL_QUADS);
+			for( int i = 0; i < 6; i++ )
+				drawCubeFace(i);
+		glEnd();
+	glEndList();
 }
 
 // Each texture being created goes through the same method calls and is named with a number, referenced by index.
@@ -183,6 +198,16 @@ void pollEventsAndDraw() {
 // If any of the arrow keys, Z, or A have been pressed, rotate the cube accordingly.
 // If space has been pressed, stop all rotation. ESC will close the program.
 void checkKeys(SDL_Event &event, bool &running) {
+	checkKeysForCubeRotation(event);
+	checkKeysForSideRotation(event);
+
+	if(event.type == SDLK_ESCAPE) {
+		running = false;
+	}
+}
+
+// The arrow keys, Z, A, and space all manipulate the cube's rotation in some form.
+void checkKeysForCubeRotation(SDL_Event &event) {
 	switch(event.key.keysym.sym) {
 		case SDLK_LEFT:
 			rotVelocityOf[X] = rotVel;
@@ -207,40 +232,44 @@ void checkKeys(SDL_Event &event, bool &running) {
 				rotVelocityOf[i] = 0;
 			}	
 			break;
+	}
+}
+
+// Keys 1-6 rotate a side off the cube either CW or CCW, based on whether or not shift is held down.
+void checkKeysForSideRotation(SDL_Event &event) {
+	switch(event.key.keysym.sym) {
 		case SDLK_1: // Front (2)
-			rotateFace(2, true);
+			rotateSide(2, shiftIsDown);
 			break;
 		case SDLK_2: // Bottom (1)
-			rotateFace(1, true);
+			rotateSide(1, shiftIsDown);
 			break;
 		case SDLK_3: // Back (3)
-			rotateFace(3, true);
+			rotateSide(3, shiftIsDown);
 			break;
 		case SDLK_4: // Top (0)
-			rotateFace(0, true);
+			rotateSide(0, shiftIsDown);
 			break;
 		case SDLK_5: // Right (5)
-			rotateFace(5, true);
+			rotateSide(5, shiftIsDown);
 			break;
 		case SDLK_6: // Left (4)
-			rotateFace(4, true);
+			rotateSide(4, shiftIsDown);
 			break;
 		case SDL_KEYDOWN:
 			switch(event.key.keysym.sym) {
 				case SDLK_LSHIFT:
 				case SDLK_RSHIFT:
-					shift = true;
+					shiftIsDown = true;
 					break;
 			}
 		case SDL_KEYUP:
 			switch(event.key.keysym.sym) {
 				case SDLK_LSHIFT:
 				case SDLK_RSHIFT:
-					shift = false;
+					shiftIsDown = false;
 					break;
 			}
-		case SDLK_ESCAPE:
-			running = false;
 	}
 }
 
@@ -283,8 +312,8 @@ void rotateToFace(int face) {
 }
 
 // Rotate the given face either clockwise or counterclockwise.
-// Each cube on the face will rotate with it, meaning that quads on other faces will be affected.
-void rotateFace(int face, bool clockwise) {
+// Each cube on the given side will rotate with it, meaning that quads on other faces will be affected.
+void rotateSide(int face, bool clockwise) {
 	int rotation = clockwise ? -90 : 90;
 
 	for( int i = 0; i < 3; i++ ) {
@@ -361,11 +390,8 @@ void drawRubixCube() {
 
 	rotateCube();
 	
-	glColor3f(0, 0, 0);
-	glBegin(GL_QUADS);
-		for( int i = 0; i < 6; i++ )
-			drawCubeFace(i);
-	glEnd();
+		glColor3f(0, 0, 0);
+		glCallList( underCube );
 	
 	glColor3f(1, 1, 1);
 	drawQuadsOnCube();
@@ -374,7 +400,7 @@ void drawRubixCube() {
 }
 
 // Draw the 54 quads slightly off the black cube to prevent clipping.
-// The quads are drawn based on shifting the perspective (in two-thirds increments) to the respective
+// The quads are drawn based on shift the perspective (in two-thirds increments) to the respective
 // face (via rotation) and row and column (via translation).
 void drawQuadsOnCube() {
 	double twoThirds = 2.0/3.0;
