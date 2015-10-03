@@ -5,6 +5,7 @@
 *				of an actual rubix cube.
 */
 #include "main.h"
+#include "Quad.h"
 
 SDL_Window *mainWindow;
 SDL_Surface **textureSurface;
@@ -14,7 +15,7 @@ GLuint underCube;
 double rotX, rotY, rotZ, rotVel, negRotVel;
 bool shiftIsDown;
 
-Quad quads[6][3][3];
+Quad *quads[6][3][3];
 double rotVelocityOf[3] = { 0.0 };
 float vertices[6][12] = {
 	// Top face
@@ -60,6 +61,7 @@ int main(int argc, char **argv) {
 
 	SDL_DestroyWindow(mainWindow);
 	SDL_Quit();
+	delete[] quads;
 	return 0;
 }
 
@@ -75,10 +77,12 @@ void init() {
 	for( int i = 0; i < 6; i++ ) {
 		for( int j = 0; j < 3; j++ ) {
 			for( int k = 0; k < 3; k++ ) {
-				quads[i][j][k].origTexture = i;
+				quads[i][j][k] = new Quad( i, j, k, 0 );
+
+				/*quads[i][j][k].origTexture = i;
 				quads[i][j][k].texCol = j;
 				quads[i][j][k].texRow = k;
-				quads[i][j][k].angle = 0;
+				quads[i][j][k].angle = 0;*/
 			}
 		}
 	}
@@ -319,7 +323,8 @@ void rotateSide(int face, bool clockwise) {
 
 	for( int i = 0; i < 3; i++ ) {
 		for( int j = 0; j < 3; j++ ) {
-			quads[face][i][j].angle = (quads[face][i][j].angle + rotation) % 360;
+			//quads[face][i][j].angle = (quads[face][i][j].angle + rotation) % 360;
+			quads[face][i][j]->addToAngle(rotation);
 		}
 	}
 
@@ -330,24 +335,27 @@ void rotateSide(int face, bool clockwise) {
 // TODO: Automate
 // Manual way to move corners to their next position on face rotation
 void moveCorners(int face, bool clockwise) {
-	Quad quadOne = quads[face][0][0];
+	Quad *quadOne = quads[face][0][0];
 
 	quads[face][0][0] = quads[face][0][2];
 	quads[face][0][2] = quads[face][2][2];
 	quads[face][2][2] = quads[face][2][0];
 	quads[face][2][0] = quadOne;
+
+	delete quadOne;
 }
 
 // TODO: Automate
 // Manul way to move non-corners to their next position on face rotation
 void moveNonCorners(int face, bool clockwise) {
-	Quad quadTwo = quads[face][1][0];
+	Quad *quadTwo = quads[face][1][0];
 	
 	quads[face][1][0] = quads[face][0][1];
 	quads[face][0][1] = quads[face][1][2];
 	quads[face][1][2] = quads[face][2][1];
 	quads[face][2][1] = quadTwo;
 
+	delete quadTwo;
 	/* WIP -- Current issues: rotating wrong way; 6 being overwritten (making 2 and 6 overwritten)
 	for( int i = 1; i < 8; i += 2 ) {
 		int getQuadFromI = ( i == 1 || i == 7 ) ? 4 : 2;
@@ -421,12 +429,17 @@ void drawQuadsOnFace(int face, double increment) {
 
 		for( int k = 2; k >= 0; k-- ) {
 			glPushMatrix();
+			
+			cout << "Texture is " << quads[face][j][k]->getTexture() << ", at (" << quads[face][j][k]->getTextureColumn() << ", " << quads[face][j][k]->getTextureRow() << ")" << endl;
+			quads[face][j][k]->drawSelf(texture);
+
+			/*
 			glBindTexture( GL_TEXTURE_2D, texture[quads[face][j][k].origTexture] );
 			glRotatef( (float)quads[face][j][k].angle, 0, 0, 1 );
 			
 			glBegin(GL_QUADS);
 				drawQuad( quads[face][j][k].texCol, quads[face][j][k].texRow );
-			glEnd();
+			glEnd();*/
 
 			glPopMatrix();
 			glTranslatef( 0, increment, 0 );

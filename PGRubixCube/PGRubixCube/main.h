@@ -32,7 +32,7 @@ typedef struct {
 	int texCol;
 	int texRow;
 	int angle;
-} Quad;
+} Quads;
 
 int main(int argc, char **argv);
 void init();
