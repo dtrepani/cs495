@@ -1,8 +1,8 @@
 /*
 * Name:			Desiree Trepanier
-* Project:		PG2-3 - Rubix Cube
-* Description:	Textured rubix cube using OpenGL that can be rotated and whose faces can be rotated like that
-*				of an actual rubix cube.
+* Project:		PG2-3 - Rubiks Cube
+* Description:	Textured rubik's cube using OpenGL that can be rotated and whose faces can be rotated like that
+*				of an actual rubik's cube.
 */
 #ifndef _MAIN_
 #define _MAIN_
@@ -24,6 +24,13 @@ using namespace std;
 #define Z 2
 
 typedef struct {
+	int top;
+	int bottom;
+	int left;
+	int right;
+} Face;
+
+typedef struct {
 	int origTexture;
 	int texCol;
 	int texRow;
@@ -32,6 +39,7 @@ typedef struct {
 
 int main(int argc, char **argv);
 void init();
+void initFaces();
 void initWindow();
 void initOpenGL();
 void initDisplayList();
@@ -46,10 +54,11 @@ void rotateToFace(int face);
 void rotateSide(int face);
 void moveCorners(int face);
 void moveNonCorners(int face);
+bool isCornerQuad(int section);
 int getColForNum(int num);
 int getRowForNum(int num);
 void glPopAndPushMatrix();
-void drawRubixCube();
+void drawRubiksCube();
 void drawQuadsOnCube();
 void drawQuadsOnFace(int face, double increment);
 void drawCubeFace(int face);
