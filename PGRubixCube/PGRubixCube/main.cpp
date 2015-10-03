@@ -12,7 +12,7 @@ GLuint *texture;
 GLuint underCube;
 
 double rotX, rotY, rotZ, rotVel, negRotVel;
-bool shiftIsDown;
+bool clockwise;
 
 Quad quads[6][3][3];
 double rotVelocityOf[3] = { 0.0 };
@@ -65,6 +65,7 @@ int main(int argc, char **argv) {
 
 // Initialize variables and call initalizations for the window, openGL, and textures
 void init() {
+	clockwise = true;
 	rotX = rotY = rotZ = 0.0;
 	rotVel = 0.5;
 	negRotVel = rotVel * -1.0;
@@ -130,6 +131,19 @@ void initOpenGL() {
 
 }
 
+// The black cube under the quads to a display list because it will never change
+void initDisplayList() {
+	underCube = glGenLists(1);
+
+	glNewList( underCube, GL_COMPILE );
+		glColor3f(0, 0, 0);
+		glBegin(GL_QUADS);
+			for( int i = 0; i < 6; i++ )
+				drawCubeFace(i);
+		glEnd();
+	glEndList();
+}
+
 // Load the textures for later use when drawing the faces of the rubix cube.
 void initTextures() {
 	textureSurface = new SDL_Surface *[6];
@@ -143,19 +157,6 @@ void initTextures() {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-}
-
-// The black cube under the quads to a display list because it will never change
-void initDisplayList() {
-	underCube = glGenLists(1);
-
-	glNewList( underCube, GL_COMPILE );
-		glColor3f(0, 0, 0);
-		glBegin(GL_QUADS);
-			for( int i = 0; i < 6; i++ )
-				drawCubeFace(i);
-		glEnd();
-	glEndList();
 }
 
 // Each texture being created goes through the same method calls and is named with a number, referenced by index.
@@ -186,11 +187,9 @@ void pollEventsAndDraw() {
 	bool running = true;
 
 	while( running ) {
-		if( SDL_PollEvent(&event) )
-			if( event.type == SDL_QUIT )
-				running = false;
-			else if( event.type == SDL_KEYDOWN )
-				checkKeys(event, running);
+		if( SDL_PollEvent(&event) ) {
+			checkKeys(event, running);
+		}
 
 		drawRubixCube();
 	}
@@ -202,73 +201,74 @@ void checkKeys(SDL_Event &event, bool &running) {
 	checkKeysForCubeRotation(event);
 	checkKeysForSideRotation(event);
 
-	if(event.type == SDLK_ESCAPE) {
+	if(event.type == SDLK_ESCAPE || event.type == SDL_QUIT) {
 		running = false;
 	}
 }
 
 // The arrow keys, Z, A, and space all manipulate the cube's rotation in some form.
 void checkKeysForCubeRotation(SDL_Event &event) {
-	switch(event.key.keysym.sym) {
-		case SDLK_LEFT:
-			rotVelocityOf[X] = rotVel;
-			break;
-		case SDLK_RIGHT:
-			rotVelocityOf[X] = negRotVel;
-			break;
-		case SDLK_UP:
-			rotVelocityOf[Y] = rotVel;
-			break;
-		case SDLK_DOWN:
-			rotVelocityOf[Y] = negRotVel;
-			break;
-		case SDLK_a:
-			rotVelocityOf[Z] = rotVel;
-			break;
-		case SDLK_z:
-			rotVelocityOf[Z] = negRotVel;
-			break;
-		case SDLK_SPACE:
-			for(int i = 0; i < 3; i++) {
-				rotVelocityOf[i] = 0;
-			}	
-			break;
+	if( event.type == SDL_KEYDOWN) {
+		switch(event.key.keysym.sym) {
+			case SDLK_LEFT:
+				rotVelocityOf[X] = rotVel;
+				break;
+			case SDLK_RIGHT:
+				rotVelocityOf[X] = negRotVel;
+				break;
+			case SDLK_UP:
+				rotVelocityOf[Y] = rotVel;
+				break;
+			case SDLK_DOWN:
+				rotVelocityOf[Y] = negRotVel;
+				break;
+			case SDLK_a:
+				rotVelocityOf[Z] = rotVel;
+				break;
+			case SDLK_z:
+				rotVelocityOf[Z] = negRotVel;
+				break;
+			case SDLK_SPACE:
+				for(int i = 0; i < 3; i++) {
+					rotVelocityOf[i] = 0;
+				}	
+				break;
+		}
 	}
 }
 
 // Keys 1-6 rotate a side off the cube either CW or CCW, based on whether or not shift is held down.
 void checkKeysForSideRotation(SDL_Event &event) {
-	switch(event.key.keysym.sym) {
-		case SDLK_1: // Front (2)
-			rotateSide(2, shiftIsDown);
-			break;
-		case SDLK_2: // Bottom (1)
-			rotateSide(1, shiftIsDown);
-			break;
-		case SDLK_3: // Back (3)
-			rotateSide(3, shiftIsDown);
-			break;
-		case SDLK_4: // Top (0)
-			rotateSide(0, shiftIsDown);
-			break;
-		case SDLK_5: // Right (5)
-			rotateSide(5, shiftIsDown);
-			break;
-		case SDLK_6: // Left (4)
-			rotateSide(4, shiftIsDown);
-			break;
-		case SDL_KEYDOWN:
+	if( event.type == SDL_KEYDOWN ) {
 			switch(event.key.keysym.sym) {
+				case SDLK_1: // Front (2)
+					rotateSide(2);
+					break;
+				case SDLK_2: // Bottom (1)
+					rotateSide(1);
+					break;
+				case SDLK_3: // Back (3)
+					rotateSide(3);
+					break;
+				case SDLK_4: // Top (0)
+					rotateSide(0);
+					break;
+				case SDLK_5: // Right (5)
+					rotateSide(5);
+					break;
+				case SDLK_6: // Left (4)
+					rotateSide(4);
+					break;
 				case SDLK_LSHIFT:
 				case SDLK_RSHIFT:
-					shiftIsDown = true;
+					clockwise = false;
 					break;
 			}
-		case SDL_KEYUP:
+	} else if( event.type == SDL_KEYUP ) {
 			switch(event.key.keysym.sym) {
 				case SDLK_LSHIFT:
 				case SDLK_RSHIFT:
-					shiftIsDown = false;
+					clockwise = true;
 					break;
 			}
 	}
@@ -314,7 +314,7 @@ void rotateToFace(int face) {
 
 // Rotate the given face either clockwise or counterclockwise.
 // Each cube on the given side will rotate with it, meaning that quads on other faces will be affected.
-void rotateSide(int face, bool clockwise) {
+void rotateSide(int face) {
 	int rotation = clockwise ? -90 : 90;
 
 	for( int i = 0; i < 3; i++ ) {
@@ -323,13 +323,13 @@ void rotateSide(int face, bool clockwise) {
 		}
 	}
 
-	moveCorners(face, clockwise);
-	moveNonCorners(face, clockwise);
+	moveCorners(face);
+	moveNonCorners(face);
 }
 
 // TODO: Automate
 // Manual way to move corners to their next position on face rotation
-void moveCorners(int face, bool clockwise) {
+void moveCorners(int face) {
 	Quad quadOne = quads[face][0][0];
 
 	quads[face][0][0] = quads[face][0][2];
@@ -340,7 +340,7 @@ void moveCorners(int face, bool clockwise) {
 
 // TODO: Automate
 // Manul way to move non-corners to their next position on face rotation
-void moveNonCorners(int face, bool clockwise) {
+void moveNonCorners(int face) {
 	Quad quadTwo = quads[face][1][0];
 	
 	quads[face][1][0] = quads[face][0][1];

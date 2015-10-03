@@ -23,10 +23,6 @@ using namespace std;
 #define Y 1
 #define Z 2
 
-/**************** TODO: Make a class for Quad. It REALLY needs it. ****************
-	- Draw itself
-	- Could return the texture col and row rather than continually passing around the face
-*/
 typedef struct {
 	int origTexture;
 	int texCol;
@@ -38,8 +34,8 @@ int main(int argc, char **argv);
 void init();
 void initWindow();
 void initOpenGL();
-void initTextures();
 void initDisplayList();
+void initTextures();
 void createTexture(int index);
 void pollEventsAndDraw();
 void checkKeys(SDL_Event &event, bool &running);
@@ -47,9 +43,9 @@ void checkKeysForCubeRotation(SDL_Event &event);
 void checkKeysForSideRotation(SDL_Event &event);
 void rotateCube();
 void rotateToFace(int face);
-void rotateSide(int face, bool clockwise);
-void moveCorners(int face, bool clockwise);
-void moveNonCorners(int face, bool clockwise);
+void rotateSide(int face);
+void moveCorners(int face);
+void moveNonCorners(int face);
 int getColForNum(int num);
 int getRowForNum(int num);
 void glPopAndPushMatrix();
