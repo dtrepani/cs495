@@ -145,11 +145,12 @@ void initTextures() {
 	glLoadIdentity();
 }
 
-// 
+// The black cube under the quads to a display list because it will never change
 void initDisplayList() {
 	underCube = glGenLists(1);
 
 	glNewList( underCube, GL_COMPILE );
+		glColor3f(0, 0, 0);
 		glBegin(GL_QUADS);
 			for( int i = 0; i < 6; i++ )
 				drawCubeFace(i);
@@ -387,13 +388,8 @@ void drawRubixCube() {
 	glLoadIdentity();
 	
 	glTranslatef (0, 0, -6);
-
 	rotateCube();
-	
-		glColor3f(0, 0, 0);
-		glCallList( underCube );
-	
-	glColor3f(1, 1, 1);
+	glCallList( underCube );
 	drawQuadsOnCube();
 
 	SDL_GL_SwapWindow(mainWindow);
@@ -405,6 +401,7 @@ void drawRubixCube() {
 void drawQuadsOnCube() {
 	double twoThirds = 2.0/3.0;
 	
+	glColor3f(1, 1, 1);
 	glPushMatrix();
 
 	for( int i = 0; i < 6; i++ ) {
