@@ -19,11 +19,9 @@ using namespace std;
 #define PI 3.1415926535897932384626433832795
 #define WIDTH 640
 #define HEIGHT 480
-
-typedef struct {
-	bool posMovement;
-	bool negMovement;
-} AxisRotation;
+#define X 0
+#define Y 1
+#define Z 2
 
 /**************** TODO: Make a class for Quad. It REALLY needs it. ****************
 	- Draw itself

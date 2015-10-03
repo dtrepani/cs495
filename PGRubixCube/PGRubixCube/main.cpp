@@ -6,20 +6,15 @@
 */
 #include "main.h"
 
-const int	X = 0,
-			Y = 1,
-			Z = 2;
-
 SDL_Window *mainWindow;
 SDL_Surface **textureSurface;
 GLuint *texture;
 
-AxisRotation movingRotation[3];
-Quad quads[6][3][3];
-
-double rotX, rotY, rotZ, rotAmt;
+double rotX, rotY, rotZ, rotVel, negRotVel;
 bool shift;
 
+Quad quads[6][3][3];
+double rotVelocityOf[3] = { 0.0 };
 float vertices[6][12] = {
 	// Top face
   { -1,  1,  1,
@@ -69,14 +64,9 @@ int main(int argc, char **argv) {
 
 // Initialize variables and call initalizations for the window, openGL, and textures
 void init() {
-	rotX = rotY = rotZ = 0;
-	rotAmt = 0.5;
-
-	// Each axis will have no rotation when first initalized.
-	for( int i = 0; i < 3; i++ ) {
-		movingRotation[i].posMovement = false;
-		movingRotation[i].negMovement = false;
-	} 
+	rotX = rotY = rotZ = 0.0;
+	rotVel = 0.5;
+	negRotVel = rotVel * -1.0;
 
 	// The 54 quads that'll be manipulated as the rubix cube moves.
 	// origTexture refers to the quad's original texture when the cube spawns.
@@ -137,7 +127,6 @@ void initOpenGL() {
 				100 );
 }
 
-
 // Load the textures for later use when drawing the faces of the rubix cube.
 void initTextures() {
 	textureSurface = new SDL_Surface *[6];
@@ -196,27 +185,26 @@ void pollEventsAndDraw() {
 void checkKeys(SDL_Event &event, bool &running) {
 	switch(event.key.keysym.sym) {
 		case SDLK_LEFT:
-			setRotation(X, true, false);
+			rotVelocityOf[X] = rotVel;
 			break;
 		case SDLK_RIGHT:
-			setRotation(X, false, true);
+			rotVelocityOf[X] = negRotVel;
 			break;
 		case SDLK_UP:
-			setRotation(Y, true, false);
+			rotVelocityOf[Y] = rotVel;
 			break;
 		case SDLK_DOWN:
-			setRotation(Y, false, true);
+			rotVelocityOf[Y] = negRotVel;
 			break;
 		case SDLK_a:
-			setRotation(Z, true, false);
+			rotVelocityOf[Z] = rotVel;
 			break;
 		case SDLK_z:
-			setRotation(Z, false, true);
+			rotVelocityOf[Z] = negRotVel;
 			break;
 		case SDLK_SPACE:
 			for(int i = 0; i < 3; i++) {
-				movingRotation[i].posMovement = false;
-				movingRotation[i].negMovement = false;
+				rotVelocityOf[i] = 0;
 			}	
 			break;
 		case SDLK_1: // Front (2)
@@ -238,17 +226,22 @@ void checkKeys(SDL_Event &event, bool &running) {
 			rotateFace(4, true);
 			break;
 		case SDL_KEYDOWN:
-			// on keydown + lshift or rshift, shift = true
-			// on keyup + lshift or rshift, shift = false
+			switch(event.key.keysym.sym) {
+				case SDLK_LSHIFT:
+				case SDLK_RSHIFT:
+					shift = true;
+					break;
+			}
+		case SDL_KEYUP:
+			switch(event.key.keysym.sym) {
+				case SDLK_LSHIFT:
+				case SDLK_RSHIFT:
+					shift = false;
+					break;
+			}
 		case SDLK_ESCAPE:
 			running = false;
 	}
-}
-
-// Used to rotate the cube around the proper axis.
-void setRotation(int axis, bool posMovement, bool negMovement) {
-	movingRotation[axis].posMovement = posMovement;
-	movingRotation[axis].negMovement = negMovement;
 }
 
 // Set the current rotation of the cube and rotate it further if applicable
@@ -256,19 +249,10 @@ void rotateCube() {
 	glRotatef( rotX, 1, 0, 0 );
 	glRotatef( rotY, 0, 1, 0 );
 	glRotatef( rotZ, 0, 0, 1 );
-
-	rotX += getRotationAmount(X);
-	rotY += getRotationAmount(Y);
-	rotZ += getRotationAmount(Z);
-}
-
-// Used to determine if an axis is moving at all. This is determined by whether posMovement
-// or negMovement is true. If it is moving in the positive direction, return the positive
-// rotation amount. If negative direction, return negative rotation amount. Else, it's not moving.
-double getRotationAmount(int axis) {
-	if( movingRotation[axis].posMovement ) return rotAmt;
-	else if( movingRotation[axis].negMovement ) return -rotAmt;
-	else return 0;
+	
+	rotX += rotVelocityOf[X];
+	rotY += rotVelocityOf[Y];
+	rotZ += rotVelocityOf[Z];
 }
 
 // Rotate to the given face in order to draw the quads.
