@@ -329,10 +329,18 @@ void rotateToFace(int face) {
 	}
 }
 
+void swap(Quad &quadOne, Quad &quadTwo) {
+	Quad tmp = quadOne;
+
+	quadOne = quadTwo;
+	quadTwo = quadOne;
+}
+
 // Rotate the given face either clockwise or counterclockwise.
 // Each cube on the given side will rotate with it, meaning that quads on other faces will be affected.
 void rotateSide(int face) {
 	int rotation = clockwise ? -90 : 90;
+	Quad quadFaceBefore[3][3];
 
 	for( int i = 0; i < 3; i++ ) {
 		for( int j = 0; j < 3; j++ ) {
@@ -340,56 +348,89 @@ void rotateSide(int face) {
 		}
 	}
 
-	moveCorners(face);
-	moveNonCorners(face);
-}
+	getQuadsForFace(face, quadFaceBefore);
 
-// TODO: Automate
-// Manual way to move corners to their next position on face rotation
-void moveCorners(int face) {
-	Quad quadOne = quads[face][0][0];
-
-	quads[face][0][0] = quads[face][0][2];
-	quads[face][0][2] = quads[face][2][2];
-	quads[face][2][2] = quads[face][2][0];
-	quads[face][2][0] = quadOne;
-}
-
-// TODO: Automate
-// Manul way to move non-corners to their next position on face rotation
-void moveNonCorners(int face) {
-	Quad quadTwo = quads[face][1][0];
-	
-	quads[face][1][0] = quads[face][0][1];
-	quads[face][0][1] = quads[face][1][2];
-	quads[face][1][2] = quads[face][2][1];
-	quads[face][2][1] = quadTwo;
-
-	/* WIP -- Current issues: rotating wrong way; 6 being overwritten (making 2 and 6 overwritten)
-	for( int i = 1; i < 8; i += 2 ) {
-		int getQuadFromI = ( i == 1 || i == 7 ) ? 4 : 2;
-		if( i == 3 || i == 7 ) getQuadFromI = getQuadFromI * -1;
-		if( clockwise ) getQuadFromI = getQuadFromI * -1;
-		int quadNum = i + getQuadFromI;
-
-		cout << "i is " << i << " and quadNum is " << quadNum << endl;
-
-		if( i == 7 )
-			quads[face][getColForNum(i)][getRowForNum(i)] = quadTwo;
-		else
-			quads[face][getColForNum(i)][getRowForNum(i)] = quads[face][getColForNum(quadNum)][getRowForNum(quadNum)];
-	} */
-}
-
-bool isCornerQuad(int section) {
-	int col = getColForNum( section ),
-		row = getRowForNum( section );
-
-	if( section % 2 == 1 && section != 5 ) {
-		return true;
+	for( int i = 0; i < 3; i++ ) {
+		for( int j = 0; j < 3; j++ ) {
+			if( !(i == 1 && j == 1) ) { // is not section 5
+				if( clockwise ) {
+					quads[face][2-j][i] = quadFaceBefore[i][j];
+				} else {
+					quads[face][j][2-i] = quadFaceBefore[i][j];				
+				}
+			}
+		}
 	}
 
+	Quad faceTop[3][3];
+	getQuadsForFace(faces[face].top, faceTop);
+
+
+	/*rotateFaceXToFaceY(face, "LEFT", "TOP");
+	rotateFaceXToFaceY(face, "BOTTOM", "LEFT");
+	rotateFaceXToFaceY(face, "RIGHT", "BOTTOM");*/
+}
+
+void rotateFaceXToFaceY(int srcFace, string faceX, string faceY) {
+	int xCol, xRow, xFace, yFace;
+	bool xColConstant;
+
+	xFace = getAdjFaceFromString(srcFace, faceX);
+	yFace = getAdjFaceFromString(srcFace, faceY);
+
+	findWhichQuadsToRotate(faceX, xCol, xRow, xColConstant);
+
+	for(int i = 0; i < 3; i++) {
+		int col, row;
+		if(xColConstant) {
+			col = xCol;
+			row = i;
+		} else {
+			col = i;
+			row = xRow;
+		}
+
+		if( clockwise ) {
+			quads[yFace][2-row][col] = quads[xFace][col][row];
+		} else {
+			quads[yFace][row][2-col] = quads[xFace][col][row];				
+		}
+	}
+}
+
+void findWhichQuadsToRotate(string adjFace, int &col, int &row, bool &colConstant) {
+	if( adjFace == "TOP" ) {
+		col = 0;
+		row = 2;
+		colConstant = false;
+	} else if( adjFace == "BOTTOM" ) {
+		col = 0;
+		row = 0;
+		colConstant = false;
+	} else if( adjFace == "LEFT" ) {
+		col = 2;
+		row = 0;
+		colConstant = true;
+	} else if( adjFace == "RIGHT" )	{
+		col = 0;
+		row = 0;
+		colConstant = true;
+	}
+}
+
+int getAdjFaceFromString(int face, string adjFace) {
+	if( adjFace == "TOP" )		return faces[face].top;
+	if( adjFace == "BOTTOM" )	return faces[face].bottom;
+	if( adjFace == "LEFT" )		return faces[face].left;
+	if( adjFace == "RIGHT" )	return faces[face].right;
+
 	return false;
+}
+
+// Copy the quads for a specific face into a 2d array.
+// Used to 
+void getQuadsForFace(int face, Quad (&quadFace)[3][3]) {
+	memcpy(&quadFace[0][0], &quads[face][0][0], sizeof(quadFace[0][0]) * 9);
 }
 
 // Find the column given a second number. Used when moving quads.
