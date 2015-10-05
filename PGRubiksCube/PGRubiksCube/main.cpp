@@ -104,8 +104,8 @@ void initFaces() {
 	
 	faces[0].top = faces[1].bottom = 3;
 	faces[1].top = faces[0].bottom = 5;
-	faces[0].left = faces[1].right = 2;
-	faces[1].left = faces[0].right = 4;
+	faces[0].left = faces[1].left = 4;
+	faces[0].right = faces[1].right = 2;
 }
 
 // Initalize window
@@ -114,7 +114,7 @@ void initWindow() {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 
-	mainWindow = SDL_CreateWindow(	"Rubiks Cube",
+	mainWindow = SDL_CreateWindow(	"Rubik's Cube",
 									SDL_WINDOWPOS_UNDEFINED,
 									SDL_WINDOWPOS_UNDEFINED,
 									WIDTH,
@@ -329,13 +329,6 @@ void rotateToFace(int face) {
 	}
 }
 
-void swap(Quad &quadOne, Quad &quadTwo) {
-	Quad tmp = quadOne;
-
-	quadOne = quadTwo;
-	quadTwo = quadOne;
-}
-
 // Rotate the given face either clockwise or counterclockwise.
 // Each cube on the given side will rotate with it, meaning that quads on other faces will be affected.
 void rotateSide(int face) {
@@ -349,6 +342,11 @@ void rotateSide(int face) {
 	}
 
 	getQuadsForFace(face, quadFaceBefore);
+	
+	/* TC
+	for(int i = 0; i < 6; i++) {
+		printf("Face %d: (%d, %d, %d, %d)", i, faces[i].top, faces[i].bottom, faces[i].left, faces[i].right);
+	}*/
 
 	for( int i = 0; i < 3; i++ ) {
 		for( int j = 0; j < 3; j++ ) {
@@ -364,7 +362,49 @@ void rotateSide(int face) {
 
 	Quad faceTop[3][3];
 	getQuadsForFace(faces[face].top, faceTop);
+	for( int i = 0; i < 3; i++ ) { // CW: Top = Left; CCW: Top = Right
+		int col;
+		if( clockwise ) {
+			col = 2;
+			quads[faces[face].top][i][2-col] = quads[faces[face].left][col][i];
+		} else {
+			col = 0;
+			quads[faces[face].top][2-i][col] = quads[faces[face].right][col][i];
+		}
+	}
+	
+	for( int i = 0; i < 3; i++ ) { // CW: Left = Bottom; CCW: Right = Bottom
+		int row;
+		if( clockwise ) {
+			row = 2;
+			quads[faces[face].left][row][2-i] = quads[faces[face].bottom][i][row];
+		} else {
+			row = 0;
+			quads[faces[face].right][2-row][i] = quads[faces[face].bottom][i][row];
+		}
+	}
 
+	for( int i = 0; i < 3; i++ ) { // CW: Bottom = Right; CCW: Bottom = Left
+		int col;
+		if( clockwise ) {
+			col = 0;
+			quads[faces[face].bottom][i][2-col] = quads[faces[face].right][col][i];
+		} else {
+			col = 2;
+			quads[faces[face].bottom][2-i][col] = quads[faces[face].left][col][i];
+		}
+	}
+	
+	for( int i = 0; i < 3; i++ ) { // CW: Right = Top (Saved); CCW: Left = Top (Saved)
+		int row;
+		if( clockwise ) {
+			row = 0;
+			quads[faces[face].right][row][2-i] = faceTop[i][row];
+		} else {
+			row = 2;
+			quads[faces[face].left][2-row][i] = faceTop[i][row];			
+		}
+	}
 
 	/*rotateFaceXToFaceY(face, "LEFT", "TOP");
 	rotateFaceXToFaceY(face, "BOTTOM", "LEFT");
