@@ -9,51 +9,13 @@
 SDL_Window *mainWindow;
 SDL_Surface **textureSurface;
 GLuint *texture;
-GLuint underCube;
 
 double rotX, rotY, rotZ, rotVel, negRotVel;
 bool clockwise;
 
-Quad quads[6][3][3];
-Face faces[6];
+//Quad quads[6][3][3];
+Face *face[6];
 double rotVelocityOf[3] = { 0.0 };
-float vertices[6][12] = {
-	// Top face
-  { -1,  1,  1,
-	 1,  1,  1,
-	 1,  1, -1,
-	-1,  1, -1  },
-
-	// Bottom face
-  { -1, -1, -1,
-	 1, -1, -1,
-	 1, -1,  1,
-	-1, -1,  1  },
-
-	// Left face
-  { -1, -1, -1,
-	-1, -1,  1,
-	-1,  1,  1,
-	-1,  1, -1  },
-
-	// Front face
-  { -1, -1,  1,
-	 1, -1,  1,
-	 1,  1,  1,
-	-1,  1,  1  },
-	
-	// Back face
-  {  1, -1, -1,
-	-1, -1, -1,
-	-1,  1, -1,
-	 1,  1, -1  },
-
-	// Right face
-  {  1, -1,  1,
-	 1, -1, -1,
-	 1,  1, -1,
-	 1,  1,  1  },
-};
 
 int main(int argc, char **argv) {
 	init();
@@ -74,7 +36,7 @@ void init() {
 	// The 54 quads that'll be manipulated as the rubik's cube moves.
 	// origTexture refers to the quad's original texture when the cube spawns.
 	// texCol and texRow refer to the section of the texture to be drawn.
-	for( int i = 0; i < 6; i++ ) {
+	/*for( int i = 0; i < 6; i++ ) {
 		for( int j = 0; j < 3; j++ ) {
 			for( int k = 0; k < 3; k++ ) {
 				quads[i][j][k].origTexture = i;
@@ -83,29 +45,26 @@ void init() {
 				quads[i][j][k].angle = 0;
 			}
 		}
-	}
+	}*/
 
 	initFaces();
 	initWindow();
 	initOpenGL();
 	initTextures();
-	initDisplayList();
 }
 
 // The faces need to know what faces are adjacent to them when rotating sides.
 void initFaces() {
-	for( int i = 2; i < 6; i++ ) {
-		faces[i].top = 0;
-		faces[i].bottom = 1;
+	for( int i = 0; i < 6; i++ ) {
+		face[i] = new Face(i);
+	}
 
-		faces[i].right = ( i == 5 ) ? 2 : i + 1;
-		faces[i].left = ( i == 2 ) ? 5 : i - 1;
+	for( int i = 2; i < 6; i++ ) {
+		face[i]->setAdjFaces( face[0], face[1], face[( i == 2 ) ? 5 : i - 1], face[( i == 5 ) ? 2 : i + 1] );
 	}
 	
-	faces[0].top = faces[1].bottom = 3;
-	faces[1].top = faces[0].bottom = 5;
-	faces[0].left = faces[1].left = 4;
-	faces[0].right = faces[1].right = 2;
+	face[0]->setAdjFaces( face[3], face[5], face[4], face[2] );
+	face[1]->setAdjFaces( face[5], face[3], face[4], face[2] );
 }
 
 // Initalize window
@@ -147,19 +106,6 @@ void initOpenGL() {
 				0.1,
 				100 );
 
-}
-
-// The black cube under the quads to a display list because it will never change
-void initDisplayList() {
-	underCube = glGenLists(1);
-
-	glNewList( underCube, GL_COMPILE );
-		glColor3f(0, 0, 0);
-		glBegin(GL_QUADS);
-			for( int i = 0; i < 6; i++ )
-				drawCubeFace(i);
-		glEnd();
-	glEndList();
 }
 
 // Load the textures for later use when drawing the faces of the rubik's cube.
@@ -260,22 +206,22 @@ void checkKeysForSideRotation(SDL_Event &event) {
 	if( event.type == SDL_KEYDOWN ) {
 			switch(event.key.keysym.sym) {
 				case SDLK_1: // Front (3)
-					rotateSide(3);
+					face[3]->rotateAbout(clockwise);
 					break;
 				case SDLK_2: // Bottom (1)
-					rotateSide(1);
+					face[1]->rotateAbout(clockwise);
 					break;
 				case SDLK_3: // Back (5)
-					rotateSide(5);
+					face[5]->rotateAbout(clockwise);
 					break;
 				case SDLK_4: // Top (0)
-					rotateSide(0);
+					face[0]->rotateAbout(clockwise);
 					break;
 				case SDLK_5: // Right (4)
-					rotateSide(4);
+					face[4]->rotateAbout(clockwise);
 					break;
 				case SDLK_6: // Left (2)
-					rotateSide(2);
+					face[2]->rotateAbout(clockwise);
 					break;
 				case SDLK_LSHIFT:
 				case SDLK_RSHIFT:
@@ -303,32 +249,52 @@ void rotateCube() {
 	rotZ += rotVelocityOf[Z];
 }
 
-// Rotate to the given face in order to draw the quads.
-void rotateToFace(int face) {
-	glPopAndPushMatrix();
-
-	switch(face) {
-	case 0: // Top
-		glRotatef( 90, 1, 0, 0 );
-		break;
-	case 1: // Bottom
-		glRotatef( -90, 1, 0, 0 );
-		break;
-	case 2: // Left
-		glRotatef( -90, 0, 1, 0 );
-		break;
-	case 3: // Front
-		glRotatef( 0, 0, 1, 0 );
-		break;
-	case 4: // Back
-		glRotatef( 90, 0, 1, 0 );
-		break;
-	case 5: // Right
-		glRotatef( 180, 0, 1, 0 );
-		break;
-	}
+// The face knows where it needs to rotate to.
+// Pass the current perspective to the face and load the returned perspective rotation.
+void rotateToFace(int faceNum) {
+	GLfloat matrix[16];
+	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+	face[faceNum]->rotateToSelf(matrix);
+	glLoadMatrixf(matrix);
 }
 
+// Draw the rubik's cube to the window with its current rotation, textures, and position.
+// To have a multi-texture cube and prevent clipping, additional quads are draw slightly
+// raised off the main cube.
+void drawRubiksCube() {
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glLoadIdentity();
+	glTranslatef (0, 0, -6);
+	
+	rotateCube();
+	
+	glColor3f(0, 0, 0);
+	glPushMatrix();
+	for( int i = 0; i < 6; i++ ) {
+		drawFace(i);
+	}
+	glPopMatrix();
+
+	SDL_GL_SwapWindow(mainWindow);
+}
+
+// The face knows where to draw itself.
+// Pass the current perspective to the face for it to use to draw itself then reset the perspective from
+// the rotation done in rotateToFace.
+void drawFace(int faceNum) {
+	rotateToFace(faceNum);
+
+	glBegin(GL_QUADS);
+		GLfloat matrix[16];
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		face[faceNum]->drawSelf(texture, matrix);
+	glEnd();
+
+	glPopMatrix();
+	glPushMatrix();
+}
+
+#ifdef _TMP_
 // Rotate the given face either clockwise or counterclockwise.
 // Each cube on the given side will rotate with it, meaning that quads on other faces will be affected.
 void rotateSide(int face) {
@@ -360,7 +326,7 @@ void rotateSide(int face) {
 		}
 	}
 
-	Quad faceTop[3][3];
+	/*Quad faceTop[3][3];
 	getQuadsForFace(faces[face].top, faceTop);
 	for( int i = 0; i < 3; i++ ) { // CW: Top = Left; CCW: Top = Right
 		int col;
@@ -404,169 +370,11 @@ void rotateSide(int face) {
 			row = 2;
 			quads[faces[face].left][2-row][i] = faceTop[i][row];			
 		}
-	}
+	}*/
 
 	/*rotateFaceXToFaceY(face, "LEFT", "TOP");
 	rotateFaceXToFaceY(face, "BOTTOM", "LEFT");
 	rotateFaceXToFaceY(face, "RIGHT", "BOTTOM");*/
 }
 
-void rotateFaceXToFaceY(int srcFace, string faceX, string faceY) {
-	int xCol, xRow, xFace, yFace;
-	bool xColConstant;
-
-	xFace = getAdjFaceFromString(srcFace, faceX);
-	yFace = getAdjFaceFromString(srcFace, faceY);
-
-	findWhichQuadsToRotate(faceX, xCol, xRow, xColConstant);
-
-	for(int i = 0; i < 3; i++) {
-		int col, row;
-		if(xColConstant) {
-			col = xCol;
-			row = i;
-		} else {
-			col = i;
-			row = xRow;
-		}
-
-		if( clockwise ) {
-			quads[yFace][2-row][col] = quads[xFace][col][row];
-		} else {
-			quads[yFace][row][2-col] = quads[xFace][col][row];				
-		}
-	}
-}
-
-void findWhichQuadsToRotate(string adjFace, int &col, int &row, bool &colConstant) {
-	if( adjFace == "TOP" ) {
-		col = 0;
-		row = 2;
-		colConstant = false;
-	} else if( adjFace == "BOTTOM" ) {
-		col = 0;
-		row = 0;
-		colConstant = false;
-	} else if( adjFace == "LEFT" ) {
-		col = 2;
-		row = 0;
-		colConstant = true;
-	} else if( adjFace == "RIGHT" )	{
-		col = 0;
-		row = 0;
-		colConstant = true;
-	}
-}
-
-int getAdjFaceFromString(int face, string adjFace) {
-	if( adjFace == "TOP" )		return faces[face].top;
-	if( adjFace == "BOTTOM" )	return faces[face].bottom;
-	if( adjFace == "LEFT" )		return faces[face].left;
-	if( adjFace == "RIGHT" )	return faces[face].right;
-
-	return false;
-}
-
-// Copy the quads for a specific face into a 2d array.
-// Used to 
-void getQuadsForFace(int face, Quad (&quadFace)[3][3]) {
-	memcpy(&quadFace[0][0], &quads[face][0][0], sizeof(quadFace[0][0]) * 9);
-}
-
-// Find the column given a second number. Used when moving quads.
-int getColForNum(int num) {
-	return num % 3;
-}
-
-// Find the row given a second number. Used when moving quads.
-int getRowForNum(int num) {
-	return num / 3;
-}
-
-// To reset turtle position to the last pushed matrix
-void glPopAndPushMatrix() {
-	glPopMatrix();
-	glPushMatrix();
-}
-
-// Draw the rubik's cube to the window with its current rotation, textures, and position.
-// To have a multi-texture cube and prevent clipping, additional quads are draw slightly
-// raised off the main cube.
-void drawRubiksCube() {
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glLoadIdentity();
-	
-	glTranslatef (0, 0, -6);
-	rotateCube();
-	glCallList( underCube );
-	drawQuadsOnCube();
-
-	SDL_GL_SwapWindow(mainWindow);
-}
-
-// Draw the 54 quads slightly off the black cube to prevent clipping.
-// The quads are drawn based on shift the perspective (in two-thirds increments) to the respective
-// face (via rotation) and row and column (via translation).
-void drawQuadsOnCube() {
-	double twoThirds = 2.0/3.0;
-	
-	glColor3f(1, 1, 1);
-	glPushMatrix();
-
-	for( int i = 0; i < 6; i++ ) {
-		rotateToFace(i);
-		glTranslatef( twoThirds * -1.0, twoThirds * -1.0, 0 ); // Start drawing the quads at the upper-left and front of the face
-		drawQuadsOnFace(i, twoThirds);
-	}
-
-	glPopMatrix();
-}
-
-// Draw the 9 quads on the currently active face via translation and rotate the
-// quad according to the quad's current angle.
-void drawQuadsOnFace(int face, double increment) {
-	for( int j = 0; j < 3; j++ ) {
-		glPushMatrix();
-
-		for( int k = 2; k >= 0; k-- ) {
-			glPushMatrix();
-			glBindTexture( GL_TEXTURE_2D, texture[quads[face][j][k].origTexture] );
-			glRotatef( (float)quads[face][j][k].angle, 0, 0, 1 );
-			
-			glBegin(GL_QUADS);
-				drawQuad( quads[face][j][k].texCol, quads[face][j][k].texRow );
-			glEnd();
-
-			glPopMatrix();
-			glTranslatef( 0, increment, 0 );
-		}
-
-		glPopMatrix();
-
-		glTranslatef( increment, 0, 0 );
-	}
-}
-
-// Draw the face of the rubik's cube. Each face has 12 vertices.
-// Face values: Top = 0, Bottom = 1, Left = 2, Front = 3, Right = 4, Back = 5
-void drawCubeFace(int face) {
-	glTexCoord2f( 0, 1 ); glVertex3f( vertices[face][0],  vertices[face][1],  vertices[face][2] );
-	glTexCoord2f( 1, 1 ); glVertex3f( vertices[face][3],  vertices[face][4],  vertices[face][5] );
-	glTexCoord2f( 1, 0 ); glVertex3f( vertices[face][6],  vertices[face][7],  vertices[face][8] );
-	glTexCoord2f( 0, 0 ); glVertex3f( vertices[face][9],  vertices[face][10], vertices[face][11]);
-}
-
-// Draw a quad on the currently active face based on the given column and row. 
-// Each quad is ~0.33 in size, thus drawn in one-third increments.
-void drawQuad(int col, int row) {
-	double	oneThird = 0.325,
-			negOneThird = -0.325,
-			zWithOffset = 1.005,
-			colX = col/3.0,
-			rowY = row/3.0;
-	
-	glTexCoord2f( colX,				rowY + oneThird );	glVertex3f( negOneThird,	negOneThird,	zWithOffset );
-	glTexCoord2f( colX + oneThird,	rowY + oneThird );	glVertex3f( oneThird,		negOneThird,	zWithOffset );
-	glTexCoord2f( colX + oneThird,	rowY			);	glVertex3f( oneThird,		oneThird,		zWithOffset );
-	glTexCoord2f( colX,				rowY			);	glVertex3f( negOneThird,	oneThird,		zWithOffset );
-}
+#endif
