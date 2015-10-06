@@ -11,7 +11,6 @@
 #include "Quad.h"
 using namespace std;
 
-
 class Face {
 private:
 	typedef struct {
@@ -25,22 +24,20 @@ private:
 	float rotationAmt;
 	AdjFace adjFace;
 	Quad *quadsOnFace[3][3];
+	void drawQuadsOnFace(GLuint *textureArray, GLfloat (&matrix)[16]);
+	void drawQuad(int col, int row, GLuint *textureArray, GLfloat (&matrix)[16]);
+	
+	void setRotation(float aRotationAmt, bool aRotateAlongX);
+	void setQuad(Quad *aQuad, int col, int row);
+	Quad * getQuad(int col, int row);
 
 public:
 	Face(int aFaceNum);
 	~Face();
 	void setAdjFaces(Face *top, Face *bottom, Face *left, Face *right);
-	void setRotation(float aRotationAmt, bool aRotateAlongX);
 	void rotateToSelf(GLfloat (&matrix)[16]);
 	void rotateAbout(bool clockwise);
 	void drawSelf(GLuint *textureArray, GLfloat (&matrix)[16]);
-	void drawQuadsOnFace(GLuint *textureArray, GLfloat (&matrix)[16]);
-	void drawQuad(int col, int row, GLuint *textureArray, GLfloat (&matrix)[16]);
-	
-	Face *getAdjFaceTop();
-	Face *getAdjFaceBottom();
-	Face *getAdjFaceLeft();
-	Face *getAdjFaceRight();
 };
 
 #endif

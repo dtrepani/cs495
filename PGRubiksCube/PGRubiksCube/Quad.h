@@ -22,15 +22,6 @@ public:
 	~Quad();
 	void addToAngle(int angleToBeAdded);
 	void drawSelf(GLuint *textureArray, GLfloat (&matrix)[16]);
-
-	int getTexture();
-	int getTextureColumn();
-	int getTextureRow();
-	int getAngle();
-	void setTexture(int aTexture);
-	void setTextureColumn(int aTexCol);
-	void setTextureRow(int aTexRow);
-	void setAngle(int anAngle);
 };
 
 #endif

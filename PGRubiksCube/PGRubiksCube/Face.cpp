@@ -82,6 +82,59 @@ void Face::rotateAbout(bool clockwise) {
 			}
 		}
 	}
+
+	// for top, save bottom row in own variables and manually set
+	Quad *topFaceBottomRow[3][3];
+	for( int i = 0; i < 3; i++ ) {
+		for( int j = 0; j < 3; j++ ) {
+			//topFaceBottomRow[i][2] = adjFace.top->getQuad(i, 2); // without loop (only bottom row)
+			topFaceBottomRow[i][j] = adjFace.top->getQuad(i, j);	
+		}
+	}
+
+	for( int i = 0; i < 3; i++ ) { // CW: Top = Left; CCW: Top = Right
+		int col;
+		if( clockwise ) {
+			col = 2;
+			adjFace.top->setQuad( adjFace.left->getQuad(col, i), i, 2-col );
+		} else {
+			col = 0;
+			adjFace.top->setQuad( adjFace.right->getQuad(col, i), 2-i, col );
+		}
+	}
+	
+	for( int i = 0; i < 3; i++ ) { // CW: Left = Bottom; CCW: Right = Bottom
+		int row;
+		if( clockwise ) {
+			row = 2;
+			adjFace.left->setQuad( adjFace.bottom->getQuad(i, row), row, 2-i );
+		} else {
+			row = 0;
+			adjFace.right->setQuad( adjFace.bottom->getQuad(i, row), 2-row, i );
+		}
+	}
+
+	for( int i = 0; i < 3; i++ ) { // CW: Bottom = Right; CCW: Bottom = Left
+		int col;
+		if( clockwise ) {
+			col = 0;
+			adjFace.bottom->setQuad( adjFace.right->getQuad(col, i), i, 2-col );
+		} else {
+			col = 2;
+			adjFace.bottom->setQuad( adjFace.left->getQuad(col, i), 2-i, col );
+		}
+	}
+	
+	for( int i = 0; i < 3; i++ ) { // CW: Right = Top (Saved); CCW: Left = Top (Saved)
+		int row;
+		if( clockwise ) {
+			row = 0;
+			adjFace.right->setQuad( topFaceBottomRow[i][row], row, 2-i );
+		} else {
+			row = 2;
+			adjFace.left->setQuad( topFaceBottomRow[i][row], 2-row, i );
+		}
+	}
 }
 
 void Face::drawSelf(GLuint *textureArray, GLfloat (&matrix)[16]) {
@@ -127,18 +180,10 @@ void Face::drawQuad(int col, int row, GLuint *textureArray, GLfloat (&matrix)[16
 	glPopMatrix();
 }
 
-Face *Face::getAdjFaceTop() {
-	return adjFace.top;
+void Face::setQuad(Quad *aQuad, int col, int row) {
+	quadsOnFace[col][row] = aQuad;
 }
 
-Face *Face::getAdjFaceBottom() {
-	return adjFace.bottom;
-}
-
-Face *Face::getAdjFaceLeft() {
-	return adjFace.left;
-}
-
-Face *Face::getAdjFaceRight() {
-	return adjFace.right;
+Quad * Face::getQuad(int col, int row) {
+	return quadsOnFace[col][row];
 }

@@ -35,36 +35,3 @@ void Quad::drawSelf(GLuint *textureArray, GLfloat (&matrix)[16]) {
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 }
-
-
-int Quad::getTexture() {
-	return texture;
-}
-
-int Quad::getTextureColumn() {
-	return texCol;
-}
-
-int Quad::getTextureRow() {
-	return texRow;
-}
-
-int Quad::getAngle() {
-	return angle;
-}
-
-void Quad::setTexture(int aTexture) {
-	texture = aTexture;
-}
-
-void Quad::setTextureColumn(int aTexCol) {
-	texCol = aTexCol;
-}
-
-void Quad::setTextureRow(int aTexRow) {
-	texRow = aTexRow;
-}
-
-void Quad::setAngle(int anAngle) {
-	angle = anAngle;
-}
