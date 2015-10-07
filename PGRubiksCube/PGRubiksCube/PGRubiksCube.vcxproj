@@ -69,11 +69,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Face.cpp" />
+    <ClCompile Include="glQuaternion.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Quad.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Face.h" />
+    <ClInclude Include="glQuaternion.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Quad.h" />
   </ItemGroup>

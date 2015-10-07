@@ -24,6 +24,9 @@
     <ClCompile Include="Quad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="glQuaternion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -33,6 +36,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Quad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="glQuaternion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

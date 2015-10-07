@@ -33,5 +33,5 @@ void Quad::drawSelf(GLuint *textureArray, GLfloat (&matrix)[16]) {
 		glTexCoord2f( colX,				rowY			);	glVertex3f( negOneThird,	oneThird,		zWithOffset );
 	glEnd();
 
-	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+	//glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 }

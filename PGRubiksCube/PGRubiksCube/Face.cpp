@@ -35,22 +35,12 @@ Face::~Face() {
 	delete[] &quadsOnFace;
 }
 
+// Each face will need to know which faces are adjacent to it when the cube is rotate is rotated about the face.
 void Face::setAdjFaces(Face *aTop, Face *aBottom, Face *aLeft, Face *aRight) {
 	adjFace.top = aTop;
 	adjFace.bottom = aBottom;
 	adjFace.left = aLeft;
 	adjFace.right = aRight;
-}
-
-void Face::setRotation(float aRotationAmt, bool aRotateAlongX) {
-	rotationAmt = (float) aRotationAmt;
-	if(aRotateAlongX) {
-		rotateAlongX = true;
-		rotateAlongY = false;
-	} else {
-		rotateAlongX = false;
-		rotateAlongY = true;
-	}
 }
 
 // Rotate to the given face in order to draw the quads.
@@ -60,6 +50,9 @@ void Face::rotateToSelf(GLfloat (&matrix)[16]) {
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 }
 
+// Rotates the face and all quads touching the face on adjacent faces.
+// The quads on the face will rotate as well as move positions.
+// The quads on adjacent faces will not rotate, but will move positions and move to another face.
 void Face::rotateAbout(bool clockwise) {
 	int rotation = clockwise ? -90 : 90;
 	Quad *quadsBeforeRotation[3][3];
@@ -83,7 +76,6 @@ void Face::rotateAbout(bool clockwise) {
 		}
 	}
 
-	// for top, save bottom row in own variables and manually set
 	Quad *topFaceBottomRow[3][3];
 	for( int i = 0; i < 3; i++ ) {
 		for( int j = 0; j < 3; j++ ) {
@@ -96,10 +88,13 @@ void Face::rotateAbout(bool clockwise) {
 		int col;
 		if( clockwise ) {
 			col = 2;
-			adjFace.top->setQuad( adjFace.left->getQuad(col, i), i, 2-col );
+			//adjFace.top->setQuad( adjFace.left->getQuad(col, i), i, 2-col );
+			adjFace.top->setQuad( adjFace.left->getQuad(col, i), 2-i, col );
 		} else {
-			col = 0;
-			adjFace.top->setQuad( adjFace.right->getQuad(col, i), 2-i, col );
+			//col = 0;
+			//adjFace.top->setQuad( adjFace.right->getQuad(col, i), 2-i, col );
+			col = 2;
+			adjFace.top->setQuad( adjFace.left->getQuad(col, i), i, 2-col );
 		}
 	}
 	
@@ -107,10 +102,13 @@ void Face::rotateAbout(bool clockwise) {
 		int row;
 		if( clockwise ) {
 			row = 2;
-			adjFace.left->setQuad( adjFace.bottom->getQuad(i, row), row, 2-i );
+			//adjFace.left->setQuad( adjFace.bottom->getQuad(i, row), row, 2-i );
+			adjFace.left->setQuad( adjFace.bottom->getQuad(i, row), 2-row, i );
 		} else {
-			row = 0;
-			adjFace.right->setQuad( adjFace.bottom->getQuad(i, row), 2-row, i );
+			//row = 0;
+			//adjFace.right->setQuad( adjFace.bottom->getQuad(i, row), 2-row, i );
+			row = 2;
+			adjFace.left->setQuad( adjFace.bottom->getQuad(i, row), row, 2-i );
 		}
 	}
 
@@ -118,10 +116,13 @@ void Face::rotateAbout(bool clockwise) {
 		int col;
 		if( clockwise ) {
 			col = 0;
-			adjFace.bottom->setQuad( adjFace.right->getQuad(col, i), i, 2-col );
+			//adjFace.bottom->setQuad( adjFace.right->getQuad(col, i), i, 2-col );
+			adjFace.bottom->setQuad( adjFace.right->getQuad(col, i), 2-i, col );
 		} else {
-			col = 2;
-			adjFace.bottom->setQuad( adjFace.left->getQuad(col, i), 2-i, col );
+			//col = 2;
+			//adjFace.bottom->setQuad( adjFace.left->getQuad(col, i), 2-i, col );
+			col = 0;
+			adjFace.bottom->setQuad( adjFace.right->getQuad(col, i), i, 2-col );
 		}
 	}
 	
@@ -129,14 +130,17 @@ void Face::rotateAbout(bool clockwise) {
 		int row;
 		if( clockwise ) {
 			row = 0;
-			adjFace.right->setQuad( topFaceBottomRow[i][row], row, 2-i );
+			adjFace.left->setQuad( topFaceBottomRow[i][row], row, 2-i );
 		} else {
-			row = 2;
-			adjFace.left->setQuad( topFaceBottomRow[i][row], 2-row, i );
+			//row = 2;
+			//adjFace.left->setQuad( topFaceBottomRow[i][row], 2-row, i );
+			row = 0;
+			adjFace.right->setQuad( topFaceBottomRow[i][row], row, 2-i );
 		}
 	}
 }
 
+// Draw the underlying black quad and then the quads currently on this face.
 void Face::drawSelf(GLuint *textureArray, GLfloat (&matrix)[16]) {
 	glLoadMatrixf(matrix);
 
@@ -153,6 +157,22 @@ void Face::drawSelf(GLuint *textureArray, GLfloat (&matrix)[16]) {
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 }
 
+// Set the face's rotation angle and whether its on the x or y-axis.
+// Allows the face to know where to rotate to get to itself.
+void Face::setRotation(float aRotationAmt, bool aRotateAlongX) {
+	rotationAmt = (float) aRotationAmt;
+	if(aRotateAlongX) {
+		rotateAlongX = true;
+		rotateAlongY = false;
+	} else {
+		rotateAlongX = false;
+		rotateAlongY = true;
+	}
+}
+
+// The face draws each of the quads currently on it.
+// The quads do not know how to get to themselves to draw themselves, so translation
+// on the face level is necessary.
 void Face::drawQuadsOnFace(GLuint *textureArray, GLfloat (&matrix)[16]) {
 	glTranslatef( twoThirds * -1.0, twoThirds * -1.0, 0 );
 	glColor3f(1, 1, 1);
@@ -170,12 +190,14 @@ void Face::drawQuadsOnFace(GLuint *textureArray, GLfloat (&matrix)[16]) {
 	}
 }
 
+// The quads will need to temporarily rotate the perspective to draw themselves at their
+// respective angles, so the current matrix must be given to them.
 void Face::drawQuad(int col, int row, GLuint *textureArray, GLfloat (&matrix)[16]) {
 	glPushMatrix();
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 	quadsOnFace[col][row]->drawSelf(textureArray, matrix);
-	glLoadMatrixf(matrix);
+	//glLoadMatrixf(matrix);
 	
 	glPopMatrix();
 }

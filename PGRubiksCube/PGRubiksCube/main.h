@@ -14,10 +14,10 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_image.h>
+#include "glQuaternion.h"
 #include "Face.h"
 using namespace std;
 
-#define PI 3.1415926535897932384626433832795
 #define WIDTH 640
 #define HEIGHT 480
 #define X 0
@@ -35,9 +35,9 @@ void pollEventsAndDraw();
 void checkKeys(SDL_Event &event, bool &running);
 void checkKeysForCubeRotation(SDL_Event &event);
 void checkKeysForSideRotation(SDL_Event &event);
-void rotateCube();
-void rotateToFace(int faceNum);
 void drawRubiksCube();
 void drawFace(int faceNum);
+void rotateCube();
+void rotateToFace(int faceNum);
 
 #endif

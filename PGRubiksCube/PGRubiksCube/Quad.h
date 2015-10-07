@@ -4,10 +4,8 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
-#include <cmath>
 #include <SDL.h>
 #include <SDL_opengl.h>
-#include <SDL_image.h>
 using namespace std;
 
 class Quad {
