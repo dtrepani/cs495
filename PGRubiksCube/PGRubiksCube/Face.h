@@ -11,19 +11,14 @@ using namespace std;
 
 class Face {
 private:
-	typedef struct {
-		Face *top;
-		Face *bottom;
-		Face *left;
-		Face *right;
-	} AdjFace;
-
-	bool rotateAlongX, rotateAlongY;
+	bool rotateAlongX, rotateAlongY, reverseAboutFaceRotation;
 	float rotationAmt;
-	AdjFace adjFace;
+	Face *adjTop, *adjBottom, *adjLeft, *adjRight;
 	Quad *quadsOnFace[3][3];
+
 	void drawQuadsOnFace(GLuint *textureArray, GLfloat (&matrix)[16]);
 	void drawQuad(int col, int row, GLuint *textureArray, GLfloat (&matrix)[16]);
+	void rotateQuadsAbout(Face *destFace, Face *srcFace, Quad *srcQuads[3][3], bool clockwise, bool colToRow, int srcCW);
 	
 	void setRotation(float aRotationAmt, bool aRotateAlongX);
 	void setQuad(Quad *aQuad, int col, int row);

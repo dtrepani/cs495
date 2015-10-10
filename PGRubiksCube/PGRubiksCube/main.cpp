@@ -49,7 +49,7 @@ void initFaces() {
 	}
 	
 	face[0]->setAdjFaces( face[3], face[5], face[4], face[2] );
-	face[1]->setAdjFaces( face[5], face[3], face[4], face[2] );
+	face[1]->setAdjFaces( face[5], face[3], face[2], face[4] );
 }
 
 // Initalize window
