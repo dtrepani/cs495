@@ -1,3 +1,8 @@
+/*
+* Name:			Desiree Trepanier
+* Project:		PG2-4 - Rubik's Cube
+* Description:	
+*/
 #ifndef _FACE_
 #define _FACE_
 
@@ -11,14 +16,23 @@ using namespace std;
 
 class Face {
 private:
-	bool rotateAlongX, rotateAlongY, reverseAboutFaceRotation;
+	typedef struct {
+		Face *face;
+		bool affectsCol;
+		int colOrRowAffected;
+	} AdjFace;
+
+	bool rotateAlongX, rotateAlongY;
 	float rotationAmt;
-	Face *adjTop, *adjBottom, *adjLeft, *adjRight;
+	//Face *adjTop, *adjBottom, *adjLeft, *adjRight; //TC
+	void setAffectedInAdjFaces(bool topAndBottomAffectsCol,	int topColOrRowAffected,	int bottomColOrRowAffected,
+							   bool leftAndRightAffectsCol,	int leftColOrRowAffected,	int rightColOrRowAffected);
+	AdjFace *adjTop, *adjBottom, *adjLeft, *adjRight;
 	Quad *quadsOnFace[3][3];
 
 	void drawQuadsOnFace(GLuint *textureArray, GLfloat (&matrix)[16]);
 	void drawQuad(int col, int row, GLuint *textureArray, GLfloat (&matrix)[16]);
-	void rotateQuadsAbout(Face *destFace, Face *srcFace, Quad *srcQuads[3][3], bool clockwise, bool colToRow, int srcCW);
+	void rotateQuadsAbout(AdjFace *srcFace, AdjFace *destFace, AdjFace *destFaceCCW, Quad *srcQuads[3][3], bool clockwise);
 	
 	void setRotation(float aRotationAmt, bool aRotateAlongX);
 	void setQuad(Quad *aQuad, int col, int row);

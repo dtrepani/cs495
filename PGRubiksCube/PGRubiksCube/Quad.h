@@ -1,3 +1,8 @@
+/*
+* Name:			Desiree Trepanier
+* Project:		PG2-4 - Rubik's Cube
+* Description:	
+*/
 #ifndef _QUAD_
 #define _QUAD_
 

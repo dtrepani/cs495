@@ -1,6 +1,6 @@
 /*
 * Name:			Desiree Trepanier
-* Project:		PG2-3 - Rubiks Cube
+* Project:		PG2-4 - Rubik's Cube
 * Description:	Textured rubik's cube using OpenGL that can be rotated and whose faces can be rotated like that
 *				of an actual rubik's cube.
 */

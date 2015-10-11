@@ -1,3 +1,8 @@
+/*
+* Name:			Desiree Trepanier
+* Project:		PG2-4 - Rubik's Cube
+* Description:	
+*/
 #include "Quad.h"
 
 Quad::Quad(int aTexture, int aTexCol, int aTexRow) {

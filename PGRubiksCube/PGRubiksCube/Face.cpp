@@ -1,3 +1,8 @@
+/*
+* Name:			Desiree Trepanier
+* Project:		PG2-4 - Rubik's Cube
+* Description:	
+*/
 #include "Face.h"
 
 static double twoThirds = 2.0/3.0;
@@ -14,41 +19,53 @@ Face::Face(int textureNum) {
 	switch(textureNum) {
 		case 0: // Top
 			setRotation(-90.0, true);
-			reverseAboutFaceRotation = false;
+			setAffectedInAdjFaces(false, 0, 0, false, 0, 0);
 			break;
 		case 1: // Bottom
 			setRotation(90.0, true);
-			reverseAboutFaceRotation = false;
+			setAffectedInAdjFaces(false, 2, 2, false, 2, 2);
 			break;
 		case 2: // Left
 			setRotation(-90.0, false);
-			reverseAboutFaceRotation = true;
+			setAffectedInAdjFaces(false, 0, 2, true, 2, 0); // TC: bottom might be 0 instead of 2
 			break;
 		case 3: // Front
 			setRotation(0.0, false);
-			reverseAboutFaceRotation = false;
+			setAffectedInAdjFaces(false, 2, 0, true, 2, 0);
 			break;
 		case 4: // Back
 			setRotation(90.0, false);
-			reverseAboutFaceRotation = false;
+			setAffectedInAdjFaces(false, 0, 2, true, 2, 0);
 			break;
 		case 5: // Right
 			setRotation(180.0, false);
-			reverseAboutFaceRotation = true;
+			setAffectedInAdjFaces(false, 2, 0, true, 2, 0);
 			break;
 	}
 }
 
 Face::~Face() {
+	delete adjTop;
+	delete adjBottom;
+	delete adjLeft;
+	delete adjRight;
 	delete[] &quadsOnFace;
+}
+
+void Face::setAffectedInAdjFaces(bool topAndBottomAffectsCol,	int topColOrRowAffected,	int bottomColOrRowAffected,
+								 bool leftAndRightAffectsCol,	int leftColOrRowAffected,	int rightColOrRowAffected) {
+	adjTop		= new AdjFace;	adjTop->affectsCol	  = topAndBottomAffectsCol;		adjTop->colOrRowAffected	= topColOrRowAffected;
+	adjBottom	= new AdjFace;	adjBottom->affectsCol = topAndBottomAffectsCol;		adjBottom->colOrRowAffected	= bottomColOrRowAffected;
+	adjLeft		= new AdjFace;	adjLeft->affectsCol	  = leftAndRightAffectsCol;		adjLeft->colOrRowAffected	= leftColOrRowAffected;
+	adjRight	= new AdjFace;	adjRight->affectsCol  = leftAndRightAffectsCol;		adjRight->colOrRowAffected	= rightColOrRowAffected;
 }
 
 // Each face will need to know which faces are adjacent to it when the cube is rotate is rotated about the face.
 void Face::setAdjFaces(Face *aTop, Face *aBottom, Face *aLeft, Face *aRight) {
-	adjTop = aTop;
-	adjBottom = aBottom;
-	adjLeft = aLeft;
-	adjRight = aRight;
+	adjTop->face = aTop;
+	adjBottom->face = aBottom;
+	adjLeft->face = aLeft;
+	adjRight->face = aRight;
 }
 
 // Rotate to the given face in order to draw the quads.
@@ -87,97 +104,42 @@ void Face::rotateAbout(bool clockwise) {
 	Quad *topFaceBottomRow[3][3];
 	for( int i = 0; i < 3; i++ ) {
 		for( int j = 0; j < 3; j++ ) {
-			//topFaceBottomRow[i][2] = adjTop->getQuad(i, 2); // without loop (only bottom row)
-			topFaceBottomRow[i][j] = adjTop->getQuad(i, j);	
+			topFaceBottomRow[i][j] = adjTop->face->getQuad(i, j);	
 		}
 	}
 	
-	rotateQuadsAbout(adjTop,	adjLeft,	NULL,				clockwise, true,	2);
-	rotateQuadsAbout(adjLeft,	adjBottom,	NULL,				clockwise, false,	0);
-	rotateQuadsAbout(adjBottom, adjRight,	NULL,				clockwise, true,	0);
-	rotateQuadsAbout(adjRight,	NULL,		topFaceBottomRow,	clockwise, false,	2);
-	
-	/*for( int i = 0; i < 3; i++ ) { // CW: Top = Left; CCW: Top = Right
-		int col;
-		if( clockwise ) {
-			col = 2;
-			//adjTop->setQuad( adjLeft->getQuad(col, i), i, 2-col );
-			adjTop->setQuad( adjLeft->getQuad(col, i), 2-i, col );
-			cout << "Putting left's (" << col << ", " << i << ") in top's (" << 2-i << ", " << col << ")" << endl;
-		} else {
-			//col = 0;
-			//adjTop->setQuad( adjFace.right->getQuad(col, i), 2-i, col );
-			col = 0;
-			adjTop->setQuad( adjLeft->getQuad(col, i), i, 2-col );
-		}
-	}
-	
-	for( int i = 0; i < 3; i++ ) { // CW: Left = Bottom; CCW: Right = Bottom
-		int row;
-		if( clockwise ) {
-			row = 0;
-			//adjLeft->setQuad( adjBottom->getQuad(i, row), row, 2-i );
-			adjLeft->setQuad( adjBottom->getQuad(i, row), 2-row, i );
-			cout << "Putting bottom's (" << i << ", " << row << ") in left's (" << 2-row << ", " << i << ")" << endl;
-		} else {
-			//row = 0;
-			//adjRight->setQuad( adjBottom->getQuad(i, row), 2-row, i );
-			row = 2;
-			adjLeft->setQuad( adjBottom->getQuad(i, row), row, 2-i );
-		}
-	}
-
-	for( int i = 0; i < 3; i++ ) { // CW: Bottom = Right; CCW: Bottom = Left
-		int col;
-		if( clockwise ) {
-			col = 0;
-			//adjBottom->setQuad( adjRight->getQuad(col, i), i, 2-col );
-			adjBottom->setQuad( adjRight->getQuad(col, i), 2-i, col );
-			cout << "Putting right's (" << col << ", " << i << ") in bottom's (" << 2-i << ", " << col << ")" << endl;
-		} else {
-			//col = 2;
-			//adjBottom->setQuad( adjLeft->getQuad(col, i), 2-i, col );
-			col = 2;
-			adjBottom->setQuad( adjRight->getQuad(col, i), i, 2-col );
-		}
-	}
-	
-	for( int i = 0; i < 3; i++ ) { // CW: Right = Top (Saved); CCW: Left = Top (Saved)
-		int row;
-		if( clockwise ) {
-			row = 2;
-			adjRight->setQuad( topFaceBottomRow[i][row], 2-row, i );
-			cout << "Putting top's (" << i << ", " << row << ") in right's (" << 2-row << ", " << i << ")" << endl;
-		} else {
-			//row = 2;
-			//adjFace.left->setQuad( topFaceBottomRow[i][row], 2-row, i );
-			row = 0;
-			adjRight->setQuad( topFaceBottomRow[i][row], row, 2-i );
-		}
-	}*/
+	// TC: NOT FINISHED WITH THIS STUFF
+	rotateQuadsAbout(adjLeft,	adjTop,		adjTop,		NULL,				clockwise);
+	rotateQuadsAbout(adjBottom,	adjLeft,	adjBottom,	NULL,				clockwise);
+	rotateQuadsAbout(adjRight,	adjBottom,  adjRight,	NULL,				clockwise);
+	rotateQuadsAbout(adjTop,	adjRight,	adjLeft,	topFaceBottomRow,	clockwise);
 }
 
-void Face::rotateQuadsAbout(Face *destFace, Face *srcFace, Quad *srcQuads[3][3], bool clockwise, bool colToRow, int srcCW) {
-	srcCW = clockwise ? srcCW : (srcCW + 2) % 2;
-
-	for( int i = 0; i < 3; i ++) {
-		int srcCol	= colToRow	? srcCW		:	i,
-			srcRow	= colToRow	? i			:	srcCW,
-			destCol = clockwise ? 2-srcRow	:	srcRow,
-			destRow = clockwise ? srcCol	:	2-srcCol;
-
-		if( colToRow && reverseAboutFaceRotation ) {
-			destCol = clockwise ? srcRow	: 2-srcRow;
-			destRow = clockwise ? 2-srcCol	: srcCol;
-		}
-
-		if( srcFace ) {
-			destFace->setQuad( srcFace->getQuad(srcCol, srcRow), destCol, destRow );
-		} else {
-			destFace->setQuad( srcQuads[srcCol][srcRow], destCol, destRow );
-		}
+void Face::rotateQuadsAbout(AdjFace *srcFace, AdjFace *destFace, AdjFace *destFaceCCW, Quad *srcQuads[3][3], bool clockwise) {
+	for( int i = 0; i < 3; i++ ) {
+		int srcCol, srcRow, destCol, destRow;
 		
-		//cout << "Putting sources's (" << srcCol << ", " << srcRow << ") in destination's (" << destCol << ", " << destRow << ")" << endl;
+		if( srcFace->affectsCol ) {
+			srcCol = srcFace->colOrRowAffected;
+			srcRow = i;
+		} else {
+			srcCol = i;
+			srcRow = srcFace->colOrRowAffected;
+		}
+
+		if( destFace->affectsCol ) {
+			destCol = destFace->colOrRowAffected;
+			destRow = clockwise? i : 2 - i;
+		} else {
+			destCol = clockwise? i : 2 - i;
+			destRow = destFace->colOrRowAffected;
+		}
+
+		if( srcFace != adjTop ) {
+			destFace->face->setQuad( srcFace->face->getQuad( srcCol, srcRow ), destCol, destRow );
+		} else {
+			destFace->face->setQuad( srcQuads[srcCol][srcRow], destCol, destRow );
+		}
 	}
 }
 
