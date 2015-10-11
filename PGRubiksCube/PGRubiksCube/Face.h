@@ -1,7 +1,7 @@
 /*
 * Name:			Desiree Trepanier
 * Project:		PG2-4 - Rubik's Cube
-* Description:	
+* Description:
 */
 #ifndef _FACE_
 #define _FACE_
@@ -32,8 +32,8 @@ private:
 
 	void drawQuadsOnFace(GLuint *textureArray, GLfloat (&matrix)[16]);
 	void drawQuad(int col, int row, GLuint *textureArray, GLfloat (&matrix)[16]);
-	void rotateQuadsAbout(AdjFace *srcFace, AdjFace *destFace, AdjFace *destFaceCCW, Quad *srcQuads[3][3], bool clockwise);
-	
+	void rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[3][3]);
+
 	void setRotation(float aRotationAmt, bool aRotateAlongX);
 	void setQuad(Quad *aQuad, int col, int row);
 	Quad * getQuad(int col, int row);

@@ -1,13 +1,16 @@
 /*
 * Name:			Desiree Trepanier
 * Project:		PG2-4 - Rubik's Cube
-* Description:	
+* Description:
 */
 #include "Face.h"
 
-static double twoThirds = 2.0/3.0;
+/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO:
+	- Fix orientation of quads when rotated to different face
+	- Quads mixing up when multiple rotations occur?
+*/
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO: ROTATE QUADS WHEN ROTATE ABOUT FACE
+static double twoThirds = 2.0/3.0;
 
 Face::Face(int textureNum) {
 	for(int i = 0; i < 3; i ++) {
@@ -27,19 +30,19 @@ Face::Face(int textureNum) {
 			break;
 		case 2: // Left
 			setRotation(-90.0, false);
-			setAffectedInAdjFaces(false, 0, 2, true, 2, 0); // TC: bottom might be 0 instead of 2
+			setAffectedInAdjFaces(true, 0, 0, true, 2, 0);
 			break;
 		case 3: // Front
 			setRotation(0.0, false);
 			setAffectedInAdjFaces(false, 2, 0, true, 2, 0);
 			break;
-		case 4: // Back
+		case 4: // Right
 			setRotation(90.0, false);
-			setAffectedInAdjFaces(false, 0, 2, true, 2, 0);
+			setAffectedInAdjFaces(true, 2, 2, true, 2, 0);
 			break;
-		case 5: // Right
+		case 5: // Back
 			setRotation(180.0, false);
-			setAffectedInAdjFaces(false, 2, 0, true, 2, 0);
+			setAffectedInAdjFaces(false, 0, 2, true, 2, 0);
 			break;
 	}
 }
@@ -88,14 +91,14 @@ void Face::rotateAbout(bool clockwise) {
 			quadsOnFace[i][j]->addToAngle(rotation);
 		}
 	}
-	
+
 	for( int i = 0; i < 3; i++ ) {
 		for( int j = 0; j < 3; j++ ) {
 			if( !(i == 1 && j == 1) ) { // is not section 5
 				if( clockwise ) {
 					quadsOnFace[2-j][i] = quadsBeforeRotation[i][j];
 				} else {
-					quadsOnFace[j][2-i] = quadsBeforeRotation[i][j];				
+					quadsOnFace[j][2-i] = quadsBeforeRotation[i][j];
 				}
 			}
 		}
@@ -104,21 +107,40 @@ void Face::rotateAbout(bool clockwise) {
 	Quad *topFaceBottomRow[3][3];
 	for( int i = 0; i < 3; i++ ) {
 		for( int j = 0; j < 3; j++ ) {
-			topFaceBottomRow[i][j] = adjTop->face->getQuad(i, j);	
+			topFaceBottomRow[i][j] = adjTop->face->getQuad(i, j);
 		}
 	}
-	
-	// TC: NOT FINISHED WITH THIS STUFF
-	rotateQuadsAbout(adjLeft,	adjTop,		adjTop,		NULL,				clockwise);
-	rotateQuadsAbout(adjBottom,	adjLeft,	adjBottom,	NULL,				clockwise);
-	rotateQuadsAbout(adjRight,	adjBottom,  adjRight,	NULL,				clockwise);
-	rotateQuadsAbout(adjTop,	adjRight,	adjLeft,	topFaceBottomRow,	clockwise);
+
+	if(clockwise) {
+		rotateQuadsAbout(adjTop,	adjLeft,	NULL);
+		rotateQuadsAbout(adjLeft,	adjBottom,	NULL);
+		rotateQuadsAbout(adjBottom, adjRight,	NULL);
+		rotateQuadsAbout(adjRight,	adjTop,		topFaceBottomRow);
+	} else {
+		rotateQuadsAbout(adjTop,	adjRight,	NULL);
+		rotateQuadsAbout(adjRight,	adjBottom,	NULL);
+		rotateQuadsAbout(adjBottom, adjLeft,	NULL);
+		rotateQuadsAbout(adjLeft,	adjTop,		topFaceBottomRow);
+	}
 }
 
-void Face::rotateQuadsAbout(AdjFace *srcFace, AdjFace *destFace, AdjFace *destFaceCCW, Quad *srcQuads[3][3], bool clockwise) {
+
+// Rotates one side of a face to another side.
+// The face that is being rotated about knows which columns or rows of its adjacent faces
+// are affected when it rotates. The top adjacent face will always be overwritten when
+// rotating about this face, thus needs a copy of its quads passed in order to set the destination
+// face to its proper quads.
+void Face::rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[3][3]) {
 	for( int i = 0; i < 3; i++ ) {
 		int srcCol, srcRow, destCol, destRow;
-		
+
+		/*
+		int destCol = destFace->affectsCol ? destFace->colOrRowAffected : i,
+			destRow = destFace->affectsCol ? i : destFace->colOrRowAffected,
+			srcCol	= srcFace->affectsCol ? srcFace->colOrRowAffected : i,
+			srcRow	= srcFace->affectsCol ? i : srcFace->colOrRowAffected;
+			*/
+
 		if( srcFace->affectsCol ) {
 			srcCol = srcFace->colOrRowAffected;
 			srcRow = i;
@@ -129,9 +151,9 @@ void Face::rotateQuadsAbout(AdjFace *srcFace, AdjFace *destFace, AdjFace *destFa
 
 		if( destFace->affectsCol ) {
 			destCol = destFace->colOrRowAffected;
-			destRow = clockwise? i : 2 - i;
+			destRow = i;
 		} else {
-			destCol = clockwise? i : 2 - i;
+			destCol = i;
 			destRow = destFace->colOrRowAffected;
 		}
 
@@ -156,7 +178,7 @@ void Face::drawSelf(GLuint *textureArray, GLfloat (&matrix)[16]) {
 	glEnd();
 
 	drawQuadsOnFace(textureArray, matrix);
-	
+
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 }
 
@@ -201,7 +223,7 @@ void Face::drawQuad(int col, int row, GLuint *textureArray, GLfloat (&matrix)[16
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 	quadsOnFace[col][row]->drawSelf(textureArray, matrix);
 	//glLoadMatrixf(matrix);
-	
+
 	glPopMatrix();
 }
 
