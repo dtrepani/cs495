@@ -1,7 +1,8 @@
 /*
 * Name:			Desiree Trepanier
 * Project:		PG2-4 - Rubik's Cube
-* Description:	
+* Description:	The quads on the cube. A quad knows its texture, its position on the texture, the
+				angle its drawn at, and how to draw itself.
 */
 #ifndef _QUAD_
 #define _QUAD_

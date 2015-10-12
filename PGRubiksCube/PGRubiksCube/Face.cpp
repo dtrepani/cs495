@@ -1,7 +1,8 @@
 /*
 * Name:			Desiree Trepanier
 * Project:		PG2-4 - Rubik's Cube
-* Description:
+* Description:	The faces of the cube. A face knows which quads are on it, its adjacent faces and
+				how its rotation affects those faces, and how to draw itself.
 */
 #include "Face.h"
 
@@ -10,16 +11,18 @@
 	- Quads mixing up when multiple rotations occur?
 */
 
-static double twoThirds = 2.0/3.0;
-
-Face::Face(int textureNum) {
-	for(int i = 0; i < 3; i ++) {
-		for(int j = 0; j < 3; j++) {
-			quadsOnFace[i][j] = new Quad(textureNum, i, j);
+Face::Face(int faceNum) {
+	for( int i = 0; i < 3; i ++ ) {
+		for( int j = 0; j < 3; j++ ) {
+			quadsOnFace[i][j] = new Quad(faceNum, i, j);
 		}
 	}
 
-	switch(textureNum) {
+	for( int i = 0; i < 4; i++ ) {
+		adjFaces[i] = new AdjFace;
+	}
+
+	switch(faceNum) {
 		case 0: // Top
 			setRotation(-90.0, true);
 			setAffectedInAdjFaces(false, 0, 0, false, 0, 0);
@@ -48,27 +51,16 @@ Face::Face(int textureNum) {
 }
 
 Face::~Face() {
-	delete adjTop;
-	delete adjBottom;
-	delete adjLeft;
-	delete adjRight;
+	delete[] &adjFaces;
 	delete[] &quadsOnFace;
-}
-
-void Face::setAffectedInAdjFaces(bool topAndBottomAffectsCol,	int topColOrRowAffected,	int bottomColOrRowAffected,
-								 bool leftAndRightAffectsCol,	int leftColOrRowAffected,	int rightColOrRowAffected) {
-	adjTop		= new AdjFace;	adjTop->affectsCol	  = topAndBottomAffectsCol;		adjTop->colOrRowAffected	= topColOrRowAffected;
-	adjBottom	= new AdjFace;	adjBottom->affectsCol = topAndBottomAffectsCol;		adjBottom->colOrRowAffected	= bottomColOrRowAffected;
-	adjLeft		= new AdjFace;	adjLeft->affectsCol	  = leftAndRightAffectsCol;		adjLeft->colOrRowAffected	= leftColOrRowAffected;
-	adjRight	= new AdjFace;	adjRight->affectsCol  = leftAndRightAffectsCol;		adjRight->colOrRowAffected	= rightColOrRowAffected;
 }
 
 // Each face will need to know which faces are adjacent to it when the cube is rotate is rotated about the face.
 void Face::setAdjFaces(Face *aTop, Face *aBottom, Face *aLeft, Face *aRight) {
-	adjTop->face = aTop;
-	adjBottom->face = aBottom;
-	adjLeft->face = aLeft;
-	adjRight->face = aRight;
+	adjFaces[TOP]->face	= aTop;
+	adjFaces[BOTTOM]->face = aBottom;
+	adjFaces[LEFT]->face	= aLeft;
+	adjFaces[RIGHT]->face	= aRight;
 }
 
 // Rotate to the given face in order to draw the quads.
@@ -80,11 +72,14 @@ void Face::rotateToSelf(GLfloat (&matrix)[16]) {
 
 // Rotates the face and all quads touching the face on adjacent faces.
 // The quads on the face will rotate as well as move positions.
-// The quads on adjacent faces will not rotate, but will move positions and move to another face.
+// The quads on adjacent faces will move positions and move to another face. 
+// They may need to rotate to keep their orientation on the new face.
 void Face::rotateAbout(bool clockwise) {
 	int rotation = clockwise ? -90 : 90;
 	Quad *quadsBeforeRotation[3][3];
 	memcpy(&quadsBeforeRotation[0][0], &quadsOnFace[0][0], sizeof(quadsBeforeRotation[0][0]) * 9);
+	
+	angle = ( angle + rotation ) % 360;
 
 	for( int i = 0; i < 3; i++ ) {
 		for( int j = 0; j < 3; j++ ) {
@@ -104,65 +99,7 @@ void Face::rotateAbout(bool clockwise) {
 		}
 	}
 
-	Quad *topFaceBottomRow[3][3];
-	for( int i = 0; i < 3; i++ ) {
-		for( int j = 0; j < 3; j++ ) {
-			topFaceBottomRow[i][j] = adjTop->face->getQuad(i, j);
-		}
-	}
-
-	if(clockwise) {
-		rotateQuadsAbout(adjTop,	adjLeft,	NULL);
-		rotateQuadsAbout(adjLeft,	adjBottom,	NULL);
-		rotateQuadsAbout(adjBottom, adjRight,	NULL);
-		rotateQuadsAbout(adjRight,	adjTop,		topFaceBottomRow);
-	} else {
-		rotateQuadsAbout(adjTop,	adjRight,	NULL);
-		rotateQuadsAbout(adjRight,	adjBottom,	NULL);
-		rotateQuadsAbout(adjBottom, adjLeft,	NULL);
-		rotateQuadsAbout(adjLeft,	adjTop,		topFaceBottomRow);
-	}
-}
-
-
-// Rotates one side of a face to another side.
-// The face that is being rotated about knows which columns or rows of its adjacent faces
-// are affected when it rotates. The top adjacent face will always be overwritten when
-// rotating about this face, thus needs a copy of its quads passed in order to set the destination
-// face to its proper quads.
-void Face::rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[3][3]) {
-	for( int i = 0; i < 3; i++ ) {
-		int srcCol, srcRow, destCol, destRow;
-
-		/*
-		int destCol = destFace->affectsCol ? destFace->colOrRowAffected : i,
-			destRow = destFace->affectsCol ? i : destFace->colOrRowAffected,
-			srcCol	= srcFace->affectsCol ? srcFace->colOrRowAffected : i,
-			srcRow	= srcFace->affectsCol ? i : srcFace->colOrRowAffected;
-			*/
-
-		if( srcFace->affectsCol ) {
-			srcCol = srcFace->colOrRowAffected;
-			srcRow = i;
-		} else {
-			srcCol = i;
-			srcRow = srcFace->colOrRowAffected;
-		}
-
-		if( destFace->affectsCol ) {
-			destCol = destFace->colOrRowAffected;
-			destRow = i;
-		} else {
-			destCol = i;
-			destRow = destFace->colOrRowAffected;
-		}
-
-		if( srcFace != adjTop ) {
-			destFace->face->setQuad( srcFace->face->getQuad( srcCol, srcRow ), destCol, destRow );
-		} else {
-			destFace->face->setQuad( srcQuads[srcCol][srcRow], destCol, destRow );
-		}
-	}
+	rotateQuadsAboutOrder(clockwise);
 }
 
 // Draw the underlying black quad and then the quads currently on this face.
@@ -182,23 +119,14 @@ void Face::drawSelf(GLuint *textureArray, GLfloat (&matrix)[16]) {
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 }
 
-// Set the face's rotation angle and whether its on the x or y-axis.
-// Allows the face to know where to rotate to get to itself.
-void Face::setRotation(float aRotationAmt, bool aRotateAlongX) {
-	rotationAmt = (float) aRotationAmt;
-	if(aRotateAlongX) {
-		rotateAlongX = true;
-		rotateAlongY = false;
-	} else {
-		rotateAlongX = false;
-		rotateAlongY = true;
-	}
-}
+
 
 // The face draws each of the quads currently on it.
 // The quads do not know how to get to themselves to draw themselves, so translation
 // on the face level is necessary.
 void Face::drawQuadsOnFace(GLuint *textureArray, GLfloat (&matrix)[16]) {
+	double twoThirds = 2.0/3.0;
+
 	glTranslatef( twoThirds * -1.0, twoThirds * -1.0, 0 );
 	glColor3f(1, 1, 1);
 
@@ -219,18 +147,83 @@ void Face::drawQuadsOnFace(GLuint *textureArray, GLfloat (&matrix)[16]) {
 // respective angles, so the current matrix must be given to them.
 void Face::drawQuad(int col, int row, GLuint *textureArray, GLfloat (&matrix)[16]) {
 	glPushMatrix();
-
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 	quadsOnFace[col][row]->drawSelf(textureArray, matrix);
-	//glLoadMatrixf(matrix);
-
 	glPopMatrix();
 }
 
+// Set the face's rotation angle and whether its on the x or y-axis.
+// Allows the face to know where to rotate to get to itself.
+void Face::setRotation(float aRotationAmt, bool aRotateAlongX) {
+	rotationAmt = (float) aRotationAmt;
+	if(aRotateAlongX) {
+		rotateAlongX = true;
+		rotateAlongY = false;
+	} else {
+		rotateAlongX = false;
+		rotateAlongY = true;
+	}
+}
+
+// Depending on if the face is rotating clockwise or counterclockwise, the left or right adjacent
+// face will need to switch places in rotation order. The top adjacent face will always be overwritten
+// so a copy of its quads must be made.
+void Face::rotateQuadsAboutOrder(bool clockwise) {
+	AdjFace *firstAdjFace  = clockwise ? adjFaces[LEFT]  : adjFaces[RIGHT];
+	AdjFace *secondAdjFace = clockwise ? adjFaces[RIGHT] : adjFaces[LEFT];
+	Quad *topAdjFace[3][3];
+
+	for( int i = 0; i < 3; i++ ) {
+		for( int j = 0; j < 3; j++ ) {
+			topAdjFace[i][j] = adjFaces[TOP]->face->getQuad(i, j);
+		}
+	}
+
+	rotateQuadsAbout(adjFaces[TOP],		firstAdjFace,		NULL);
+	rotateQuadsAbout(firstAdjFace,		adjFaces[BOTTOM],	NULL);
+	rotateQuadsAbout(adjFaces[BOTTOM],	secondAdjFace,		NULL);
+	rotateQuadsAbout(secondAdjFace,		adjFaces[TOP],		topAdjFace);
+}
+
+// Rotates one side of a face to another side.
+// The face that is being rotated about knows which columns or rows of its adjacent faces
+// are affected when it rotates. The top adjacent face will always be overwritten when
+// rotating about this face, thus needs a copy of its quads passed in order to set the destination
+// face to its proper quads.
+void Face::rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[3][3]) {
+	for( int i = 0; i < 3; i++ ) {		
+		int destCol = destFace->affectsCol	? destFace->colOrRowAffected	: i,
+			destRow = destFace->affectsCol	? i								: destFace->colOrRowAffected,
+			srcCol	= srcFace->affectsCol	? srcFace->colOrRowAffected		: i,
+			srcRow	= srcFace->affectsCol	? i								: srcFace->colOrRowAffected;
+
+		if( srcFace != adjFaces[TOP] ) {
+			destFace->face->setQuad( srcFace->face->getQuad( srcCol, srcRow ), destCol, destRow );
+		} else {
+			destFace->face->setQuad( srcQuads[srcCol][srcRow], destCol, destRow );
+		}
+	}
+}
+
+// When rotating, the face will need to know how its rotation will affect its adjacent 
+// faces as each face will affects its adjacent faces differently.
+void Face::setAffectedInAdjFaces(bool topAndBottomAffectsCol,	int topColOrRowAffected,	int bottomColOrRowAffected,
+								 bool leftAndRightAffectsCol,	int leftColOrRowAffected,	int rightColOrRowAffected) {
+	adjFaces[TOP]->affectsCol	  = topAndBottomAffectsCol;		adjFaces[TOP]->colOrRowAffected	= topColOrRowAffected;
+	adjFaces[BOTTOM]->affectsCol = topAndBottomAffectsCol;		adjFaces[BOTTOM]->colOrRowAffected	= bottomColOrRowAffected;
+	adjFaces[LEFT]->affectsCol	  = leftAndRightAffectsCol;		adjFaces[LEFT]->colOrRowAffected	= leftColOrRowAffected;
+	adjFaces[RIGHT]->affectsCol  = leftAndRightAffectsCol;		adjFaces[RIGHT]->colOrRowAffected	= rightColOrRowAffected;
+}
+
+											// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO: setQuad should adjust the quad to the orientation of the new face
 void Face::setQuad(Quad *aQuad, int col, int row) {
 	quadsOnFace[col][row] = aQuad;
 }
 
 Quad * Face::getQuad(int col, int row) {
 	return quadsOnFace[col][row];
+}
+
+int Face::getAngle() {
+	return angle;
 }

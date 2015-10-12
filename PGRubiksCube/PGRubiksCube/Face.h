@@ -1,7 +1,8 @@
 /*
 * Name:			Desiree Trepanier
 * Project:		PG2-4 - Rubik's Cube
-* Description:
+* Description:	The faces of the cube. A face knows which quads are on it, its adjacent faces and
+				how its rotation affects those faces, and how to draw itself.
 */
 #ifndef _FACE_
 #define _FACE_
@@ -14,6 +15,11 @@
 #include "Quad.h"
 using namespace std;
 
+#define TOP 0
+#define BOTTOM 1
+#define LEFT 2
+#define RIGHT 3
+
 class Face {
 private:
 	typedef struct {
@@ -22,21 +28,22 @@ private:
 		int colOrRowAffected;
 	} AdjFace;
 
+	int angle;
 	bool rotateAlongX, rotateAlongY;
 	float rotationAmt;
-	//Face *adjTop, *adjBottom, *adjLeft, *adjRight; //TC
-	void setAffectedInAdjFaces(bool topAndBottomAffectsCol,	int topColOrRowAffected,	int bottomColOrRowAffected,
-							   bool leftAndRightAffectsCol,	int leftColOrRowAffected,	int rightColOrRowAffected);
-	AdjFace *adjTop, *adjBottom, *adjLeft, *adjRight;
+	AdjFace *adjFaces[4];
 	Quad *quadsOnFace[3][3];
-
 	void drawQuadsOnFace(GLuint *textureArray, GLfloat (&matrix)[16]);
 	void drawQuad(int col, int row, GLuint *textureArray, GLfloat (&matrix)[16]);
-	void rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[3][3]);
-
 	void setRotation(float aRotationAmt, bool aRotateAlongX);
+	void rotateQuadsAboutOrder(bool clockwise);
+	void rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[3][3]);
+	void setAffectedInAdjFaces(bool topAndBottomAffectsCol,	int topColOrRowAffected,	int bottomColOrRowAffected,
+							   bool leftAndRightAffectsCol,	int leftColOrRowAffected,	int rightColOrRowAffected);
+
 	void setQuad(Quad *aQuad, int col, int row);
 	Quad * getQuad(int col, int row);
+	int getAngle();
 
 public:
 	Face(int aFaceNum);

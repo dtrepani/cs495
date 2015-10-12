@@ -1,7 +1,8 @@
 /*
 * Name:			Desiree Trepanier
 * Project:		PG2-4 - Rubik's Cube
-* Description:	
+* Description:	The quads on the cube. A quad knows its texture, its position on the texture, the
+				angle its drawn at, and how to draw itself.
 */
 #include "Quad.h"
 
@@ -15,10 +16,14 @@ Quad::Quad(int aTexture, int aTexCol, int aTexRow) {
 Quad::~Quad() {
 }
 
+// The quad may need to be rotated as the faces rotate on the cube.
 void Quad::addToAngle(int angleToBeAdded) {
 	angle = ( angle + angleToBeAdded ) % 360;
 }
 
+// Draw the quad. The matrix given should already be setup for the quad to draw itself. The quad
+// knows what texture and what part of the texture to draw on itself as well to draw itself slightly
+// off the face to avoid clipping.
 void Quad::drawSelf(GLuint *textureArray, GLfloat (&matrix)[16]) {
 	double	oneThird = 0.325,
 			negOneThird = -0.325,
@@ -37,6 +42,4 @@ void Quad::drawSelf(GLuint *textureArray, GLfloat (&matrix)[16]) {
 		glTexCoord2f( colX + oneThird,	rowY			);	glVertex3f( oneThird,		oneThird,		zWithOffset );
 		glTexCoord2f( colX,				rowY			);	glVertex3f( negOneThird,	oneThird,		zWithOffset );
 	glEnd();
-
-	//glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 }
