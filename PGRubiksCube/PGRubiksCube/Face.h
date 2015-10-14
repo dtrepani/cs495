@@ -29,7 +29,7 @@ private:
 	} AdjFace;
 
 	int angle;
-	bool rotateAlongX, rotateAlongY;
+	bool rotateAlongX, rotateAlongY, rotateQuads;
 	float rotationAmt;
 	AdjFace *adjFaces[4];
 	Quad *quadsOnFace[3][3];
@@ -37,11 +37,11 @@ private:
 	void drawQuad(int col, int row, GLuint *textureArray, GLfloat (&matrix)[16]);
 	void setRotation(float aRotationAmt, bool aRotateAlongX);
 	void rotateQuadsAboutOrder(bool clockwise);
-	void rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[3][3]);
+	void rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[3][3], bool clockwise);
 	void setAffectedInAdjFaces(bool topAndBottomAffectsCol,	int topColOrRowAffected,	int bottomColOrRowAffected,
 							   bool leftAndRightAffectsCol,	int leftColOrRowAffected,	int rightColOrRowAffected);
 
-	void setQuad(Quad *aQuad, int col, int row);
+	void setQuad(Quad *aQuad, int col, int row, int angle);
 	Quad * getQuad(int col, int row);
 	int getAngle();
 

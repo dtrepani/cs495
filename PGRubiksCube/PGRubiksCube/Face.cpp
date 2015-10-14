@@ -26,26 +26,32 @@ Face::Face(int faceNum) {
 		case 0: // Top
 			setRotation(-90.0, true);
 			setAffectedInAdjFaces(false, 0, 0, false, 0, 0);
+			rotateQuads = false;
 			break;
 		case 1: // Bottom
 			setRotation(90.0, true);
 			setAffectedInAdjFaces(false, 2, 2, false, 2, 2);
+			rotateQuads = false;
 			break;
 		case 2: // Left
 			setRotation(-90.0, false);
 			setAffectedInAdjFaces(true, 0, 0, true, 2, 0);
+			rotateQuads = true;
 			break;
 		case 3: // Front
 			setRotation(0.0, false);
 			setAffectedInAdjFaces(false, 2, 0, true, 2, 0);
+			rotateQuads = true;
 			break;
 		case 4: // Right
 			setRotation(90.0, false);
 			setAffectedInAdjFaces(true, 2, 2, true, 2, 0);
+			rotateQuads = true;
 			break;
 		case 5: // Back
 			setRotation(180.0, false);
 			setAffectedInAdjFaces(false, 0, 2, true, 2, 0);
+			rotateQuads = true;
 			break;
 	}
 }
@@ -152,7 +158,7 @@ void Face::drawQuad(int col, int row, GLuint *textureArray, GLfloat (&matrix)[16
 	glPopMatrix();
 }
 
-// Set the face's rotation angle and whether its on the x or y-axis.
+// Set the face's rotation angle, whether its on the x or y-axis.
 // Allows the face to know where to rotate to get to itself.
 void Face::setRotation(float aRotationAmt, bool aRotateAlongX) {
 	rotationAmt = (float) aRotationAmt;
@@ -179,10 +185,10 @@ void Face::rotateQuadsAboutOrder(bool clockwise) {
 		}
 	}
 
-	rotateQuadsAbout(adjFaces[TOP],		firstAdjFace,		NULL);
-	rotateQuadsAbout(firstAdjFace,		adjFaces[BOTTOM],	NULL);
-	rotateQuadsAbout(adjFaces[BOTTOM],	secondAdjFace,		NULL);
-	rotateQuadsAbout(secondAdjFace,		adjFaces[TOP],		topAdjFace);
+	rotateQuadsAbout(adjFaces[TOP],		firstAdjFace,		NULL,		clockwise);
+	rotateQuadsAbout(firstAdjFace,		adjFaces[BOTTOM],	NULL,		clockwise);
+	rotateQuadsAbout(adjFaces[BOTTOM],	secondAdjFace,		NULL,		clockwise);
+	rotateQuadsAbout(secondAdjFace,		adjFaces[TOP],		topAdjFace,	clockwise);
 }
 
 // Rotates one side of a face to another side.
@@ -190,17 +196,24 @@ void Face::rotateQuadsAboutOrder(bool clockwise) {
 // are affected when it rotates. The top adjacent face will always be overwritten when
 // rotating about this face, thus needs a copy of its quads passed in order to set the destination
 // face to its proper quads.
-void Face::rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[3][3]) {
-	for( int i = 0; i < 3; i++ ) {		
-		int destCol = destFace->affectsCol	? destFace->colOrRowAffected	: i,
-			destRow = destFace->affectsCol	? i								: destFace->colOrRowAffected,
-			srcCol	= srcFace->affectsCol	? srcFace->colOrRowAffected		: i,
-			srcRow	= srcFace->affectsCol	? i								: srcFace->colOrRowAffected;
+void Face::rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[3][3], bool clockwise) {
+	int rotation = rotateQuads ? (clockwise ? -90 : 90) : 0;
+
+	// TODO:	Reverse copy order from bottom face for front and back face (2 maps to 0 rather than 0 maps to 0)
+	//			Quad rotation also reversed for all faces with src Bottom (90 == -90 and vice versa))
+	// IDEA:	Add reverse bool to AdjFace
+
+	for( int i = 0; i < 3; i++ ) {	
+		int index	= (srcFace == adjFaces[BOTTOM] /*&& (this == back || this == front)*/ ) ? 2 - i : i, // NOT WORKING
+			destCol = destFace->affectsCol	? destFace->colOrRowAffected	: index,
+			destRow = destFace->affectsCol	? index							: destFace->colOrRowAffected,
+			srcCol	= srcFace->affectsCol	? srcFace->colOrRowAffected		: index,
+			srcRow	= srcFace->affectsCol	? index							: srcFace->colOrRowAffected;
 
 		if( srcFace != adjFaces[TOP] ) {
-			destFace->face->setQuad( srcFace->face->getQuad( srcCol, srcRow ), destCol, destRow );
+			destFace->face->setQuad( srcFace->face->getQuad( srcCol, srcRow ), destCol, destRow, rotation );
 		} else {
-			destFace->face->setQuad( srcQuads[srcCol][srcRow], destCol, destRow );
+			destFace->face->setQuad( srcQuads[srcCol][srcRow], destCol, destRow, rotation );
 		}
 	}
 }
@@ -216,8 +229,9 @@ void Face::setAffectedInAdjFaces(bool topAndBottomAffectsCol,	int topColOrRowAff
 }
 
 											// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO: setQuad should adjust the quad to the orientation of the new face
-void Face::setQuad(Quad *aQuad, int col, int row) {
+void Face::setQuad(Quad *aQuad, int col, int row, int angle) {
 	quadsOnFace[col][row] = aQuad;
+	quadsOnFace[col][row]->addToAngle(angle);
 }
 
 Quad * Face::getQuad(int col, int row) {
