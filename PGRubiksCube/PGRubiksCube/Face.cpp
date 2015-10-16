@@ -195,7 +195,11 @@ void Face::rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[
 	int rotation = rotateQuads ? (clockwise ? -90 : 90) : 0;
 	int destAnimAngle = animAngle;
 	int destAnimAxis = destFace->affectsCol ? X : Y;
-	bool topOrBottomFace = isTopOrBottomFace(clockwise ? destFace : srcFace);
+	bool reverseI = //clockwise ? (srcFace->affectsCol && !destFace->affectsCol)
+					//		  : (!srcFace->affectsCol && destFace->affectsCol);
+					//isTopOrBottomFace(clockwise ? destFace : srcFace);
+					false;
+		// Only works on face 1
 
 	for( int i = 0; i < 4; i++ ) {
 		if( destFace == adjFaces[i] && !adjFaces[i]->animPositiveDir ) {
@@ -205,8 +209,8 @@ void Face::rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[
 	}
 
 	for( int i = 0; i < 3; i++ ) {	
-		int destCol = destFace->affectsCol	? destFace->colOrRowAffected : (topOrBottomFace ? 2 - i : i),
-			destRow = destFace->affectsCol	? (topOrBottomFace ? 2 - i : i) : destFace->colOrRowAffected,
+		int destCol = destFace->affectsCol	? destFace->colOrRowAffected : (reverseI ? 2 - i : i),
+			destRow = destFace->affectsCol	? (reverseI ? 2 - i : i) : destFace->colOrRowAffected,
 			srcCol	= srcFace->affectsCol	? srcFace->colOrRowAffected	: i,
 			srcRow	= srcFace->affectsCol	? i	: srcFace->colOrRowAffected;
 
