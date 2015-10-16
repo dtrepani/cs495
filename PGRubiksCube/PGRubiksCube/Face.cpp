@@ -6,9 +6,11 @@
 */
 #include "Face.h"
 
-Face::Face(int faceNum) {
+// TODO: Fix rotating quads on top and bottom faces when rotating about face
+
+Face::Face(int aFaceNum) {
 	animAngle = 0;
-	bottomFace = false;
+	faceNum = aFaceNum;
 
 	for( int i = 0; i < 3; i ++ ) {
 		for( int j = 0; j < 3; j++ ) {
@@ -37,7 +39,6 @@ Face::Face(int faceNum) {
 		case 1: // Bottom
 			setFaceInformation(90.0, true, false);
 			setAffectedInAdjFaces(false, 2, 2, false, 2, 2, animPositiveDirs);
-			bottomFace = true;
 			break;
 		case 2: // Left
 			setFaceInformation(-90.0, false, true);
@@ -166,7 +167,7 @@ void Face::setRotation(float aRotationAmt, bool aRotateAlongX) {
 // so a copy of its quads must be made.
 // The bottom face of the cube's adjacent faces will rotate opposite of what the other faces would.
 void Face::rotateQuadsAboutOrder(bool clockwise) {
-	if(bottomFace) clockwise = !clockwise;
+	if(isBottomFace()) clockwise = !clockwise;
 
 	AdjFace *firstAdjFace  = clockwise ? adjFaces[LEFT]  : adjFaces[RIGHT];
 	AdjFace *secondAdjFace = clockwise ? adjFaces[RIGHT] : adjFaces[LEFT];
@@ -184,6 +185,7 @@ void Face::rotateQuadsAboutOrder(bool clockwise) {
 	rotateQuadsAbout(secondAdjFace,		adjFaces[TOP],		topAdjFace,	clockwise);
 }
 
+// TODO: Fix comment
 // Rotates one side of a face to another side.
 // The face that is being rotated about knows which columns or rows of its adjacent faces
 // are affected when it rotates. The top adjacent face will always be overwritten when
@@ -193,6 +195,7 @@ void Face::rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[
 	int rotation = rotateQuads ? (clockwise ? -90 : 90) : 0;
 	int destAnimAngle = animAngle;
 	int destAnimAxis = destFace->affectsCol ? X : Y;
+	bool topOrBottomFace = isTopOrBottomFace(clockwise ? destFace : srcFace);
 
 	for( int i = 0; i < 4; i++ ) {
 		if( destFace == adjFaces[i] && !adjFaces[i]->animPositiveDir ) {
@@ -201,16 +204,11 @@ void Face::rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[
 		}
 	}
 
-	// TODO:	Reverse copy order from bottom face for front and back face (2 maps to 0 rather than 0 maps to 0)
-	//			Quad rotation also reversed for all faces with src Bottom (90 == -90 and vice versa))
-	// IDEA:	Add reverse bool to AdjFace
-
 	for( int i = 0; i < 3; i++ ) {	
-		int index	= /*(srcFace == adjFaces[BOTTOM] && (this == back || this == front) ) ? 2 - i :*/ i, // NOT WORKING
-			destCol = destFace->affectsCol	? destFace->colOrRowAffected	: index,
-			destRow = destFace->affectsCol	? index							: destFace->colOrRowAffected,
-			srcCol	= srcFace->affectsCol	? srcFace->colOrRowAffected		: index,
-			srcRow	= srcFace->affectsCol	? index							: srcFace->colOrRowAffected;
+		int destCol = destFace->affectsCol	? destFace->colOrRowAffected : (topOrBottomFace ? 2 - i : i),
+			destRow = destFace->affectsCol	? (topOrBottomFace ? 2 - i : i) : destFace->colOrRowAffected,
+			srcCol	= srcFace->affectsCol	? srcFace->colOrRowAffected	: i,
+			srcRow	= srcFace->affectsCol	? i	: srcFace->colOrRowAffected;
 
 		if( srcFace != adjFaces[TOP] ) {
 			destFace->face->setQuad( srcFace->face->getQuad( srcCol, srcRow ), destCol, destRow, rotation, destAnimAngle, destAnimAxis );
@@ -244,7 +242,6 @@ void Face::setAffectedInAdjFaces(bool topAndBottomAffectsCol,	int topColOrRowAff
 	adjFaces[RIGHT]->animPositiveDir	= animPositiveDirs[RIGHT];
 }
 
-			// ===================================== TODO: setQuad should adjust the quad to the orientation of the new face
 void Face::setQuad(Quad *aQuad, int col, int row, int angle, int animAngle, int animAxis) {
 	quadsOnFace[col][row] = aQuad;
 	quadsOnFace[col][row]->addToAngle(angle, animAngle, animAxis);
@@ -254,6 +251,14 @@ Quad * Face::getQuad(int col, int row) {
 	return quadsOnFace[col][row];
 }
 
-int Face::getAngle() { // TODO: Check if needed in the end
-	return angle;
+bool Face::isBottomFace() {
+	return (faceNum == 1);
+}
+
+bool Face::isTopFace() {
+	return (faceNum == 0);
+}
+
+bool Face::isTopOrBottomFace(AdjFace *aFace) {
+	return (aFace->face->isBottomFace() || aFace->face->isTopFace());
 }

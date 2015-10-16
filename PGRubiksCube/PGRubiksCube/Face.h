@@ -31,8 +31,8 @@ private:
 		int colOrRowAffected;
 	} AdjFace;
 
-	int angle, animAngle;
-	bool rotateAlongX, rotateAlongY, rotateQuads, bottomFace;
+	int faceNum, angle, animAngle;
+	bool rotateAlongX, rotateAlongY, rotateQuads;
 	float rotationAmt;
 	AdjFace *adjFaces[4];
 	Quad *quadsOnFace[3][3];
@@ -48,12 +48,15 @@ private:
 							   bool animPositiveDirs[4]);
 	void setQuad(Quad *aQuad, int col, int row, int angle, int animAngle, int animAxis);
 	Quad * getQuad(int col, int row);
+	bool isTopOrBottomFace(AdjFace *aFace);
 	int getAngle();
 
 public:
 	Face(int aFaceNum);
 	~Face();
 	bool isAnimating();
+	bool isBottomFace();
+	bool isTopFace();
 	void setAdjFaces(Face *top, Face *bottom, Face *left, Face *right);
 	void rotateToSelf(GLfloat (&matrix)[16]);
 	void rotateAbout(bool clockwise);
