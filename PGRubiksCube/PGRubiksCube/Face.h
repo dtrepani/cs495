@@ -19,35 +19,41 @@ using namespace std;
 #define BOTTOM 1
 #define LEFT 2
 #define RIGHT 3
+#define X 0
+#define Y 1
+#define Z 2
 
 class Face {
 private:
 	typedef struct {
 		Face *face;
-		bool affectsCol;
+		bool affectsCol, animPositiveDir;
 		int colOrRowAffected;
 	} AdjFace;
 
-	int angle;
-	bool rotateAlongX, rotateAlongY, rotateQuads;
+	int angle, animAngle;
+	bool rotateAlongX, rotateAlongY, rotateQuads, bottomFace;
 	float rotationAmt;
 	AdjFace *adjFaces[4];
 	Quad *quadsOnFace[3][3];
+
 	void drawQuadsOnFace(GLuint *textureArray, GLfloat (&matrix)[16]);
-	void drawQuad(int col, int row, GLuint *textureArray, GLfloat (&matrix)[16]);
+	void drawQuad(int col, int row, double colLoc, double rowLoc, GLuint *textureArray, GLfloat (&matrix)[16]);
 	void setRotation(float aRotationAmt, bool aRotateAlongX);
 	void rotateQuadsAboutOrder(bool clockwise);
 	void rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[3][3], bool clockwise);
+	void setFaceInformation(float aRotationAmt, bool aRotateAlongX, bool aRotateQuads);
 	void setAffectedInAdjFaces(bool topAndBottomAffectsCol,	int topColOrRowAffected,	int bottomColOrRowAffected,
-							   bool leftAndRightAffectsCol,	int leftColOrRowAffected,	int rightColOrRowAffected);
-
-	void setQuad(Quad *aQuad, int col, int row, int angle);
+							   bool leftAndRightAffectsCol,	int leftColOrRowAffected,	int rightColOrRowAffected,
+							   bool animPositiveDirs[4]);
+	void setQuad(Quad *aQuad, int col, int row, int angle, int animAngle, int animAxis);
 	Quad * getQuad(int col, int row);
 	int getAngle();
 
 public:
 	Face(int aFaceNum);
 	~Face();
+	bool isAnimating();
 	void setAdjFaces(Face *top, Face *bottom, Face *left, Face *right);
 	void rotateToSelf(GLfloat (&matrix)[16]);
 	void rotateAbout(bool clockwise);

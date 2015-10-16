@@ -6,12 +6,10 @@
 */
 #include "Face.h"
 
-/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO:
-	- Fix orientation of quads when rotated to different face
-	- Quads mixing up when multiple rotations occur?
-*/
-
 Face::Face(int faceNum) {
+	animAngle = 0;
+	bottomFace = false;
+
 	for( int i = 0; i < 3; i ++ ) {
 		for( int j = 0; j < 3; j++ ) {
 			quadsOnFace[i][j] = new Quad(faceNum, i, j);
@@ -22,36 +20,40 @@ Face::Face(int faceNum) {
 		adjFaces[i] = new AdjFace;
 	}
 
+	// Determines which adjacent faces move in the opposite direction from the given animAngle in
+	// order to move with the rotating face
+	bool animPositiveDirs[4] = {
+		(faceNum == 0 || faceNum == 4 || faceNum == 5) ? true : false,
+		(faceNum == 0 || faceNum == 3 || faceNum == 4) ? true : false,
+		(faceNum != 1) ? true : false,
+		(faceNum == 0) ? true : false
+	};
+
 	switch(faceNum) {
 		case 0: // Top
-			setRotation(-90.0, true);
-			setAffectedInAdjFaces(false, 0, 0, false, 0, 0);
-			rotateQuads = false;
+			setFaceInformation(-90.0, true, false);
+			setAffectedInAdjFaces(false, 0, 0, false, 0, 0, animPositiveDirs);
 			break;
 		case 1: // Bottom
-			setRotation(90.0, true);
-			setAffectedInAdjFaces(false, 2, 2, false, 2, 2);
-			rotateQuads = false;
+			setFaceInformation(90.0, true, false);
+			setAffectedInAdjFaces(false, 2, 2, false, 2, 2, animPositiveDirs);
+			bottomFace = true;
 			break;
 		case 2: // Left
-			setRotation(-90.0, false);
-			setAffectedInAdjFaces(true, 0, 0, true, 2, 0);
-			rotateQuads = true;
+			setFaceInformation(-90.0, false, true);
+			setAffectedInAdjFaces(true, 0, 0, true, 2, 0, animPositiveDirs);
 			break;
 		case 3: // Front
-			setRotation(0.0, false);
-			setAffectedInAdjFaces(false, 2, 0, true, 2, 0);
-			rotateQuads = true;
+			setFaceInformation(0.0, false, true);
+			setAffectedInAdjFaces(false, 2, 0, true, 2, 0, animPositiveDirs);
 			break;
 		case 4: // Right
-			setRotation(90.0, false);
-			setAffectedInAdjFaces(true, 2, 2, true, 2, 0);
-			rotateQuads = true;
+			setFaceInformation(90.0, false, true);
+			setAffectedInAdjFaces(true, 2, 2, true, 2, 0, animPositiveDirs);
 			break;
 		case 5: // Back
-			setRotation(180.0, false);
-			setAffectedInAdjFaces(false, 0, 2, true, 2, 0);
-			rotateQuads = true;
+			setFaceInformation(180.0, false, true);
+			setAffectedInAdjFaces(false, 0, 2, true, 2, 0, animPositiveDirs);
 			break;
 	}
 }
@@ -59,6 +61,10 @@ Face::Face(int faceNum) {
 Face::~Face() {
 	delete[] &adjFaces;
 	delete[] &quadsOnFace;
+}
+
+bool Face::isAnimating() {
+	return (quadsOnFace[1][1]->isAnimating());
 }
 
 // Each face will need to know which faces are adjacent to it when the cube is rotate is rotated about the face.
@@ -82,6 +88,7 @@ void Face::rotateToSelf(GLfloat (&matrix)[16]) {
 // They may need to rotate to keep their orientation on the new face.
 void Face::rotateAbout(bool clockwise) {
 	int rotation = clockwise ? -90 : 90;
+	animAngle = clockwise ? 90 : -90;
 	Quad *quadsBeforeRotation[3][3];
 	memcpy(&quadsBeforeRotation[0][0], &quadsOnFace[0][0], sizeof(quadsBeforeRotation[0][0]) * 9);
 	
@@ -89,7 +96,7 @@ void Face::rotateAbout(bool clockwise) {
 
 	for( int i = 0; i < 3; i++ ) {
 		for( int j = 0; j < 3; j++ ) {
-			quadsOnFace[i][j]->addToAngle(rotation);
+			quadsOnFace[i][j]->addToAngle(rotation, animAngle, Z);
 		}
 	}
 
@@ -112,49 +119,32 @@ void Face::rotateAbout(bool clockwise) {
 void Face::drawSelf(GLuint *textureArray, GLfloat (&matrix)[16]) {
 	glLoadMatrixf(matrix);
 
-	glColor3f(0, 0, 0);
-	glBegin(GL_QUADS);
-		glVertex3f( -1,	-1,	1 );
-		glVertex3f(  1, -1,	1 );
-		glVertex3f(  1,  1,	1 );
-		glVertex3f( -1,  1,	1 );
-	glEnd();
+	glEnd(); // TODO: Why won't cube draw properly with this gone?
 
 	drawQuadsOnFace(textureArray, matrix);
-
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 }
 
 
 
 // The face draws each of the quads currently on it.
-// The quads do not know how to get to themselves to draw themselves, so translation
-// on the face level is necessary.
+// The quads do not know where on the face they are, therefore the face must tell them.
 void Face::drawQuadsOnFace(GLuint *textureArray, GLfloat (&matrix)[16]) {
 	double twoThirds = 2.0/3.0;
 
-	glTranslatef( twoThirds * -1.0, twoThirds * -1.0, 0 );
-	glColor3f(1, 1, 1);
-
 	for( int i = 0; i < 3; i++ ) {
-		glPushMatrix();
-
-		for( int j = 2; j >= 0; j-- ) {
-			drawQuad(i, j, textureArray, matrix);
-			glTranslatef( 0, twoThirds, 0 );
+		for( int j = 0; j < 3; j++ ) {
+			drawQuad(2-i, j, twoThirds - i*twoThirds, twoThirds - j*twoThirds, textureArray, matrix);
 		}
-
-		glPopMatrix();
-		glTranslatef( twoThirds, 0, 0 );
 	}
 }
 
 // The quads will need to temporarily rotate the perspective to draw themselves at their
 // respective angles, so the current matrix must be given to them.
-void Face::drawQuad(int col, int row, GLuint *textureArray, GLfloat (&matrix)[16]) {
+void Face::drawQuad(int col, int row, double colLoc, double rowLoc, GLuint *textureArray, GLfloat (&matrix)[16]) {
 	glPushMatrix();
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-	quadsOnFace[col][row]->drawSelf(textureArray, matrix);
+	quadsOnFace[col][row]->drawSelf(colLoc, rowLoc, textureArray, matrix);
 	glPopMatrix();
 }
 
@@ -174,7 +164,10 @@ void Face::setRotation(float aRotationAmt, bool aRotateAlongX) {
 // Depending on if the face is rotating clockwise or counterclockwise, the left or right adjacent
 // face will need to switch places in rotation order. The top adjacent face will always be overwritten
 // so a copy of its quads must be made.
+// The bottom face of the cube's adjacent faces will rotate opposite of what the other faces would.
 void Face::rotateQuadsAboutOrder(bool clockwise) {
+	if(bottomFace) clockwise = !clockwise;
+
 	AdjFace *firstAdjFace  = clockwise ? adjFaces[LEFT]  : adjFaces[RIGHT];
 	AdjFace *secondAdjFace = clockwise ? adjFaces[RIGHT] : adjFaces[LEFT];
 	Quad *topAdjFace[3][3];
@@ -198,46 +191,69 @@ void Face::rotateQuadsAboutOrder(bool clockwise) {
 // face to its proper quads.
 void Face::rotateQuadsAbout(AdjFace *destFace, AdjFace *srcFace, Quad *srcQuads[3][3], bool clockwise) {
 	int rotation = rotateQuads ? (clockwise ? -90 : 90) : 0;
+	int destAnimAngle = animAngle;
+	int destAnimAxis = destFace->affectsCol ? X : Y;
+
+	for( int i = 0; i < 4; i++ ) {
+		if( destFace == adjFaces[i] && !adjFaces[i]->animPositiveDir ) {
+			destAnimAngle = -1 * animAngle;
+			break;
+		}
+	}
 
 	// TODO:	Reverse copy order from bottom face for front and back face (2 maps to 0 rather than 0 maps to 0)
 	//			Quad rotation also reversed for all faces with src Bottom (90 == -90 and vice versa))
 	// IDEA:	Add reverse bool to AdjFace
 
 	for( int i = 0; i < 3; i++ ) {	
-		int index	= (srcFace == adjFaces[BOTTOM] /*&& (this == back || this == front)*/ ) ? 2 - i : i, // NOT WORKING
+		int index	= /*(srcFace == adjFaces[BOTTOM] && (this == back || this == front) ) ? 2 - i :*/ i, // NOT WORKING
 			destCol = destFace->affectsCol	? destFace->colOrRowAffected	: index,
 			destRow = destFace->affectsCol	? index							: destFace->colOrRowAffected,
 			srcCol	= srcFace->affectsCol	? srcFace->colOrRowAffected		: index,
 			srcRow	= srcFace->affectsCol	? index							: srcFace->colOrRowAffected;
 
 		if( srcFace != adjFaces[TOP] ) {
-			destFace->face->setQuad( srcFace->face->getQuad( srcCol, srcRow ), destCol, destRow, rotation );
+			destFace->face->setQuad( srcFace->face->getQuad( srcCol, srcRow ), destCol, destRow, rotation, destAnimAngle, destAnimAxis );
 		} else {
-			destFace->face->setQuad( srcQuads[srcCol][srcRow], destCol, destRow, rotation );
+			destFace->face->setQuad( srcQuads[srcCol][srcRow], destCol, destRow, rotation, destAnimAngle, destAnimAxis );
 		}
 	}
+}
+
+// Various information dependent on which face the current one is that is necessary for the face to function.
+// rotateQuads determines if the quads on adjacent faces will be rotated when this faces rotates. The top and
+// bottom faces of the cube do not rotate said quads.
+void Face::setFaceInformation(float aRotationAmt, bool aRotateAlongX, bool aRotateQuads) {
+	setRotation(aRotationAmt, aRotateAlongX);
+	rotateQuads = aRotateQuads;
 }
 
 // When rotating, the face will need to know how its rotation will affect its adjacent 
 // faces as each face will affects its adjacent faces differently.
 void Face::setAffectedInAdjFaces(bool topAndBottomAffectsCol,	int topColOrRowAffected,	int bottomColOrRowAffected,
-								 bool leftAndRightAffectsCol,	int leftColOrRowAffected,	int rightColOrRowAffected) {
+								 bool leftAndRightAffectsCol,	int leftColOrRowAffected,	int rightColOrRowAffected,
+								 bool animPositiveDirs[]) {
 	adjFaces[TOP]->affectsCol	  = topAndBottomAffectsCol;		adjFaces[TOP]->colOrRowAffected	= topColOrRowAffected;
-	adjFaces[BOTTOM]->affectsCol = topAndBottomAffectsCol;		adjFaces[BOTTOM]->colOrRowAffected	= bottomColOrRowAffected;
+	adjFaces[BOTTOM]->affectsCol  = topAndBottomAffectsCol;		adjFaces[BOTTOM]->colOrRowAffected	= bottomColOrRowAffected;
 	adjFaces[LEFT]->affectsCol	  = leftAndRightAffectsCol;		adjFaces[LEFT]->colOrRowAffected	= leftColOrRowAffected;
-	adjFaces[RIGHT]->affectsCol  = leftAndRightAffectsCol;		adjFaces[RIGHT]->colOrRowAffected	= rightColOrRowAffected;
+	adjFaces[RIGHT]->affectsCol   = leftAndRightAffectsCol;		adjFaces[RIGHT]->colOrRowAffected	= rightColOrRowAffected;
+	
+	adjFaces[TOP]->animPositiveDir		= animPositiveDirs[TOP];
+	adjFaces[BOTTOM]->animPositiveDir	= animPositiveDirs[BOTTOM];
+	adjFaces[LEFT]->animPositiveDir		= animPositiveDirs[LEFT];
+	adjFaces[RIGHT]->animPositiveDir	= animPositiveDirs[RIGHT];
 }
 
-											// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO: setQuad should adjust the quad to the orientation of the new face
-void Face::setQuad(Quad *aQuad, int col, int row, int angle) {
+			// ===================================== TODO: setQuad should adjust the quad to the orientation of the new face
+void Face::setQuad(Quad *aQuad, int col, int row, int angle, int animAngle, int animAxis) {
 	quadsOnFace[col][row] = aQuad;
-	quadsOnFace[col][row]->addToAngle(angle);
+	quadsOnFace[col][row]->addToAngle(angle, animAngle, animAxis);
 }
 
 Quad * Face::getQuad(int col, int row) {
 	return quadsOnFace[col][row];
 }
 
-int Face::getAngle() {
+int Face::getAngle() { // TODO: Check if needed in the end
 	return angle;
 }

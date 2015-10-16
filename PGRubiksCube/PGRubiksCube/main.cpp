@@ -186,28 +186,41 @@ void checkKeysForCubeRotation(SDL_Event &event) {
 	}
 }
 
-// Keys 1-6 rotate a side off the cube either CW or CCW, based on whether or not shift is held down.
+// Keys 1-6 rotate a side of the cube either CW or CCW, based on whether or not shift is held down.
+// Will not accept input if a face is currently being animated.
 void checkKeysForSideRotation(SDL_Event &event) {
+	bool cubeAnimating = false;
+	for( int i = 0; i < 6; i++ ) {
+		if( face[i]->isAnimating() ) {
+			cubeAnimating = true;
+			break;
+		}
+	}
+
 	if( event.type == SDL_KEYDOWN ) {
+			if( !cubeAnimating ) {
+				switch(event.key.keysym.sym) {
+					case SDLK_1: // Front (3)
+						face[3]->rotateAbout(clockwise);
+						break;
+					case SDLK_2: // Bottom (1)
+						face[1]->rotateAbout(clockwise);
+						break;
+					case SDLK_3: // Back (5)
+						face[5]->rotateAbout(clockwise);
+						break;
+					case SDLK_4: // Top (0)
+						face[0]->rotateAbout(clockwise);
+						break;
+					case SDLK_5: // Right (4)
+						face[4]->rotateAbout(clockwise);
+						break;
+					case SDLK_6: // Left (2)
+						face[2]->rotateAbout(clockwise);
+						break;
+				}
+			}
 			switch(event.key.keysym.sym) {
-				case SDLK_1: // Front (3)
-					face[3]->rotateAbout(clockwise);
-					break;
-				case SDLK_2: // Bottom (1)
-					face[1]->rotateAbout(clockwise);
-					break;
-				case SDLK_3: // Back (5)
-					face[5]->rotateAbout(clockwise);
-					break;
-				case SDLK_4: // Top (0)
-					face[0]->rotateAbout(clockwise);
-					break;
-				case SDLK_5: // Right (4)
-					face[4]->rotateAbout(clockwise);
-					break;
-				case SDLK_6: // Left (2)
-					face[2]->rotateAbout(clockwise);
-					break;
 				case SDLK_LSHIFT:
 				case SDLK_RSHIFT:
 					clockwise = false;

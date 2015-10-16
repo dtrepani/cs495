@@ -16,16 +16,20 @@ using namespace std;
 
 class Quad {
 private:
-	int texture,
-		texCol,
-		texRow,
-		angle;
+	int texture, texCol, texRow;
+	int angle, animAngle;
+	bool animX, animY, animZ;
+
+	void drawGLQuad(double offset, bool drawTex);
+	void setAnimAxis(bool x, bool y, bool z);
 
 public:
 	Quad(int aTexture, int aTexCol, int aTexRow);
 	~Quad();
-	void addToAngle(int angleToBeAdded);
-	void drawSelf(GLuint *textureArray, GLfloat (&matrix)[16]);
+	void addToAngle(int angleToBeAdded, int anAnimAngle, int anAnimAxis);
+	void animateRotation(int anAnimAngle, int anAnimAxis);
+	void drawSelf(double colLoc, double rowLoc, GLuint *textureArray, GLfloat (&matrix)[16]);
+	bool isAnimating();
 };
 
 #endif
