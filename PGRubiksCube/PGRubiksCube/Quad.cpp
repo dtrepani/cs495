@@ -46,7 +46,7 @@ void Quad::drawSelf(double colLoc, double rowLoc, GLuint *textureArray, GLfloat 
 	
 	glLoadMatrixf(matrix);
 
-	if(animAngle != 0) {
+	if( animAngle != 0 ) {
 		glRotatef( (float)animAngle, animX, animY, animZ );
 		animAngle = (animAngle < 0) ? animAngle + 2 : animAngle - 2;
 	}
