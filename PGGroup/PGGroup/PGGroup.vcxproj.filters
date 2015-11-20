@@ -25,6 +25,12 @@
     <Filter Include="Source Files\Structures">
       <UniqueIdentifier>{d4582107-c24d-4bbf-aa66-dcdd486e065a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Structures\Linked Lists">
+      <UniqueIdentifier>{73e6685e-1638-4b2b-9ff7-689bf69860e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Structures\Linked Lists">
+      <UniqueIdentifier>{fb44e27b-a409-4b70-a1de-01cc7eb5ed88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -36,20 +42,26 @@
     <ClCompile Include="Entity.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="LinkedList.cpp">
-      <Filter>Source Files\Structures</Filter>
-    </ClCompile>
     <ClCompile Include="glQuaternion.cpp">
-      <Filter>Source Files\Structures</Filter>
-    </ClCompile>
-    <ClCompile Include="Node.cpp">
       <Filter>Source Files\Structures</Filter>
     </ClCompile>
     <ClCompile Include="PlayerEntity.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="ThreeAxis.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="LinkedList.cpp">
+      <Filter>Source Files\Structures\Linked Lists</Filter>
+    </ClCompile>
+    <ClCompile Include="ColliderLinkedList.cpp">
+      <Filter>Source Files\Structures\Linked Lists</Filter>
+    </ClCompile>
+    <ClCompile Include="ColliderNode.cpp">
+      <Filter>Source Files\Structures\Linked Lists</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Source Files\Structures\Linked Lists</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -65,17 +77,23 @@
     <ClInclude Include="glQuaternion.h">
       <Filter>Header Files\Structures</Filter>
     </ClInclude>
-    <ClInclude Include="LinkedList.h">
-      <Filter>Header Files\Structures</Filter>
-    </ClInclude>
-    <ClInclude Include="Node.h">
-      <Filter>Header Files\Structures</Filter>
-    </ClInclude>
     <ClInclude Include="PlayerEntity.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="ThreeAxis.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkedList.h">
+      <Filter>Header Files\Structures\Linked Lists</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Header Files\Structures\Linked Lists</Filter>
+    </ClInclude>
+    <ClInclude Include="ColliderLinkedList.h">
+      <Filter>Header Files\Structures\Linked Lists</Filter>
+    </ClInclude>
+    <ClInclude Include="ColliderNode.h">
+      <Filter>Header Files\Structures\Linked Lists</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

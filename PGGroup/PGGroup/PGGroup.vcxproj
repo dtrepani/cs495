@@ -69,6 +69,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ColliderEntity.cpp" />
+    <ClCompile Include="ColliderLinkedList.cpp" />
+    <ClCompile Include="ColliderNode.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="glQuaternion.cpp" />
     <ClCompile Include="LinkedList.cpp" />
@@ -79,6 +81,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ColliderEntity.h" />
+    <ClInclude Include="ColliderLinkedList.h" />
+    <ClInclude Include="ColliderNode.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="glQuaternion.h" />
     <ClInclude Include="LinkedList.h" />

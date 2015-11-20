@@ -7,15 +7,13 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_image.h>
-#include "LinkedList.h"
+#include "ColliderLinkedList.h"
 #include "ThreeAxis.h"
 using namespace std;
 
 class ThreeAxis;
-class LinkedList;
+class ColliderLinkedList;
 class Entity {
-private:
-
 protected:
 	ThreeAxis* position;
 	ThreeAxis* rotation;
@@ -23,18 +21,17 @@ protected:
 	float opacity;
 	GLuint* texture;
 	GLuint vbo;//vertex buffer object?
-	LinkedList* colliders;// REMEMBER: Colliders should be relative to the position of the entity
+	ColliderLinkedList* colliders; // REMEMBER: Colliders should be relative to the position of the entity
 	
-	bool hasCollided(LinkedList* otherColliders);
+	bool hasCollided(ColliderLinkedList* otherColliders);
 
 public:
-	Entity(float posX, float posY, float posZ,
-			GLuint *aTexture, GLuint aVBO);
+	Entity(ThreeAxis* aPosition, GLuint *aTexture, GLuint aVBO);
 	~Entity(void);
 	void move(float gravity);
 
 	ThreeAxis* getPosition();
-	LinkedList* getColliders();
+	ColliderLinkedList* getColliders();
 };
 
 #endif

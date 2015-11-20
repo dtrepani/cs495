@@ -1,25 +1,24 @@
 #include "Entity.h"
 
-Entity::Entity(float posX, float posY, float posZ,
-				GLuint *aTexture, GLuint aVBO) {
-	position = new ThreeAxis(posX, posY, posZ);
+Entity::Entity(ThreeAxis* aPosition, GLuint *aTexture, GLuint aVBO) {
+	position = aPosition;
 	rotation = new ThreeAxis(0.0, 0.0, 0.0);
 	velocity = new ThreeAxis(0.0, 0.0, 0.0);
 	texture = aTexture;
 	vbo = aVBO;
+	colliders = new ColliderLinkedList();
 }
 
 Entity::~Entity(void) {
 	delete position;
 	delete rotation;
 	delete velocity;
-	delete texture;
 	delete colliders;
 }
 
-bool Entity::hasCollided(LinkedList* otherColliders) {
+bool Entity::hasCollided(ColliderLinkedList* otherColliders) {
 	return colliders->hasCollided(otherColliders);
 }
 
 ThreeAxis* Entity::getPosition() { return position; }
-LinkedList* Entity::getColliders() { return colliders; }
+ColliderLinkedList* Entity::getColliders() { return colliders; }

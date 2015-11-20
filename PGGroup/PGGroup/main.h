@@ -14,6 +14,8 @@ using namespace std;
 #define HEIGHT 480
 #define WIDTH 640
 
+// will need a list of all entities (or grid of lists of entities based on position?)
+
 int main(int argc, char **argv);
 void init();
 void initWindow();

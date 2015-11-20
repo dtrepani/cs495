@@ -11,7 +11,7 @@ public:
 	ThreeAxis(float anX, float aY, float aZ);
 	~ThreeAxis(void);
 
-	float distance(ThreeAxis* otherEntity);
+	float distanceTo(ThreeAxis* otherEntity);
 
 	float getX();
 	float getY();

@@ -1,13 +1,11 @@
 #include "PlayerEntity.h"
 
-
-PlayerEntity::PlayerEntity(float posX, float posY, float posZ, GLuint *aTexture, GLuint aVBO)
-: Entity(posX, posY, posZ, aTexture, aVBO) {
+PlayerEntity::PlayerEntity(ThreeAxis* aPosition, GLuint *aTexture, GLuint aVBO)
+: Entity(aPosition, aTexture, aVBO) {
 	state = STANDING;
 	interact = false;
 	health = 100; // can change later if wanted ?
 }
-
 
 PlayerEntity::~PlayerEntity(void) {
 }

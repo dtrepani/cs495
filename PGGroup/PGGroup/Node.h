@@ -2,7 +2,6 @@
 #define _NODE_
 
 #include "Entity.h"
-#include "ColliderEntity.h"
 
 class Node {
 private:
@@ -12,8 +11,7 @@ private:
 public:
 	Node(Entity* anEntity, Node* aNext);
 	~Node(void);
-	bool hasCollided(Node* otherCollider);
-
+	Node* getNext();
 	Entity* getEntity();
 };
 

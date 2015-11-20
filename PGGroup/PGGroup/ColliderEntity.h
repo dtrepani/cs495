@@ -5,12 +5,14 @@
 
 class ColliderEntity : public Entity {
 private:
+	ThreeAxis* entityPosition; // Used to always reference the colliders at a relative position.
 	int radius;
 
 public:
-	ColliderEntity(int aRadius, float posX, float posY, float posZ, GLuint *aTexture, GLuint aVBO);
+	ColliderEntity(ThreeAxis* aPosition, GLuint *aTexture, GLuint aVBO, int aRadius, ThreeAxis *anEntityPosition);
 	~ColliderEntity(void);
 	int getRadius();
+	ThreeAxis* getPosition();
 };
 
 #endif

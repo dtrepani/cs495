@@ -6,8 +6,8 @@ ThreeAxis::~ThreeAxis(void) {}
 
 // Determine the distance between two entities.
 // Only an entity's position should be passed in.
-float ThreeAxis::distance(ThreeAxis* otherEntity) {
-	return sqrt(pow((otherEntity->getX()-x), 2) + pow((otherEntity->getY()-y), 2) + pow((otherEntity->getZ()-z), 2));
+float ThreeAxis::distanceTo(ThreeAxis* otherEntity) {
+	return sqrt( pow((otherEntity->getX()-x), 2) + pow((otherEntity->getY()-y), 2) + pow((otherEntity->getZ()-z), 2) );
 }
 
 float ThreeAxis::getX() { return x; }
