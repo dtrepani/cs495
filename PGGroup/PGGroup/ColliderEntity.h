@@ -10,6 +10,7 @@ private:
 public:
 	ColliderEntity(int aRadius, float posX, float posY, float posZ, GLuint *aTexture, GLuint aVBO);
 	~ColliderEntity(void);
+	int getRadius();
 };
 
 #endif

@@ -5,6 +5,7 @@ ColliderEntity::ColliderEntity(int aRadius, float posX, float posY, float posZ, 
 	radius = aRadius;
 }
 
-
 ColliderEntity::~ColliderEntity(void) {
 }
+
+int ColliderEntity::getRadius() { return radius; }
