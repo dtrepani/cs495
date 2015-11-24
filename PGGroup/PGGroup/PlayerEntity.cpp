@@ -7,8 +7,7 @@ PlayerEntity::PlayerEntity(ThreeAxis* aPosition, GLuint *aTexture, GLuint aVBO)
 	health = 100; // can change later if wanted ?
 }
 
-PlayerEntity::~PlayerEntity(void) {
-}
+PlayerEntity::~PlayerEntity(void) {}
 
 void PlayerEntity::pain(int hurt){
 	health -= hurt;

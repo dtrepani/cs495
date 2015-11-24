@@ -14,7 +14,17 @@ using namespace std;
 #define HEIGHT 480
 #define WIDTH 640
 
-// will need a list of all entities (or grid of lists of entities based on position?)
+// Load entites and texture on per-level basis
+// REMEMBER: Will need a list of all entities per level (or grid of lists of entities based on position?)
+//			And a separate list for the level's planes (walls, floors, etc)
+
+typedef enum { // better suited in the level superclass
+	NORMAL,
+	INTERACTABLE,
+	COLLIDER,
+	PLAYER,
+	WIZARD
+} EntityType;
 
 int main(int argc, char **argv);
 void init();

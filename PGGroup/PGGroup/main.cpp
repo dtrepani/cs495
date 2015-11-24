@@ -64,7 +64,6 @@ void initOpenGL() {
 				tan( 45.0/360*PI ) * 0.1,
 				0.1,
 				100 );
-
 }
 
 // Load the textures for later use.
@@ -80,6 +79,11 @@ void initTextures() {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+}
+
+// better suited in the level superclass
+void createModel() {
+	// model name (texture name), vbo, position, type (collider, player, wizard, normal)
 }
 
 // Each texture being created goes through the same method calls and is named with a number, referenced by index.

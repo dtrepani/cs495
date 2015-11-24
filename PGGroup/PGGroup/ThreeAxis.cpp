@@ -10,6 +10,11 @@ float ThreeAxis::distanceTo(ThreeAxis* otherEntity) {
 	return sqrt( pow((otherEntity->getX()-x), 2) + pow((otherEntity->getY()-y), 2) + pow((otherEntity->getZ()-z), 2) );
 }
 
+// Increment the values. Used for fluid movement.
+void ThreeAxis::incrementX(float anX) { x += anX; }
+void ThreeAxis::incrementY(float aY) { y += aY; }
+void ThreeAxis::incrementZ(float aZ) { z += aZ; }
+
 float ThreeAxis::getX() { return x; }
 float ThreeAxis::getY() { return y; }
 float ThreeAxis::getZ() { return z; }

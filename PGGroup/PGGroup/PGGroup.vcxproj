@@ -73,11 +73,13 @@
     <ClCompile Include="ColliderNode.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="glQuaternion.cpp" />
+    <ClCompile Include="InteractableEntity.cpp" />
     <ClCompile Include="LinkedList.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="PlayerEntity.cpp" />
     <ClCompile Include="ThreeAxis.cpp" />
+    <ClCompile Include="WizardEntity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ColliderEntity.h" />
@@ -85,11 +87,13 @@
     <ClInclude Include="ColliderNode.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="glQuaternion.h" />
+    <ClInclude Include="InteractableEntity.h" />
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="PlayerEntity.h" />
     <ClInclude Include="ThreeAxis.h" />
+    <ClInclude Include="WizardEntity.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -63,6 +63,12 @@
     <ClCompile Include="Node.cpp">
       <Filter>Source Files\Structures\Linked Lists</Filter>
     </ClCompile>
+    <ClCompile Include="WizardEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InteractableEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -94,6 +100,12 @@
     </ClInclude>
     <ClInclude Include="ColliderNode.h">
       <Filter>Header Files\Structures\Linked Lists</Filter>
+    </ClInclude>
+    <ClInclude Include="WizardEntity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InteractableEntity.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

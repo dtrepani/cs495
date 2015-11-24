@@ -12,6 +12,9 @@ public:
 	~ThreeAxis(void);
 
 	float distanceTo(ThreeAxis* otherEntity);
+	void incrementX(float anX);
+	void incrementY(float aY);
+	void incrementZ(float aZ);
 
 	float getX();
 	float getY();
