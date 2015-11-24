@@ -6,7 +6,7 @@ ColliderNode::~ColliderNode(void) {}
 
 // Iterate through this list's nodes to check for collision
 bool ColliderNode::hasCollidedWhileIteratingThroughThisList(ColliderNode* otherColliderHead) {
-	if(hasCollidedWhileIteratingThroughThisList(otherColliderHead)) { return true; }
+	if(hasCollidedWhileIteratingThroughOtherList(otherColliderHead)) { return true; }
 	if(next) { return next->hasCollidedWhileIteratingThroughThisList(otherColliderHead); }
 	return false;
 }
@@ -36,4 +36,7 @@ int ColliderNode::sumOfRadii(ColliderNode* otherCollider) {
 	ColliderEntity* otherEntity = otherCollider->getEntity();
 	return	( entity->getRadius() + otherEntity->getRadius() );
 }
+
+ColliderNode* ColliderNode::getNext() { return next; }
+ColliderEntity* ColliderNode::getEntity() { return entity; }
 

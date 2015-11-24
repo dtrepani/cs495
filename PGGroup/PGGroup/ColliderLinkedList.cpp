@@ -8,3 +8,5 @@ ColliderLinkedList::~ColliderLinkedList(void) {}
 bool ColliderLinkedList::hasCollided(ColliderLinkedList* otherColliders) {
 	return head->hasCollidedWhileIteratingThroughThisList(otherColliders->getHead());
 }
+
+ColliderNode* ColliderLinkedList::getHead() { return head; }

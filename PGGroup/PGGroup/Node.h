@@ -1,8 +1,7 @@
 #ifndef _NODE_
 #define _NODE_
 
-#include "Entity.h"
-
+class Entity;
 class Node {
 private:
 	Entity* entity;

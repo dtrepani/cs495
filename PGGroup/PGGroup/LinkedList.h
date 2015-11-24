@@ -1,9 +1,10 @@
 #ifndef _LINKEDLIST_
 #define _LINKEDLIST_
 
+#include <stdio.h>
 #include "Node.h"
 
-class Node;
+class Entity;
 class LinkedList {
 private:
 	Node *head;

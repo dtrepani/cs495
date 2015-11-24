@@ -1,4 +1,5 @@
 #include "Entity.h"
+#include "ColliderLinkedList.h"
 
 Entity::Entity(ThreeAxis* aPosition, GLuint *aTexture, GLuint aVBO) {
 	position = aPosition;

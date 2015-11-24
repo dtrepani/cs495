@@ -7,11 +7,9 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_image.h>
-#include "ColliderLinkedList.h"
 #include "ThreeAxis.h"
 using namespace std;
 
-class ThreeAxis;
 class ColliderLinkedList;
 class Entity {
 protected:

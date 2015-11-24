@@ -4,7 +4,6 @@
 #include "LinkedList.h"
 #include "ColliderNode.h"
 
-class ColliderNode;
 class ColliderLinkedList : public LinkedList {
 private:
 	ColliderNode* head;
