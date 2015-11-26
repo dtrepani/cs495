@@ -36,12 +36,13 @@ public:
 	Entity(ThreeAxis* aPosition, GLuint *aTexture, GLfloat* aVertices);
 	~Entity(void);
 	void move(float gravity);
-	void addCollider(ColliderEntity* colliderEntity);
+	void addCollider(float x, float y, float z, int radius);
 	void drawSelf();
 
-	void incrementXOf(LocationInfo aLocInfo, float x);
-	void incrementYOf(LocationInfo aLocInfo, float y);
-	void incrementZOf(LocationInfo aLocInfo, float z);
+	void incrementXOf(LocationInfo locInfo, float x);
+	void incrementYOf(LocationInfo locInfo, float y);
+	void incrementZOf(LocationInfo locInfo, float z);
+	void setXYZOf(LocationInfo locInfo, float x, float y, float z);
 	ThreeAxis* getPosition();
 	ThreeAxis* getRotation();
 	ThreeAxis* getVelocity();

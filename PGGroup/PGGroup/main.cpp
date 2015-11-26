@@ -112,11 +112,12 @@ void pollEventsAndDraw() {
 	SDL_Event event;
 	bool running = true;
 	
-		// ========== START TEST ========== //
-		GLfloat vertices[12] = { 1,1,0,   -1,1,0,   -1,-1,0,   1,-1,0,}; // default plane
+	// ========== START TEST ========== //
+	GLfloat vertices[12] = { 1,1,0,   -1,1,0,   -1,-1,0,   1,-1,0,}; // default plane
 
-		Entity* tmpModel = createModel("tmp", vertices, NORMAL, 0.05f, 0, 0);	
-		// ========== END TEST ========== //
+	Entity* tmpModel = createModel("tmp", vertices, NORMAL, 0.05f, 0, 0);
+	Entity* player = createModel(NULL, NULL, PLAYER, 0, 0, 0);
+	// ========== END TEST ========== //
 
 	while( running ) {
 		if( SDL_PollEvent(&event) ) {
@@ -139,8 +140,6 @@ void pollEventsAndDraw() {
 		//tmpModel->incrementYOf(ROTATION, 10.0f);
 
 		tmpModel->drawSelf();
-		
-		
 		// ========== END TEST ========== //
 		
 		SDL_GL_SwapWindow(mainWindow);

@@ -19,7 +19,7 @@ Entity::~Entity(void) {
 }
 
 // Add a collider entity to the list of colliders
-void Entity::addCollider(ColliderEntity* colliderEntity) { colliders->add(colliderEntity); }
+void Entity::addCollider(float x, float y, float z, int radius) { colliders->add(new ColliderEntity(new ThreeAxis(x, y, z), NULL, NULL, radius, position)); }
 
 // Check if this entity has collided with another entity by comparing their colliders.
 bool Entity::hasCollided(ColliderLinkedList* otherColliders) { return colliders->hasCollided(otherColliders); }
@@ -38,9 +38,16 @@ ThreeAxis* Entity::getCorrespondingThreeAxis(LocationInfo locationInfo) {
 }
 
 // Increment the values for use in creating fluid movement.
-void Entity::incrementXOf(LocationInfo aLocInfo, float x) { getCorrespondingThreeAxis(aLocInfo)->incrementX(x); }
-void Entity::incrementYOf(LocationInfo aLocInfo, float y) { getCorrespondingThreeAxis(aLocInfo)->incrementY(y); }
-void Entity::incrementZOf(LocationInfo aLocInfo, float z) { getCorrespondingThreeAxis(aLocInfo)->incrementZ(z); }
+void Entity::incrementXOf(LocationInfo locInfo, float x) { getCorrespondingThreeAxis(locInfo)->incrementX(x); }
+void Entity::incrementYOf(LocationInfo locInfo, float y) { getCorrespondingThreeAxis(locInfo)->incrementY(y); }
+void Entity::incrementZOf(LocationInfo locInfo, float z) { getCorrespondingThreeAxis(locInfo)->incrementZ(z); }
+
+// Set the x, y, and z values of any location information
+void Entity::setXYZOf(LocationInfo locInfo, float x, float y, float z) {
+	getCorrespondingThreeAxis(locInfo)->setX(x);
+	getCorrespondingThreeAxis(locInfo)->setY(y);
+	getCorrespondingThreeAxis(locInfo)->setZ(z);
+}
 
 ThreeAxis* Entity::getPosition() { return position; }
 ThreeAxis* Entity::getRotation() { return rotation; }
