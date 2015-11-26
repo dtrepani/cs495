@@ -1,7 +1,7 @@
 #include "ColliderEntity.h"
 
-ColliderEntity::ColliderEntity(ThreeAxis* aPosition, GLuint *aTexture, GLuint aVBO, int aRadius, ThreeAxis *anEntityPosition)
-: Entity(aPosition, aTexture, aVBO) {
+ColliderEntity::ColliderEntity(ThreeAxis* aPosition, GLuint *aTexture, GLfloat* aVertices, int aRadius, ThreeAxis *anEntityPosition)
+: Entity(aPosition, aTexture, aVertices) {
 	radius = aRadius;
 	entityPosition = anEntityPosition;
 }

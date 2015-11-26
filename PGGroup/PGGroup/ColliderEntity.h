@@ -9,7 +9,7 @@ private:
 	int radius;
 
 public:
-	ColliderEntity(ThreeAxis* aPosition, GLuint *aTexture, GLuint aVBO, int aRadius, ThreeAxis *anEntityPosition);
+	ColliderEntity(ThreeAxis* aPosition, GLuint *aTexture, GLfloat* aVertices, int aRadius, ThreeAxis *anEntityPosition);
 	~ColliderEntity(void);
 	int getRadius();
 	ThreeAxis* getPosition();

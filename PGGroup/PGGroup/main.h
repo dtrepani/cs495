@@ -8,6 +8,9 @@
 
 #include <cmath>
 #include "Entity.h"
+#include "InteractableEntity.h"
+#include "PlayerEntity.h"
+#include "WizardEntity.h"
 #include "glQuaternion.h"
 using namespace std;
 
@@ -21,7 +24,6 @@ using namespace std;
 typedef enum { // better suited in the level superclass
 	NORMAL,
 	INTERACTABLE,
-	COLLIDER,
 	PLAYER,
 	WIZARD
 } EntityType;
@@ -30,7 +32,9 @@ int main(int argc, char **argv);
 void init();
 void initWindow();
 void initOpenGL();
-void initTextures();
-void createTexture(int index);
+void pollEventsAndDraw();
+GLuint* createTexture(string name);
+Entity* createModel(string name, GLfloat* vertices, EntityType entityType,
+					float x, float y, float z);
 
 #endif

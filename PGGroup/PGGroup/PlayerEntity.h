@@ -17,7 +17,7 @@ private:
 	bool interact;
 
 public:
-	PlayerEntity(ThreeAxis* aPosition, GLuint *aTexture, GLuint aVBO);
+	PlayerEntity(ThreeAxis* aPosition, GLuint *aTexture, GLfloat* aVertices);
 	~PlayerEntity(void);
 	void pain(int hurt);
 	void toggleInteract();
