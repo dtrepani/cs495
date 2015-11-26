@@ -1,6 +1,9 @@
 #include "ColliderNode.h"
 
-ColliderNode::ColliderNode(ColliderEntity* anEntity, ColliderNode* aNext) : Node(anEntity, aNext) {}
+ColliderNode::ColliderNode(ColliderEntity* anEntity, ColliderNode* aNext) : Node(anEntity, aNext) {
+	entity = anEntity;
+	next = aNext;
+}
 
 ColliderNode::~ColliderNode(void) {}
 
@@ -32,9 +35,9 @@ float ColliderNode::distanceBetweenColliders(ColliderNode* otherCollider) {
 }
 
 // Sum of the radii of this node's collider and the other node's collider
-int ColliderNode::sumOfRadii(ColliderNode* otherCollider) {
+float ColliderNode::sumOfRadii(ColliderNode* otherCollider) {
 	ColliderEntity* otherEntity = otherCollider->getEntity();
-	return	( entity->getRadius() + otherEntity->getRadius() );
+	return ( entity->getRadius() + otherEntity->getRadius() );
 }
 
 ColliderNode* ColliderNode::getNext() { return next; }

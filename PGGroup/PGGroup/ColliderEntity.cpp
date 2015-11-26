@@ -1,8 +1,9 @@
 #include "ColliderEntity.h"
 
-ColliderEntity::ColliderEntity(ThreeAxis* aPosition, GLuint *aTexture, GLfloat* aVertices, int aRadius, ThreeAxis *anEntityPosition)
+// If aRadius is 0, will use a default value.
+ColliderEntity::ColliderEntity(ThreeAxis* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius, ThreeAxis *anEntityPosition)
 : Entity(aPosition, aTexture, aVertices) {
-	radius = aRadius;
+	radius = ((aRadius == 0.0) ? 3.0f : aRadius);
 	entityPosition = anEntityPosition;
 }
 
@@ -17,4 +18,4 @@ ThreeAxis* ColliderEntity::getPosition() {
 		entityPosition->getZ() + position->getZ());
 }
 
-int ColliderEntity::getRadius() { return radius; }
+float ColliderEntity::getRadius() { return radius; }

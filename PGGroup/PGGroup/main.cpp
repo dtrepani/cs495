@@ -68,22 +68,11 @@ void initOpenGL() {
 				100 );
 }
 
-// better suited in the level superclass
-Entity* createModel(string name, GLfloat* vertices, EntityType entityType,
-					float x, float y, float z) {
-	switch(entityType) {
-	case NORMAL:
-		return new Entity(new ThreeAxis(x, y, z), createTexture(name), vertices);
-	case INTERACTABLE:
-		return new InteractableEntity(new ThreeAxis(x, y, z), createTexture(name), vertices);
-	case PLAYER:
-		return new PlayerEntity(new ThreeAxis(x, y, z), createTexture(name), vertices);
-	case WIZARD:
-		return new WizardEntity(new ThreeAxis(x, y, z), createTexture(name), vertices);
-	}
-
-	return NULL;
-}
+// Better suited in the level superclass
+Entity* createEntity(string name, GLfloat* vertices, float x, float y, float z) { return new Entity(new ThreeAxis(x, y, z), createTexture(name), vertices); }
+InteractableEntity* createInteractableEntity(string name, GLfloat* vertices, float x, float y, float z) { return new InteractableEntity(new ThreeAxis(x, y, z), createTexture(name), vertices); }
+PlayerEntity* createPlayerEntity(float x, float y, float z) { return new PlayerEntity(new ThreeAxis(x, y, z), NULL, NULL); }
+WizardEntity* createWizardEntity(string name, GLfloat* vertices, float x, float y, float z) { return new WizardEntity(new ThreeAxis(x, y, z), createTexture(name), vertices); }
 
 // Each texture being created goes through the same method calls and is named with a number, referenced by index.
 GLuint* createTexture(string name) {
@@ -115,31 +104,74 @@ void pollEventsAndDraw() {
 	// ========== START TEST ========== //
 	GLfloat vertices[12] = { 1,1,0,   -1,1,0,   -1,-1,0,   1,-1,0,}; // default plane
 
-	Entity* tmpModel = createModel("tmp", vertices, NORMAL, 0.05f, 0, 0);
-	Entity* player = createModel(NULL, NULL, PLAYER, 0, 0, 0);
+	Entity* tmpModel = createEntity("tmp", vertices, 0, 0, -10.0f);
+	tmpModel->addCollider(0, 0, 0, 0);
+	PlayerEntity* player = createPlayerEntity(0, 0, 0);
 	// ========== END TEST ========== //
 
 	while( running ) {
 		if( SDL_PollEvent(&event) ) {
 			// check for other keys
 
-			if(event.type == SDLK_ESCAPE || event.type == SDL_QUIT) {
+			// ========== START TEST ========== //
+			switch(event.key.keysym.sym) {
+			case SDLK_w:
+			case SDLK_UP:
+				player->incrementZOf(POSITION, 0.2f);
+				break;
+			case SDLK_s:
+			case SDLK_DOWN:
+				player->incrementZOf(POSITION, -0.1f);
+				break;
+			case SDLK_q:
+				player->incrementXOf(POSITION, 0.1f);
+				break;
+			case SDLK_e:
+				player->incrementXOf(POSITION, -0.1f);
+				break;
+			case SDLK_a:
+			case SDLK_LEFT:
+				player->incrementYOf(ROTATION, -0.4f);
+				break;
+			case SDLK_d:
+			case SDLK_RIGHT:
+				player->incrementYOf(ROTATION, 0.4f);
+				break;
+			case SDLK_ESCAPE:
 				running = false;
+				break;
 			}
+
+			if(event.type == SDL_QUIT) running = false;
+			// ========== END TEST ========== //
 		}
 
 		// ========== START TEST ========== //
+		// Must be  in level superclass: ******
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		glLoadIdentity();
 
-		glTranslatef (0, 0, -6);
 		glColor3f(1, 1, 1);
 
-		tmpModel->incrementXOf(ROTATION, 5.0f);
-		tmpModel->incrementYOf(POSITION, 0.005f);
-		//tmpModel->incrementYOf(ROTATION, 10.0f);
+		GLfloat matrix[16];
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		player->drawSelf(matrix); // Used to adjust camera based on player position
+		glLoadMatrixf(matrix);
+		// ******************************* //
+
+		//tmpModel->incrementXOf(ROTATION, 5.0f);
+		//tmpModel->incrementYOf(POSITION, 0.005f);
+
+		if(player->hasCollided(tmpModel)) {
+			cout << "Collision!" << endl;
+		}
+
+		// TO-DO: 
+		//	Fix collisions
+		//	Fix rotation (convert to quaternions?)
 
 		tmpModel->drawSelf();
+
 		// ========== END TEST ========== //
 		
 		SDL_GL_SwapWindow(mainWindow);

@@ -20,13 +20,11 @@ using namespace std;
 // Load entites and texture on per-level basis
 // REMEMBER: Will need a list of all entities per level (or grid of lists of entities based on position?)
 //			And a separate list for the level's planes (walls, floors, etc)
-
-typedef enum { // better suited in the level superclass
-	NORMAL,
-	INTERACTABLE,
-	PLAYER,
-	WIZARD
-} EntityType;
+// Below methods better suited in a level superclass
+Entity* createEntity(string name, GLfloat* vertices, float x, float y, float z);
+InteractableEntity* createInteractableEntity(string name, GLfloat* vertices, float x, float y, float z);
+PlayerEntity* createPlayerEntity(float x, float y, float z);
+WizardEntity* createWizardEntity(string name, GLfloat* vertices, float x, float y, float z);
 
 int main(int argc, char **argv);
 void init();
@@ -34,7 +32,5 @@ void initWindow();
 void initOpenGL();
 void pollEventsAndDraw();
 GLuint* createTexture(string name);
-Entity* createModel(string name, GLfloat* vertices, EntityType entityType,
-					float x, float y, float z);
 
 #endif

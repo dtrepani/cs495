@@ -5,6 +5,7 @@ PlayerEntity::PlayerEntity(ThreeAxis* aPosition, GLuint *aTexture, GLfloat* aVer
 	state = STANDING;
 	interact = false;
 	health = 100; // can change later if wanted ?
+	addCollider(0, 0, 0, 0);
 }
 
 PlayerEntity::~PlayerEntity(void) {}
@@ -22,4 +23,14 @@ void PlayerEntity::toggleInteract(){
 void PlayerEntity::jump(){
 	state = JUMPING;
 	//velocity.y = NEED TO FIND VARIABLE THAT WORKS SMOOTHLY
+}
+
+// Adjusts the camera to the player's position and rotation.
+void PlayerEntity::drawSelf(GLfloat (&matrix)[16]) {
+	glLoadMatrixf(matrix);
+
+	glTranslatef(position->getX(), position->getY(), position->getZ());
+	rotateEntity();
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 }

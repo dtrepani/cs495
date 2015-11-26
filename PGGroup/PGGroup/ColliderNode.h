@@ -11,7 +11,7 @@ private:
 
 	bool hasCollidedWhileIteratingThroughOtherList(ColliderNode* otherCollider);
 	float distanceBetweenColliders(ColliderNode* otherCollider);
-	int sumOfRadii(ColliderNode* otherCollider);
+	float sumOfRadii(ColliderNode* otherCollider);
 
 public:
 	ColliderNode(ColliderEntity* anEntity, ColliderNode* aNext);

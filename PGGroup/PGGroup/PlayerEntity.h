@@ -22,6 +22,7 @@ public:
 	void pain(int hurt);
 	void toggleInteract();
 	void jump();
+	void drawSelf(GLfloat (&matrix)[16]);
 };
 
 #endif

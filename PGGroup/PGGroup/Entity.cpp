@@ -19,10 +19,10 @@ Entity::~Entity(void) {
 }
 
 // Add a collider entity to the list of colliders
-void Entity::addCollider(float x, float y, float z, int radius) { colliders->add(new ColliderEntity(new ThreeAxis(x, y, z), NULL, NULL, radius, position)); }
+void Entity::addCollider(float x, float y, float z, float radius) { colliders->add(new ColliderEntity(new ThreeAxis(x, y, z), NULL, NULL, radius, position)); }
 
 // Check if this entity has collided with another entity by comparing their colliders.
-bool Entity::hasCollided(ColliderLinkedList* otherColliders) { return colliders->hasCollided(otherColliders); }
+bool Entity::hasCollided(Entity* otherEntity) { return colliders->hasCollided(otherEntity->getColliders()); }
 
 // Rotate the entity according to its rotation variables.
 void Entity::rotateEntity() {

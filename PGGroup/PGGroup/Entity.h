@@ -28,7 +28,6 @@ protected:
 	GLfloat* vertices;
 	ColliderLinkedList* colliders; // REMEMBER: Colliders should be relative to the position of the entity
 	
-	bool hasCollided(ColliderLinkedList* otherColliders);
 	ThreeAxis* getCorrespondingThreeAxis(LocationInfo locationInfo);
 	void rotateEntity();
 
@@ -36,7 +35,8 @@ public:
 	Entity(ThreeAxis* aPosition, GLuint *aTexture, GLfloat* aVertices);
 	~Entity(void);
 	void move(float gravity);
-	void addCollider(float x, float y, float z, int radius);
+	bool hasCollided(Entity* otherEntity);
+	void addCollider(float x, float y, float z, float radius);
 	void drawSelf();
 
 	void incrementXOf(LocationInfo locInfo, float x);

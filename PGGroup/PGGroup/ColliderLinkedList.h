@@ -12,6 +12,7 @@ public:
 	ColliderLinkedList(void);
 	~ColliderLinkedList(void);
 	bool hasCollided(ColliderLinkedList* otherColliders);
+	void add(ColliderEntity* head);
 	ColliderNode* getHead();
 };
 
