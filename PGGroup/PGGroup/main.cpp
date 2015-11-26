@@ -117,25 +117,29 @@ void pollEventsAndDraw() {
 			switch(event.key.keysym.sym) {
 			case SDLK_w:
 			case SDLK_UP:
-				player->incrementZOf(POSITION, 0.2f);
+				//player->incrementZOf(POSITION, 0.2f);
+				player->moveForward(true);
 				break;
 			case SDLK_s:
 			case SDLK_DOWN:
-				player->incrementZOf(POSITION, -0.1f);
+				//player->incrementZOf(POSITION, -0.1f);
+				player->moveForward(false);
 				break;
 			case SDLK_q:
-				player->incrementXOf(POSITION, 0.1f);
+				//player->incrementXOf(POSITION, 0.1f);
+				player->moveSideways(true);
 				break;
 			case SDLK_e:
-				player->incrementXOf(POSITION, -0.1f);
+				//player->incrementXOf(POSITION, -0.1f);
+				player->moveSideways(false);
 				break;
 			case SDLK_a:
 			case SDLK_LEFT:
-				player->incrementYOf(ROTATION, -0.4f);
+				player->incrementYOf(ROTATION, 1.5f);
 				break;
 			case SDLK_d:
 			case SDLK_RIGHT:
-				player->incrementYOf(ROTATION, 0.4f);
+				player->incrementYOf(ROTATION, -1.5f);
 				break;
 			case SDLK_ESCAPE:
 				running = false;
