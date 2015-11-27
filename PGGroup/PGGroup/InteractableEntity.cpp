@@ -1,6 +1,6 @@
 #include "InteractableEntity.h"
 
-InteractableEntity::InteractableEntity(ThreeAxis* aPosition, GLuint *aTexture, GLfloat* aVertices)
+InteractableEntity::InteractableEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices)
 : Entity(aPosition, aTexture, aVertices) {
 }
 

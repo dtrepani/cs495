@@ -21,8 +21,8 @@ using namespace std;
 // REMEMBER: Will need a list of all entities per level (or grid of lists of entities based on position?)
 //			And a separate list for the level's planes (walls, floors, etc)
 // Below methods better suited in a level superclass
-Entity* createEntity(string name, GLfloat* vertices, float x, float y, float z);
-InteractableEntity* createInteractableEntity(string name, GLfloat* vertices, float x, float y, float z);
+Entity* createEntity(string name, GLuint* texture, GLfloat* vertices, float x, float y, float z);
+InteractableEntity* createInteractableEntity(string name, GLuint* texture, GLfloat* vertices, float x, float y, float z);
 PlayerEntity* createPlayerEntity(float x, float y, float z);
 WizardEntity* createWizardEntity(string name, GLfloat* vertices, float x, float y, float z);
 

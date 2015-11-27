@@ -1,10 +1,10 @@
 #include "Entity.h"
 #include "ColliderLinkedList.h"
 
-Entity::Entity(ThreeAxis* aPosition, GLuint *aTexture, GLfloat* aVertices) {
+Entity::Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices) {
 	position = aPosition;
-	rotation = new ThreeAxis(0.0, 0.0, 0.0);
-	velocity = new ThreeAxis(0.0, 0.0, 0.0);
+	rotation = new Vector(0.0, 0.0, 0.0);
+	velocity = new Vector(0.0, 0.0, 0.0);
 	texture = aTexture;
 	opacity = 0;
 	vertices = aVertices;
@@ -19,7 +19,7 @@ Entity::~Entity(void) {
 }
 
 // Add a collider entity to the list of colliders
-void Entity::addCollider(float x, float y, float z, float radius) { colliders->add(new ColliderEntity(new ThreeAxis(x, y, z), NULL, NULL, radius, position)); }
+void Entity::addCollider(float x, float y, float z, float radius) { colliders->add(new ColliderEntity(new Vector(x, y, z), NULL, NULL, radius, position, false)); }
 
 // Check if this entity has collided with another entity by comparing their colliders.
 bool Entity::hasCollided(Entity* otherEntity) { return colliders->hasCollided(otherEntity->getColliders()); }
@@ -31,40 +31,42 @@ void Entity::rotateEntity() {
 	glRotatef(rotation->getZ(), 0, 0, 1);
 }
 
-// Return the ThreeAxis location information based on its corresponding enum.
-ThreeAxis* Entity::getCorrespondingThreeAxis(LocationInfo locationInfo) {
+// Return the Vector location information based on its corresponding enum.
+Vector* Entity::getCorrespondingVector(LocationInfo locationInfo) {
 	return (locationInfo == POSITION) ? position 
 									  : (locationInfo == ROTATION) ? rotation : velocity;
 }
 
 // Increment the values for use in creating fluid movement.
-void Entity::incrementXOf(LocationInfo locInfo, float x) { getCorrespondingThreeAxis(locInfo)->incrementX(x); }
-void Entity::incrementYOf(LocationInfo locInfo, float y) { getCorrespondingThreeAxis(locInfo)->incrementY(y); }
-void Entity::incrementZOf(LocationInfo locInfo, float z) { getCorrespondingThreeAxis(locInfo)->incrementZ(z); }
+void Entity::incrementXOf(LocationInfo locInfo, float x) { getCorrespondingVector(locInfo)->incrementX(x); }
+void Entity::incrementYOf(LocationInfo locInfo, float y) { getCorrespondingVector(locInfo)->incrementY(y); }
+void Entity::incrementZOf(LocationInfo locInfo, float z) { getCorrespondingVector(locInfo)->incrementZ(z); }
 
 // Set the x, y, and z values of any location information
 void Entity::setXYZOf(LocationInfo locInfo, float x, float y, float z) {
-	getCorrespondingThreeAxis(locInfo)->setX(x);
-	getCorrespondingThreeAxis(locInfo)->setY(y);
-	getCorrespondingThreeAxis(locInfo)->setZ(z);
+	getCorrespondingVector(locInfo)->setX(x);
+	getCorrespondingVector(locInfo)->setY(y);
+	getCorrespondingVector(locInfo)->setZ(z);
 }
 
-ThreeAxis* Entity::getPosition() { return position; }
-ThreeAxis* Entity::getRotation() { return rotation; }
-ThreeAxis* Entity::getVelocity() { return velocity; }
+Vector* Entity::getPosition() { return position; }
+Vector* Entity::getRotation() { return rotation; }
+Vector* Entity::getVelocity() { return velocity; }
 ColliderLinkedList* Entity::getColliders() { return colliders; }
 
 // The entity knows how to draw itself and where to draw itself.
 void Entity::drawSelf() {
+	glPushMatrix();
 	glBindTexture( GL_TEXTURE_2D, *texture );
 	
 	glTranslatef(position->getX(), position->getY(), position->getZ());
 	rotateEntity();
 
 	glBegin(GL_QUADS);
-		glTexCoord2f(0,0);	glVertex3f(vertices[0], vertices[1], vertices[2]);
-		glTexCoord2f(1,0);	glVertex3f(vertices[3], vertices[4], vertices[5]);
-		glTexCoord2f(1,1);	glVertex3f(vertices[6], vertices[7], vertices[8]);
-		glTexCoord2f(0,1);	glVertex3f(vertices[9], vertices[10], vertices[11]);
+		glTexCoord2f(0, 1);	glVertex3f(vertices[0], vertices[1], vertices[2]);
+		glTexCoord2f(1, 1);	glVertex3f(vertices[3], vertices[4], vertices[5]);
+		glTexCoord2f(1, 0);	glVertex3f(vertices[6], vertices[7], vertices[8]);
+		glTexCoord2f(0, 0);	glVertex3f(vertices[9], vertices[10], vertices[11]);
 	glEnd();
+	glPopMatrix();
 }

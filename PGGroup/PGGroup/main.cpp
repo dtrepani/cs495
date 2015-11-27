@@ -6,8 +6,6 @@
 #include "main.h"
 
 SDL_Window *mainWindow;
-//SDL_Surface **textureSurface;
-//GLuint *texture;
 glQuaternion qAngle;
 
 int main(int argc, char **argv) {
@@ -69,16 +67,26 @@ void initOpenGL() {
 }
 
 // Better suited in the level superclass
-Entity* createEntity(string name, GLfloat* vertices, float x, float y, float z) { return new Entity(new ThreeAxis(x, y, z), createTexture(name), vertices); }
-InteractableEntity* createInteractableEntity(string name, GLfloat* vertices, float x, float y, float z) { return new InteractableEntity(new ThreeAxis(x, y, z), createTexture(name), vertices); }
-PlayerEntity* createPlayerEntity(float x, float y, float z) { return new PlayerEntity(new ThreeAxis(x, y, z), NULL, NULL); }
-WizardEntity* createWizardEntity(string name, GLfloat* vertices, float x, float y, float z) { return new WizardEntity(new ThreeAxis(x, y, z), createTexture(name), vertices); }
+// texture may be used when the same texture is needed multiple times throughout a level, such as for the aisles in the tutorial.
+// In this case, create the texture beforehand and pass it in.
+Entity* createEntity(string name, GLuint* texture, GLfloat* vertices, float x, float y, float z) { 
+	return new Entity(new Vector(x, y, z), (texture == NULL) ? createTexture(name) : texture, vertices);
+}
+InteractableEntity* createInteractableEntity(string name, GLuint* texture, GLfloat* vertices, float x, float y, float z) { 
+	return new InteractableEntity(new Vector(x, y, z), (texture == NULL) ? createTexture(name) : texture, vertices);
+}
+PlayerEntity* createPlayerEntity(float x, float y, float z) { 
+	return new PlayerEntity(new Vector(x, y, z), NULL, NULL); 
+}
+WizardEntity* createWizardEntity(string name, GLfloat* vertices, float x, float y, float z) { 
+	return new WizardEntity(new Vector(x, y, z), createTexture(name), vertices); 
+}
 
 // Each texture being created goes through the same method calls and is named with a number, referenced by index.
 GLuint* createTexture(string name) {
 	GLuint* texture = new GLuint;
-	SDL_Surface* textureSurface = IMG_Load( ("resources\\" + name + ".jpg").c_str() ); // TODO: Change back to SDLLoad (?) and .bmp
-	if(textureSurface == NULL) cout << "IMG_Load: " << SDL_GetError() << endl;
+	SDL_Surface* textureSurface = SDL_LoadBMP( ("resources\\" + name + ".bmp").c_str() );
+	if(textureSurface == NULL) cout << "SDL_LoadBMP: " << SDL_GetError() << endl;
 
 	glGenTextures(1, texture);
 	glBindTexture(GL_TEXTURE_2D, *texture);
@@ -102,11 +110,64 @@ void pollEventsAndDraw() {
 	bool running = true;
 	
 	// ========== START TEST ========== //
-	GLfloat vertices[12] = { 1,1,0,   -1,1,0,   -1,-1,0,   1,-1,0,}; // default plane
-
-	Entity* tmpModel = createEntity("tmp", vertices, 0, 0, -10.0f);
+#ifdef cube
+	GLfloat cube[72] = { // Front face
+-1.0, -1.0,  1.0,
+ 1.0, -1.0,  1.0,
+ 1.0,  1.0,  1.0,
+-1.0,  1.0,  1.0,
+// Back face
+-1.0, -1.0, -1.0,
+-1.0,  1.0, -1.0,
+ 1.0,  1.0, -1.0,
+ 1.0, -1.0, -1.0,
+// Top face
+-1.0,  1.0, -1.0,
+-1.0,  1.0,  1.0,
+ 1.0,  1.0,  1.0,
+ 1.0,  1.0, -1.0,
+// Bottom face
+-1.0, -1.0, -1.0,
+ 1.0, -1.0, -1.0,
+ 1.0, -1.0,  1.0,
+-1.0, -1.0,  1.0,
+// Right face
+ 1.0, -1.0, -1.0,
+ 1.0,  1.0, -1.0,
+ 1.0,  1.0,  1.0,
+ 1.0, -1.0,  1.0,
+// Left face
+-1.0, -1.0, -1.0,
+-1.0, -1.0,  1.0,
+-1.0,  1.0,  1.0,
+-1.0,  1.0, -1.0}; // default cube
+#endif
+	GLfloat modelVert[12] = {
+		-1.0, -1.0,  1.0,
+		 1.0, -1.0,  1.0,
+		 1.0,  1.0,  1.0,
+		-1.0,  1.0,  1.0};
+	Entity* tmpModel = createEntity("1", NULL, modelVert, 0, 1.0f, -10.0f);
 	tmpModel->addCollider(0, 0, 0, 0);
-	PlayerEntity* player = createPlayerEntity(0, 0, 0);
+	tmpModel->incrementYOf(ROTATION, 20.0f);
+
+	GLfloat floorVert[12] = { 
+		-3.0, 0.0,  40.0,
+		 3.0, 0.0,  40.0,
+		 3.0, 0.0, -40.0,
+		-3.0, 0.0, -40.0};
+	Entity* tmpFloor = createEntity("2", NULL, floorVert, 0, 0, 0);
+
+	GLuint* wallTex = createTexture("3");
+	GLfloat wallVert[12] = { 
+		0.0, 0.0,  40.0,
+		0.0, 10.0,  40.0,
+		0.0, 10.0, -40.0,
+		0.0, 0.0, -40.0};
+	Entity* tmpWall1 = createEntity("", wallTex, wallVert, -3.0f, 0, 0);
+	Entity* tmpWall2 = createEntity("", wallTex, wallVert, 3.0f, 0, 0);
+
+	PlayerEntity* player = createPlayerEntity(0, 1.0f, -6.0f);
 	// ========== END TEST ========== //
 
 	while( running ) {
@@ -163,21 +224,30 @@ void pollEventsAndDraw() {
 		glLoadMatrixf(matrix);
 		// ******************************* //
 
+
 		//tmpModel->incrementXOf(ROTATION, 5.0f);
 		//tmpModel->incrementYOf(POSITION, 0.005f);
 
 		if(player->hasCollided(tmpModel)) {
 			cout << "Collision!" << endl;
 		}
-
-		// TO-DO: 
-		//	Fix collisions
-		//	Fix rotation (convert to quaternions?)
-
+		
+		tmpFloor->drawSelf();
+		tmpWall1->drawSelf();
+		tmpWall2->drawSelf();
 		tmpModel->drawSelf();
 
 		// ========== END TEST ========== //
 		
 		SDL_GL_SwapWindow(mainWindow);
 	}
+	
+		// ========== START TEST ========== //
+	// Remember to delete all models (should be entity linked list) when done!
+	delete tmpModel;
+	delete tmpWall1;
+	delete tmpWall2;
+	delete tmpFloor;
+	delete player;
+		// ========== END TEST ========== //
 }

@@ -8,14 +8,12 @@ class Entity;
 class LinkedList {
 private:
 	Node *head;
-	// player entity reference?
 
 public:
 	LinkedList(void);
 	~LinkedList(void);
-	void add(Entity *anEntity);
-
-	Node* getHead();
+	virtual void add(Entity *anEntity);
+	virtual Node* getHead();
 };
 
 #endif

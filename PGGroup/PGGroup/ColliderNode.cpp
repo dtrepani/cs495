@@ -23,8 +23,8 @@ bool ColliderNode::hasCollidedWhileIteratingThroughOtherList(ColliderNode* other
 
 // Distance between the centers of this node's collider and the other node's collider
 float ColliderNode::distanceBetweenColliders(ColliderNode* otherCollider) {
-	ThreeAxis* colliderPos1 = entity->getPosition();
-	ThreeAxis* colliderPos2 = otherCollider->getEntity()->getPosition();
+	Vector* colliderPos1 = entity->getPosition();
+	Vector* colliderPos2 = otherCollider->getEntity()->getPosition();
 
 	float distance = colliderPos1->distanceTo(colliderPos2);
 

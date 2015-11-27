@@ -10,8 +10,8 @@ private:
 public:
 	Node(Entity* anEntity, Node* aNext);
 	~Node(void);
-	Node* getNext();
-	Entity* getEntity();
+	virtual Node* getNext();
+	virtual Entity* getEntity();
 };
 
 #endif

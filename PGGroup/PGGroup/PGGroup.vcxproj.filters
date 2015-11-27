@@ -48,9 +48,6 @@
     <ClCompile Include="PlayerEntity.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="ThreeAxis.cpp">
-      <Filter>Source Files\Structures</Filter>
-    </ClCompile>
     <ClCompile Include="LinkedList.cpp">
       <Filter>Source Files\Structures\Linked Lists</Filter>
     </ClCompile>
@@ -69,6 +66,9 @@
     <ClCompile Include="WizardEntity.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="Vector.cpp">
+      <Filter>Source Files\Structures</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -85,9 +85,6 @@
     </ClInclude>
     <ClInclude Include="PlayerEntity.h">
       <Filter>Header Files\Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="ThreeAxis.h">
-      <Filter>Header Files\Structures</Filter>
     </ClInclude>
     <ClInclude Include="LinkedList.h">
       <Filter>Header Files\Structures\Linked Lists</Filter>
@@ -106,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="WizardEntity.h">
       <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.h">
+      <Filter>Header Files\Structures</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

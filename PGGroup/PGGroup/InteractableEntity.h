@@ -7,7 +7,7 @@ class InteractableEntity : public Entity {
 private:
 
 public:
-	InteractableEntity(ThreeAxis* aPosition, GLuint *aTexture, GLfloat* aVertices);
+	InteractableEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices);
 	~InteractableEntity(void);
 	//virtual void interactedWith();
 };

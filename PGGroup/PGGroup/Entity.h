@@ -7,7 +7,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_image.h>
-#include "ThreeAxis.h"
+#include "Vector.h"
 using namespace std;
 
 typedef enum {
@@ -20,32 +20,31 @@ class ColliderEntity;
 class ColliderLinkedList;
 class Entity {
 protected:
-	ThreeAxis* position;
-	ThreeAxis* rotation;
-	ThreeAxis* velocity;
+	Vector* position;
+	Vector* rotation;
+	Vector* velocity;
 	float opacity;
 	GLuint* texture;
 	GLfloat* vertices;
 	ColliderLinkedList* colliders; // REMEMBER: Colliders should be relative to the position of the entity
 	
-	ThreeAxis* getCorrespondingThreeAxis(LocationInfo locationInfo);
+	Vector* getCorrespondingVector(LocationInfo locationInfo);
 	void rotateEntity();
 
 public:
-	Entity(ThreeAxis* aPosition, GLuint *aTexture, GLfloat* aVertices);
+	Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices);
 	~Entity(void);
 	void move(float gravity);
 	bool hasCollided(Entity* otherEntity);
-	void addCollider(float x, float y, float z, float radius);
-	void drawSelf();
-
+	virtual void addCollider(float x, float y, float z, float radius);
+	virtual void drawSelf();
 	void incrementXOf(LocationInfo locInfo, float x);
 	void incrementYOf(LocationInfo locInfo, float y);
 	void incrementZOf(LocationInfo locInfo, float z);
 	void setXYZOf(LocationInfo locInfo, float x, float y, float z);
-	ThreeAxis* getPosition();
-	ThreeAxis* getRotation();
-	ThreeAxis* getVelocity();
+	Vector* getPosition();
+	Vector* getRotation();
+	Vector* getVelocity();
 	ColliderLinkedList* getColliders();
 };
 

@@ -78,7 +78,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="PlayerEntity.cpp" />
-    <ClCompile Include="ThreeAxis.cpp" />
+    <ClCompile Include="Vector.cpp" />
     <ClCompile Include="WizardEntity.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -92,7 +92,7 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="PlayerEntity.h" />
-    <ClInclude Include="ThreeAxis.h" />
+    <ClInclude Include="Vector.h" />
     <ClInclude Include="WizardEntity.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
