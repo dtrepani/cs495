@@ -8,6 +8,7 @@
 
 #include <cmath>
 #include "Entity.h"
+#include "PlaneEntity.h"
 #include "InteractableEntity.h"
 #include "PlayerEntity.h"
 #include "WizardEntity.h"
@@ -32,5 +33,6 @@ void initWindow();
 void initOpenGL();
 void pollEventsAndDraw();
 GLuint* createTexture(string name);
+void movePlayer(bool* keys, PlayerEntity* player);
 
 #endif

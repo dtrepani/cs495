@@ -10,6 +10,9 @@ float Vector::distanceTo(Vector* otherEntity) {
 	return sqrt( pow((otherEntity->getX()-x), 2) + pow((otherEntity->getY()-y), 2) + pow((otherEntity->getZ()-z), 2) );
 }
 
+// Zeroes out the vector
+void Vector::zero() { x = 0; y = 0; z = 0; }
+
 // Various vector math
 Vector* Vector::add(Vector* other) { return new Vector(x + other->getX(), y + other->getY(), z + other->getZ()); }
 Vector* Vector::subtract(Vector* other) { return new Vector(x - other->getX(), y - other->getY(), z - other->getZ()); }

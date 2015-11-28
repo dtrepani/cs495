@@ -15,7 +15,7 @@ private:
 	int health;
 	Status state;
 	bool interact;
-	float sensitivityMovement, sensitivityRotation;
+	float sensitivityRotation;
 
 public:
 	PlayerEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices);
@@ -25,7 +25,7 @@ public:
 	void jump();
 	void addCollider(float x, float y, float z, float radius);
 	void moveForward(bool forward);
-	void moveSideways(bool left);
+	void strafe(bool left);
 	void drawSelf(GLfloat (&matrix)[16]);
 };
 

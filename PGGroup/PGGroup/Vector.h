@@ -12,6 +12,7 @@ public:
 	~Vector(void);
 
 	float distanceTo(Vector* otherEntity);
+	void zero();
 
 	Vector* add(Vector* other);
 	Vector* subtract(Vector* other);

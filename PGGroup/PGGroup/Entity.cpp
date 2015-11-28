@@ -1,5 +1,6 @@
 #include "Entity.h"
 #include "ColliderLinkedList.h"
+#include "PlaneEntity.h"
 
 Entity::Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices) {
 	position = aPosition;
@@ -22,7 +23,27 @@ Entity::~Entity(void) {
 void Entity::addCollider(float x, float y, float z, float radius) { colliders->add(new ColliderEntity(new Vector(x, y, z), NULL, NULL, radius, position, false)); }
 
 // Check if this entity has collided with another entity by comparing their colliders.
-bool Entity::hasCollided(Entity* otherEntity) { return colliders->hasCollided(otherEntity->getColliders()); }
+bool Entity::hasCollided(Entity* otherEntity) {	return colliders->hasCollided(otherEntity->getColliders()); }
+
+// Check if this entity has collided with a plane entity.
+// The plane entity doesn't use colliders, but has its own implementation of hasCollided so let it handle checking
+// if it's collided with this entity.
+bool Entity::hasCollided(PlaneEntity* otherEntity) { return otherEntity->hasCollided(this); }
+
+// Check if entity has collided with another entity and stop further velocity if it has.
+// If the entity is not moving toward it (i.e., trying to get away), allow it to move.
+void Entity::checkForCollision(Entity* otherEntity) {
+	if(hasCollided(otherEntity) && isMovingToward(otherEntity)) {
+		velocity->zero();
+	}
+}
+
+// Check if entity has collided with a plane entity and stop further velocity if it has.
+// The plane entity doesn't use colliders, but has its own implementation of checkForCollisions so let it handle checking
+// if it's collided with this entity.
+void Entity::checkForCollision(PlaneEntity* otherEntity) {
+	otherEntity->checkForCollision(this);
+}
 
 // Rotate the entity according to its rotation variables.
 void Entity::rotateEntity() {
@@ -30,6 +51,11 @@ void Entity::rotateEntity() {
 	glRotatef(rotation->getY(), 0, 1, 0);
 	glRotatef(rotation->getZ(), 0, 0, 1);
 }
+
+// Check if this entity is moving toward another by comparing the distance to the other entity at its current position to the
+// distance to the other entity at its new position. If the latter is less than the first, its moving toward the other entity.
+bool Entity::isMovingToward(Entity* otherEntity) { return (position->distanceTo(otherEntity->getPosition()) > ((position->add(velocity))->distanceTo(otherEntity->getPosition())) ); }
+bool Entity::isMovingToward(PlaneEntity* otherEntity) { return otherEntity->isMovingToward(this); }
 
 // Return the Vector location information based on its corresponding enum.
 Vector* Entity::getCorrespondingVector(LocationInfo locationInfo) {
@@ -41,13 +67,6 @@ Vector* Entity::getCorrespondingVector(LocationInfo locationInfo) {
 void Entity::incrementXOf(LocationInfo locInfo, float x) { getCorrespondingVector(locInfo)->incrementX(x); }
 void Entity::incrementYOf(LocationInfo locInfo, float y) { getCorrespondingVector(locInfo)->incrementY(y); }
 void Entity::incrementZOf(LocationInfo locInfo, float z) { getCorrespondingVector(locInfo)->incrementZ(z); }
-
-// Set the x, y, and z values of any location information
-void Entity::setXYZOf(LocationInfo locInfo, float x, float y, float z) {
-	getCorrespondingVector(locInfo)->setX(x);
-	getCorrespondingVector(locInfo)->setY(y);
-	getCorrespondingVector(locInfo)->setZ(z);
-}
 
 Vector* Entity::getPosition() { return position; }
 Vector* Entity::getRotation() { return rotation; }
