@@ -104,6 +104,8 @@ GLuint* createTexture(string name) {
 }
 
 void pollEventsAndDraw() {
+    static GLint initialTime = 0;
+    static GLint frames = 0;
 	SDL_Event event;
 	bool running = true;
 	bool keys[282] = { false };
@@ -166,6 +168,20 @@ void pollEventsAndDraw() {
 		0.0, 0.0, -40.0};
 	PlaneEntity* tmpWall1 = createPlaneEntity("", wallTex, VERTICAL_Z, wallVert, -3.0f, 0, 0);
 	PlaneEntity* tmpWall2 = createPlaneEntity("", wallTex, VERTICAL_Z, wallVert, 3.0f, 0, 0);
+	
+	GLuint* stepTex = createTexture("4");
+	GLfloat floorVert2[12] = { 
+		-1.0, 0.0,  3.0,
+		 1.0, 0.0,  3.0,
+		 1.0, 0.0, -3.0,
+		-1.0, 0.0, -3.0};
+	PlaneEntity* tmpFloor2 = createPlaneEntity("", stepTex, HORIZONTAL, floorVert2, 0, 2.0f, -7.0f);
+	GLfloat floorVert3[12] = { 
+		-1.0, 2.0,  0.0,
+		 1.0, 2.0,  0.0,
+		 1.0, -2.0, 0.0,
+		-1.0, -2.0, 0.0};
+	PlaneEntity* tmpFloor3 = createPlaneEntity("", stepTex, VERTICAL_X, floorVert3, 0, 0.0f, -4.0f);
 
 	PlayerEntity* player = createPlayerEntity(0, 1.0f, 0);
 	// ========== END TEST ========== //
@@ -229,6 +245,8 @@ void pollEventsAndDraw() {
 		
 		player->checkForCollision(tmpModel);
 		player->checkForCollision(tmpFloor);
+		player->checkForCollision(tmpFloor2);
+		player->checkForCollision(tmpFloor3);
 		player->checkForCollision(tmpWall1);
 		player->checkForCollision(tmpWall2);
 
@@ -241,6 +259,8 @@ void pollEventsAndDraw() {
 		
 		
 		tmpFloor->drawSelf();
+		tmpFloor2->drawSelf();
+		tmpFloor3->drawSelf();
 		tmpWall1->drawSelf();
 		tmpWall2->drawSelf();
 		tmpModel->drawSelf();
@@ -248,6 +268,8 @@ void pollEventsAndDraw() {
 		// ========== END TEST ========== //
 		
 		SDL_GL_SwapWindow(mainWindow);
+
+		printFPS(frames, initialTime);
 	}
 	
 		// ========== START TEST ========== //
@@ -260,6 +282,7 @@ void pollEventsAndDraw() {
 		// ========== END TEST ========== //
 }
 
+// Allows for movement in multiple directions and rotations simultaneously.
 void movePlayer(bool* keys, PlayerEntity* player) {
 		if(keys[SDL_GetScancodeFromKey(SDLK_UP)] || keys[SDL_GetScancodeFromKey(SDLK_w)]) player->moveForward(true);
 		if(keys[SDL_GetScancodeFromKey(SDLK_DOWN)] || keys[SDL_GetScancodeFromKey(SDLK_s)]) player->moveForward(false);
@@ -267,4 +290,18 @@ void movePlayer(bool* keys, PlayerEntity* player) {
 		if(keys[SDL_GetScancodeFromKey(SDLK_e)] ) player->strafe(false);
 		if(keys[SDL_GetScancodeFromKey(SDLK_LEFT)] || keys[SDL_GetScancodeFromKey(SDLK_a)]) player->incrementYOf(ROTATION, 1.5f);
 		if(keys[SDL_GetScancodeFromKey(SDLK_RIGHT)] || keys[SDL_GetScancodeFromKey(SDLK_d)]) player->incrementYOf(ROTATION, -1.5f);
+}
+
+// Print the current FPS for debug purposes.
+void printFPS(GLint &frames, GLint &initialTime) {
+    frames++;
+	GLint time = SDL_GetTicks();
+
+	if (time - initialTime >= 5000) {
+	    GLfloat seconds = (time - initialTime) / 1000.0;
+	    GLfloat fps = frames / seconds;
+	    printf("%d frames in %g seconds = %g FPS\n", frames, seconds, fps);
+	    initialTime = time;
+	    frames = 0;
+	}
 }

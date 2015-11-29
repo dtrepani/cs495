@@ -27,12 +27,10 @@ void PlayerEntity::toggleInteract(){
 }
 
 void PlayerEntity::jump(){
-	// TO-DO: Enable jumping only when not jumping
-	//		  Smooth jumping (increment over time instead of set)
-	//if(state != JUMPING) {
+	if(state != JUMPING) {
 		state = JUMPING;
-		velocity->setY(3.0f);
-	//}
+		initialJumpTime = SDL_GetTicks();
+	}
 }
 
 // Add a collider entity to the list of colliders
@@ -61,6 +59,17 @@ void PlayerEntity::strafe(bool left) { // TO-DO: not working correctly
 // Translation is negative because player's position is opposite what other entities' would be due to the rotation above.
 void PlayerEntity::drawSelf(GLfloat (&matrix)[16]) {
 	glLoadMatrixf(matrix);
+
+	if(state == JUMPING) {
+		if(SDL_GetTicks() - initialJumpTime < 200) {
+			velocity->incrementY(0.5f);
+		} else {
+			state = FALLING;
+		}
+	}
+
+	// TO-DO: Check for collisions HERE!!! Not main!
+	//		  When collided with floor, state = STANDING
 
 	Vector* tmp = position;
 	position = position->add(velocity);

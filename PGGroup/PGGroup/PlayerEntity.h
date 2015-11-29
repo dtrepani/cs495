@@ -9,6 +9,7 @@ private:
 		STANDING,
 		RUNNING,
 		JUMPING,
+		FALLING,
 		DEAD
 	} Status;
 
@@ -16,6 +17,7 @@ private:
 	Status state;
 	bool interact;
 	float sensitivityRotation;
+	GLint initialJumpTime;
 
 public:
 	PlayerEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices);

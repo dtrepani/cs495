@@ -8,38 +8,38 @@ PlaneEntity::PlaneEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices
 PlaneEntity::~PlaneEntity(void) {}
 
 // Find the smallest value of an axis to determine the lower boundary for the plane.
-float PlaneEntity::getSmallestVertValFor(int axis) {
+float PlaneEntity::getSmallestPositionValFor(int axis) {
 	float smallest = vertices[axis];
 	for(int i = 1; i < 4; i++) {
 		if(vertices[i*3 + axis] < smallest) {
 			smallest = vertices[i*3 + axis];
 		}
 	}
-	return smallest;
+	return smallest + ( (axis == 0) ? position->getX() : (axis == 1) ? position->getY() : position->getZ() );
 }
 
 // Find the biggest value of an axis to determine the upper boundary for the plane.
-float PlaneEntity::getGreatestVertValFor(int axis) {
+float PlaneEntity::getBiggestPositionValFor(int axis) {
 	float greatest = vertices[axis];
 	for(int i = 1; i < 4; i++) {
 		if(vertices[i*3 + axis] > greatest) {
 			greatest = vertices[i*3 + axis];
 		}
 	}
-	return greatest;
+	return greatest + ( (axis == 0) ? position->getX() : (axis == 1) ? position->getY() : position->getZ() );
 }
 
 // Check if an entity is within the plane's boundaries. Without this, a plane is considered infinite when checking for collisions.
 bool PlaneEntity::entityWithinPlaneBoundaries(Vector* otherPosition) {
 	if(orientation == VERTICAL_X) {
-		return ( (otherPosition->getX() < getGreatestVertValFor(X) && otherPosition->getX() > getSmallestVertValFor(X)) &&
-				 (otherPosition->getY() < getGreatestVertValFor(Y) && otherPosition->getY() > getSmallestVertValFor(Y)) );
+		return ( (otherPosition->getX() < getBiggestPositionValFor(X) && otherPosition->getX() > getSmallestPositionValFor(X)) &&
+				 (otherPosition->getY() < getBiggestPositionValFor(Y) && otherPosition->getY() > getSmallestPositionValFor(Y)) );
 	} else if(orientation == VERTICAL_Z) {
-		return ( (otherPosition->getY() < getGreatestVertValFor(Y) && otherPosition->getY() > getSmallestVertValFor(Y)) &&
-				 (otherPosition->getZ() < getGreatestVertValFor(Z) && otherPosition->getZ() > getSmallestVertValFor(Z)) );
+		return ( (otherPosition->getY() < getBiggestPositionValFor(Y) && otherPosition->getY() > getSmallestPositionValFor(Y)) &&
+				 (otherPosition->getZ() < getBiggestPositionValFor(Z) && otherPosition->getZ() > getSmallestPositionValFor(Z)) );
 	} else {
-		return ( (otherPosition->getX() < getGreatestVertValFor(X) && otherPosition->getX() > getSmallestVertValFor(X)) &&
-				 (otherPosition->getZ() < getGreatestVertValFor(Z) && otherPosition->getZ() > getSmallestVertValFor(Z)) );
+		return ( (otherPosition->getX() < getBiggestPositionValFor(X) && otherPosition->getX() > getSmallestPositionValFor(X)) &&
+				 (otherPosition->getZ() < getBiggestPositionValFor(Z) && otherPosition->getZ() > getSmallestPositionValFor(Z)) );
 	}
 }
 
@@ -57,7 +57,7 @@ bool PlaneEntity::hasCollided(Entity* otherEntity) {
 	} else if(orientation == VERTICAL_Z) {
 		return (abs(position->getX() - otherPosition->getX()) < SENSITIVITY * 3.0f);
 	} else {
-		return (abs(position->getY() - otherPosition->getY()) < SENSITIVITY * 6.0f); // TO-DO: Fix this filthy hack that's for the player entity only
+		return (abs(position->getY() - otherPosition->getY()) < SENSITIVITY * 5.0f); // TO-DO: Fix this filthy hack that's for the player entity only
 	}
 }
 

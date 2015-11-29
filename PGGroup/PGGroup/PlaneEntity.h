@@ -16,8 +16,9 @@ typedef enum {
 class PlaneEntity : public Entity {
 private:
 	Orientation orientation;
-	float getSmallestVertValFor(int axis);
-	float getGreatestVertValFor(int axis);
+
+	float getSmallestPositionValFor(int axis);
+	float getBiggestPositionValFor(int axis);
 	bool entityWithinPlaneBoundaries(Vector* otherPosition);
 
 public:

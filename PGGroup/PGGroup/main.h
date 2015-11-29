@@ -34,5 +34,6 @@ void initOpenGL();
 void pollEventsAndDraw();
 GLuint* createTexture(string name);
 void movePlayer(bool* keys, PlayerEntity* player);
+void printFPS(GLint &frames, GLint &previousTime);
 
 #endif
