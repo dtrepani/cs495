@@ -192,7 +192,7 @@ void pollEventsAndDraw() {
 				running = false;
 			} else if(event.type == SDL_KEYDOWN) {
 				if(event.key.keysym.sym == SDLK_SPACE) player->jump();
-				else if(event.key.keysym.sym == SDLK_x) player->incrementYOf(ROTATION, 180.0f);
+				else if(event.key.keysym.sym == SDLK_x) player->turn();
 				keys[event.key.keysym.scancode] = true;
 			} else if(event.type == SDL_KEYUP) {
 				keys[event.key.keysym.scancode] = false;

@@ -7,10 +7,10 @@
 PlayerEntity::PlayerEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices)
 : Entity(aPosition, aTexture, aVertices) {
 	state = STANDING;
+	isTurning = false;
 	interact = false;
 	health = 100; // can change later if wanted ?
 	addCollider(0, 0, 0, 0);
-
 	sensitivityRotation = 1.5f;
 }
 
@@ -30,6 +30,14 @@ void PlayerEntity::jump(){
 	if(state != JUMPING) {
 		state = JUMPING;
 		initialJumpTime = SDL_GetTicks();
+	}
+}
+
+void PlayerEntity::turn(){
+	if(!isTurning) {
+		isTurning = true;
+		initialTurnTime = SDL_GetTicks();
+		initialTurnDegree = rotation->getY();
 	}
 }
 
@@ -65,6 +73,15 @@ void PlayerEntity::drawSelf(GLfloat (&matrix)[16]) {
 			velocity->incrementY(0.5f);
 		} else {
 			state = FALLING;
+		}
+	}
+	
+	if(isTurning) {
+		if(SDL_GetTicks() - initialTurnTime < 100) {
+			rotation->incrementY(30.0f);
+		} else {
+			isTurning = false;
+			rotation->setY(initialTurnDegree + 180.0f);
 		}
 	}
 

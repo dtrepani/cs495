@@ -12,12 +12,14 @@ private:
 		FALLING,
 		DEAD
 	} Status;
-
-	int health;
+	
 	Status state;
+	GLint initialJumpTime, initialTurnTime;
+	int health;
+	float initialTurnDegree;
 	bool interact;
+	bool isTurning;
 	float sensitivityRotation;
-	GLint initialJumpTime;
 
 public:
 	PlayerEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices);
@@ -25,6 +27,7 @@ public:
 	void pain(int hurt);
 	void toggleInteract();
 	void jump();
+	void turn();
 	void addCollider(float x, float y, float z, float radius);
 	void moveForward(bool forward);
 	void strafe(bool left);
