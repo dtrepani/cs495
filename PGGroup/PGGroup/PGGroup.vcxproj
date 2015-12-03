@@ -68,6 +68,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BlockEntity.cpp" />
+    <ClCompile Include="CoinInteractableEntity.cpp" />
     <ClCompile Include="ColliderEntity.cpp" />
     <ClCompile Include="ColliderLinkedList.cpp" />
     <ClCompile Include="ColliderNode.cpp" />
@@ -83,6 +85,8 @@
     <ClCompile Include="WizardEntity.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BlockEntity.h" />
+    <ClInclude Include="CoinInteractableEntity.h" />
     <ClInclude Include="ColliderEntity.h" />
     <ClInclude Include="ColliderLinkedList.h" />
     <ClInclude Include="ColliderNode.h" />

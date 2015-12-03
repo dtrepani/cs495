@@ -39,14 +39,14 @@ public:
 	~Entity(void);
 
 	virtual bool hasCollided(Entity* otherEntity);
-	virtual void checkForCollision(Entity* otherEntity);
+	virtual bool checkForCollision(Entity* otherEntity);
 	virtual bool isMovingToward(Entity* otherEntity);
 	virtual void addCollider(float x, float y, float z, float radius);
 	virtual void drawSelf();
 
 	void move(float gravity);
 	bool hasCollided(PlaneEntity* otherEntity);
-	void checkForCollision(PlaneEntity* otherEntity);
+	bool checkForCollision(PlaneEntity* otherEntity);
 	bool isMovingToward(PlaneEntity* otherEntity);
 	void incrementXOf(LocationInfo locInfo, float x);
 	void incrementYOf(LocationInfo locInfo, float y);

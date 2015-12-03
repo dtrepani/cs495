@@ -14,6 +14,10 @@ public:
 	~LinkedList(void);
 	virtual void add(Entity *anEntity);
 	virtual Node* getHead();
+	bool hasCollided(Entity* otherEntity);
+	bool isMovingToward(Entity* otherEntity);
+	bool checkForCollision(Entity* otherEntity);
+	void drawSelf();
 };
 
 #endif

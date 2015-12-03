@@ -67,8 +67,11 @@ void initOpenGL() {
 Entity* createEntity(string name, GLuint* texture, GLfloat* vertices, float x, float y, float z) { 
 	return new Entity(new Vector(x, y, z), (texture == NULL) ? createTexture(name) : texture, vertices);
 }
-PlaneEntity* createPlaneEntity(string name, GLuint* texture, Orientation orientation, GLfloat* vertices, float x, float y, float z) { 
+PlaneEntity* createPlaneEntity(string name, GLuint* texture, Orientation orientation, GLfloat* vertices, float x, float y, float z) {
 	return new PlaneEntity(new Vector(x, y, z), (texture == NULL) ? createTexture(name) : texture, vertices, orientation);
+}
+BlockEntity* createBlockEntity(string name, GLuint* texture, float x, float y, float z, float widthX, float heightY, float lengthZ) {
+	return new BlockEntity(new Vector(x, y, z), (texture == NULL) ? createTexture(name) : texture, NULL, BLOCK, widthX, heightY, lengthZ);
 }
 InteractableEntity* createInteractableEntity(string name, GLuint* texture, GLfloat* vertices, float x, float y, float z) { 
 	return new InteractableEntity(new Vector(x, y, z), (texture == NULL) ? createTexture(name) : texture, vertices);
@@ -144,6 +147,8 @@ void pollEventsAndDraw() {
 -1.0,  1.0, -1.0}; // default cube
 #endif
 	bool collision[5] = {false};
+	LinkedList* entities = new LinkedList();
+
 	GLfloat modelVert[12] = {
 		-1.0, -1.0,  0,
 		 1.0, -1.0,  0,
@@ -175,13 +180,24 @@ void pollEventsAndDraw() {
 		 1.0, 0.0,  3.0,
 		 1.0, 0.0, -3.0,
 		-1.0, 0.0, -3.0};
-	PlaneEntity* tmpFloor2 = createPlaneEntity("", stepTex, HORIZONTAL, floorVert2, 0, 2.0f, -7.0f);
+	//PlaneEntity* tmpFloor2 = createPlaneEntity("", stepTex, HORIZONTAL, floorVert2, 0, 2.0f, -7.0f);
 	GLfloat floorVert3[12] = { 
 		-1.0, 2.0,  0.0,
 		 1.0, 2.0,  0.0,
 		 1.0, -2.0, 0.0,
 		-1.0, -2.0, 0.0};
-	PlaneEntity* tmpFloor3 = createPlaneEntity("", stepTex, VERTICAL_X, floorVert3, 0, 0.0f, -4.0f);
+	//PlaneEntity* tmpFloor3 = createPlaneEntity("", stepTex, VERTICAL_X, floorVert3, 0, 0.0f, -4.0f);
+
+	BlockEntity* tmpBlock = createBlockEntity("", stepTex, 1.0f, 0.0f, -6.0f, 3.0f, 3.0f, 5.0f);
+
+	
+	entities->add(tmpModel);
+	entities->add(tmpWall1);
+	entities->add(tmpWall2);
+	entities->add(tmpFloor);
+	//entities->add(tmpFloor2);
+	//entities->add(tmpFloor3);
+	entities->add(tmpBlock);
 
 	PlayerEntity* player = createPlayerEntity(0, 1.0f, 0);
 	// ========== END TEST ========== //
@@ -192,7 +208,7 @@ void pollEventsAndDraw() {
 				running = false;
 			} else if(event.type == SDL_KEYDOWN) {
 				if(event.key.keysym.sym == SDLK_SPACE) player->jump();
-				else if(event.key.keysym.sym == SDLK_x) player->turn();
+				else if(event.key.keysym.sym == SDLK_x) player->turn180();
 				keys[event.key.keysym.scancode] = true;
 			} else if(event.type == SDL_KEYUP) {
 				keys[event.key.keysym.scancode] = false;
@@ -201,7 +217,6 @@ void pollEventsAndDraw() {
 		movePlayer(keys, player);
 
 		// ========== START TEST ========== //
-
 		player->incrementYOf(VELOCITY, -0.2f); // gravity hack
 
 			// Must be  in level superclass: ******
@@ -213,8 +228,7 @@ void pollEventsAndDraw() {
 		GLfloat matrix[16];
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 
-		// Check collisions before drawing player
-		// TO-DO: Remove these! Temporary hacks to test stuff
+#ifndef COLLIDED_CONSOLE_HERE
 		if(player->hasCollided(tmpModel)) {
 			if(!collision[0]) {
 				cout << "Collision: Model" << endl;
@@ -242,29 +256,13 @@ void pollEventsAndDraw() {
 				collision[3] = true;
 			}
 		} else if(collision[3] == true) collision[3] = false;
-		
-		player->checkForCollision(tmpModel);
-		player->checkForCollision(tmpFloor);
-		player->checkForCollision(tmpFloor2);
-		player->checkForCollision(tmpFloor3);
-		player->checkForCollision(tmpWall1);
-		player->checkForCollision(tmpWall2);
+#endif
 
-		player->drawSelf(matrix); // Used to adjust camera based on player position
+		player->drawSelf(matrix, entities); // Used to adjust camera based on player position
 		glLoadMatrixf(matrix);
+
+		entities->drawSelf();
 			// ******************************* //
-
-		//tmpModel->incrementXOf(ROTATION, 5.0f);
-		//tmpModel->incrementZOf(POSITION, 0.05f);
-		
-		
-		tmpFloor->drawSelf();
-		tmpFloor2->drawSelf();
-		tmpFloor3->drawSelf();
-		tmpWall1->drawSelf();
-		tmpWall2->drawSelf();
-		tmpModel->drawSelf();
-
 		// ========== END TEST ========== //
 		
 		SDL_GL_SwapWindow(mainWindow);
@@ -288,8 +286,8 @@ void movePlayer(bool* keys, PlayerEntity* player) {
 		if(keys[SDL_GetScancodeFromKey(SDLK_DOWN)] || keys[SDL_GetScancodeFromKey(SDLK_s)]) player->moveForward(false);
 		if(keys[SDL_GetScancodeFromKey(SDLK_q)] ) player->strafe(true);
 		if(keys[SDL_GetScancodeFromKey(SDLK_e)] ) player->strafe(false);
-		if(keys[SDL_GetScancodeFromKey(SDLK_LEFT)] || keys[SDL_GetScancodeFromKey(SDLK_a)]) player->incrementYOf(ROTATION, 1.5f);
-		if(keys[SDL_GetScancodeFromKey(SDLK_RIGHT)] || keys[SDL_GetScancodeFromKey(SDLK_d)]) player->incrementYOf(ROTATION, -1.5f);
+		if(keys[SDL_GetScancodeFromKey(SDLK_LEFT)] || keys[SDL_GetScancodeFromKey(SDLK_a)]) player->rotate(true);
+		if(keys[SDL_GetScancodeFromKey(SDLK_RIGHT)] || keys[SDL_GetScancodeFromKey(SDLK_d)]) player->rotate(false);
 }
 
 // Print the current FPS for debug purposes.

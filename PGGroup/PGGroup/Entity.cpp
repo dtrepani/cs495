@@ -32,17 +32,19 @@ bool Entity::hasCollided(PlaneEntity* otherEntity) { return otherEntity->hasColl
 
 // Check if entity has collided with another entity and stop further velocity if it has.
 // If the entity is not moving toward it (i.e., trying to get away), allow it to move.
-void Entity::checkForCollision(Entity* otherEntity) {
-	if(hasCollided(otherEntity) && isMovingToward(otherEntity)) {
+bool Entity::checkForCollision(Entity* otherEntity) {
+	bool collisionAndMovingToward = hasCollided(otherEntity) && isMovingToward(otherEntity);
+	if(collisionAndMovingToward) {
 		velocity->zero();
 	}
+	return collisionAndMovingToward;
 }
 
 // Check if entity has collided with a plane entity and stop further velocity if it has.
 // The plane entity doesn't use colliders, but has its own implementation of checkForCollisions so let it handle checking
 // if it's collided with this entity.
-void Entity::checkForCollision(PlaneEntity* otherEntity) {
-	otherEntity->checkForCollision(this);
+bool Entity::checkForCollision(PlaneEntity* otherEntity) {
+	return otherEntity->checkForCollision(this);
 }
 
 // Rotate the entity according to its rotation variables.

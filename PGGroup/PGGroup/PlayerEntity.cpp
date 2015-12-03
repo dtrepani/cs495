@@ -26,6 +26,8 @@ void PlayerEntity::toggleInteract(){
 	interact = !interact;
 }
 
+// Player jumps.
+// The animation will be gradual and take place over ~200ms, so the initial time that space was pressed must be recorded.
 void PlayerEntity::jump(){
 	if(state != JUMPING) {
 		state = JUMPING;
@@ -33,7 +35,10 @@ void PlayerEntity::jump(){
 	}
 }
 
-void PlayerEntity::turn(){
+// Player rotates to the opposite direction. 
+// The animation will be gradual and take place over 100ms and then set the player rotation to the exact opposite rotation, so
+// the initial rotation and the time that x was pressed must be recorded.
+void PlayerEntity::turn180(){
 	if(!isTurning) {
 		isTurning = true;
 		initialTurnTime = SDL_GetTicks();
@@ -50,24 +55,28 @@ void PlayerEntity::moveForward(bool forward) {
 	float yaw = rotation->getY() * (PI / 180);
 	//float pitch = rotation->getX() * (PI / 180);
 	
-	velocity->setX( sin(yaw) * sensitivity );
+	velocity->setX( -sin(yaw) * sensitivity );
 	//position->incrementY( sin(pitch) * sensitivity );
 	velocity->setZ( cos(yaw) * sensitivity );
 }
 
-void PlayerEntity::strafe(bool left) { // TO-DO: not working correctly
+// Player strafes left or right based on the direction they're currently facing.
+void PlayerEntity::strafe(bool left) {
 	float sensitivity = left ? -SENSITIVITY : SENSITIVITY;
 	float yaw = rotation->getY() * (PI / 180);
 	
-	velocity->setX( cos(yaw) * sensitivity );
-	velocity->setZ( sin(yaw) * sensitivity );
+	velocity->setX( cos(yaw) * sensitivity/2 );
+	velocity->setZ( sin(yaw) * sensitivity/2 );
 }
 
-// Adjusts the camera to the player's position and rotation.
-// Translation is negative because player's position is opposite what other entities' would be due to the rotation above.
-void PlayerEntity::drawSelf(GLfloat (&matrix)[16]) {
-	glLoadMatrixf(matrix);
+// Rotates player left or right
+void PlayerEntity::rotate(bool left) {
+	incrementYOf(ROTATION, left ? -sensitivityRotation : sensitivityRotation);
+}
 
+// The animation for jumping, if it is occurring.
+// Takes place over 200 ms and will set the player's state to falling when done.
+void PlayerEntity::checkJump() {
 	if(state == JUMPING) {
 		if(SDL_GetTicks() - initialJumpTime < 200) {
 			velocity->incrementY(0.5f);
@@ -75,7 +84,12 @@ void PlayerEntity::drawSelf(GLfloat (&matrix)[16]) {
 			state = FALLING;
 		}
 	}
-	
+}
+
+// The animation for turning 180 degrees, if it is occurring.
+// Takes place over 100 ms and will set the player's rotation to 180 degrees after the animation has occurred to ensure
+// that the player's spin always lands them in the exact opposite direction.
+void PlayerEntity::checkTurn180() {
 	if(isTurning) {
 		if(SDL_GetTicks() - initialTurnTime < 100) {
 			rotation->incrementY(30.0f);
@@ -84,16 +98,28 @@ void PlayerEntity::drawSelf(GLfloat (&matrix)[16]) {
 			rotation->setY(initialTurnDegree + 180.0f);
 		}
 	}
+}
+
+// Adjusts the camera to the player's position and rotation.
+// Translation is negative because player's position is opposite what other entities' would be due to the rotation above.
+void PlayerEntity::drawSelf(GLfloat (&matrix)[16], LinkedList* entities) {
+	glLoadMatrixf(matrix);
+
+	checkJump();
+	checkTurn180();
 
 	// TO-DO: Check for collisions HERE!!! Not main!
 	//		  When collided with floor, state = STANDING
+	if(entities->checkForCollision(this)) {
+		state = STANDING;
+	}
 
 	Vector* tmp = position;
 	position = position->add(velocity);
 	velocity->zero();
 	delete tmp;
 
-	glRotatef( 360.0f - rotation->getY(), 0, 1, 0 );
+	glRotatef( rotation->getY(), 0, 1, 0 );
 	glTranslatef(-position->getX(), -position->getY(), -position->getZ()); 
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);

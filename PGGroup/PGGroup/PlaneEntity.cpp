@@ -32,14 +32,16 @@ float PlaneEntity::getBiggestPositionValFor(int axis) {
 // Check if an entity is within the plane's boundaries. Without this, a plane is considered infinite when checking for collisions.
 bool PlaneEntity::entityWithinPlaneBoundaries(Vector* otherPosition) {
 	if(orientation == VERTICAL_X) {
-		return ( (otherPosition->getX() < getBiggestPositionValFor(X) && otherPosition->getX() > getSmallestPositionValFor(X)) &&
+		return ( (otherPosition->getX() < getBiggestPositionValFor(X) && otherPosition->getX() > getSmallestPositionValFor(X)) && // TO-DO: should consider other entity's collider's radius
 				 (otherPosition->getY() < getBiggestPositionValFor(Y) && otherPosition->getY() > getSmallestPositionValFor(Y)) );
 	} else if(orientation == VERTICAL_Z) {
 		return ( (otherPosition->getY() < getBiggestPositionValFor(Y) && otherPosition->getY() > getSmallestPositionValFor(Y)) &&
 				 (otherPosition->getZ() < getBiggestPositionValFor(Z) && otherPosition->getZ() > getSmallestPositionValFor(Z)) );
-	} else {
+	} else if(orientation == HORIZONTAL) {
 		return ( (otherPosition->getX() < getBiggestPositionValFor(X) && otherPosition->getX() > getSmallestPositionValFor(X)) &&
 				 (otherPosition->getZ() < getBiggestPositionValFor(Z) && otherPosition->getZ() > getSmallestPositionValFor(Z)) );
+	} else {
+		return false;
 	}
 }
 
@@ -53,11 +55,13 @@ bool PlaneEntity::hasCollided(Entity* otherEntity) {
 	}
 
 	if(orientation == VERTICAL_X) {
-		return (abs(position->getZ() - otherPosition->getZ()) < SENSITIVITY * 3.0f);
+		return (abs(position->getZ() - otherPosition->getZ()) < SENSITIVITY * 3.0f); // TO-DO: Fix this filthy hack that's for the player entity only (should consider other entity's collider's radius)
 	} else if(orientation == VERTICAL_Z) {
 		return (abs(position->getX() - otherPosition->getX()) < SENSITIVITY * 3.0f);
+	} else if(orientation == HORIZONTAL) {
+		return (abs(position->getY() - otherPosition->getY()) < SENSITIVITY * 5.0f);
 	} else {
-		return (abs(position->getY() - otherPosition->getY()) < SENSITIVITY * 5.0f); // TO-DO: Fix this filthy hack that's for the player entity only
+		return false;
 	}
 }
 
@@ -70,21 +74,25 @@ bool PlaneEntity::isMovingToward(Entity* otherEntity) {
 		return ( abs(position->getZ() - otherPosition->getZ()) > abs(position->getZ() - otherPositionWithVelocity->getZ()) );
 	} else if(orientation == VERTICAL_Z) {
 		return ( abs(position->getX() - otherPosition->getX()) > abs(position->getX() - otherPositionWithVelocity->getX()) );
-	} else {
+	} else if(orientation == HORIZONTAL) {
 		return ( abs(position->getY() - otherPosition->getY()) > abs(position->getY() - otherPositionWithVelocity->getY()) );
+	} else {
+		return false;
 	}
 }
 
 // Plane entities do not need to zero out the entire velocity vector. This would prevent any kind of movement
 // if collided with the floor. Thus, only certain axis are zero'd out depending on the plane's orientation.
-void PlaneEntity::checkForCollision(Entity* otherEntity) {
-	if(hasCollided(otherEntity) && isMovingToward(otherEntity)) {
+bool PlaneEntity::checkForCollision(Entity* otherEntity) {
+	bool collisionAndMovingToward = hasCollided(otherEntity) && isMovingToward(otherEntity);
+	if(collisionAndMovingToward) {
 		if(orientation == VERTICAL_X || orientation == VERTICAL_Z) {
 			otherEntity->getVelocity()->setX(0);
 			otherEntity->getVelocity()->setZ(0);
 		}
-		else {
+		else if (orientation == HORIZONTAL) {
 			otherEntity->getVelocity()->setY(0);
 		}
 	}
+	return collisionAndMovingToward;
 }

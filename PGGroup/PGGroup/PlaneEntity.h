@@ -8,6 +8,7 @@
 #define Z 2
 
 typedef enum {
+	BLOCK,
 	VERTICAL_X,
 	VERTICAL_Z,
 	HORIZONTAL
@@ -26,7 +27,7 @@ public:
 	~PlaneEntity(void);
 	bool hasCollided(Entity* otherEntity);
 	bool isMovingToward(Entity* otherEntity);
-	void checkForCollision(Entity* otherEntity);
+	bool checkForCollision(Entity* otherEntity);
 };
 
 #endif

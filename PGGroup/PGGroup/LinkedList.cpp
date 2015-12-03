@@ -13,3 +13,22 @@ void LinkedList::add(Entity *anEntity) {
 }
 
 Node* LinkedList::getHead() { return head; };
+
+bool LinkedList::hasCollided(Entity* otherEntity) {
+	if(head) return head->hasCollided(otherEntity);
+	return false;
+}
+
+bool LinkedList::isMovingToward(Entity* otherEntity) {
+	if(head) return head->isMovingToward(otherEntity);
+	return false;
+}
+
+bool LinkedList::checkForCollision(Entity* otherEntity) {
+	if(head) return head->checkForCollision(otherEntity);
+	return false;
+}
+
+void LinkedList::drawSelf() {
+	if(head) head->drawSelf();
+}
