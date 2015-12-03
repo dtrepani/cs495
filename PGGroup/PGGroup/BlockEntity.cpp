@@ -62,7 +62,9 @@ BlockEntity::BlockEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices
 	createAndAdd(posX, posY, posZ, leftFace, VERTICAL_Z);
 }
 
-BlockEntity::~BlockEntity(void) {}
+BlockEntity::~BlockEntity(void) {
+	delete planes;
+}
 
 void BlockEntity::createAndAdd(float x, float y, float z, GLfloat* vertices, Orientation orientation) {
 	planes->add(new PlaneEntity(new Vector(x, y, z), texture, vertices, orientation));

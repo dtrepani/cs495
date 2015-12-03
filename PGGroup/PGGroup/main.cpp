@@ -188,10 +188,10 @@ void pollEventsAndDraw() {
 		-1.0, -2.0, 0.0};
 	//PlaneEntity* tmpFloor3 = createPlaneEntity("", stepTex, VERTICAL_X, floorVert3, 0, 0.0f, -4.0f);
 
-	BlockEntity* tmpBlock = createBlockEntity("", stepTex, 1.0f, 0.0f, -6.0f, 3.0f, 3.0f, 5.0f);
+	BlockEntity* tmpBlock = createBlockEntity("", stepTex, 0.0f, 0.0f, -7.0f, 3.0f, 3.0f, 5.0f);
 
 	
-	entities->add(tmpModel);
+	//entities->add(tmpModel);
 	entities->add(tmpWall1);
 	entities->add(tmpWall2);
 	entities->add(tmpFloor);
