@@ -19,8 +19,8 @@ private:
 public:
 	PlaneEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, Orientation aOrientation);
 	~PlaneEntity(void);
-	float getSmallestPositionValFor(int axis);
-	float getBiggestPositionValFor(int axis);
+	float getMin(int axis);
+	float getMax(int axis);
 	bool hasCollided(Entity* otherEntity);
 	bool isMovingToward(Entity* otherEntity);
 	bool checkForCollision(Entity* otherEntity);
