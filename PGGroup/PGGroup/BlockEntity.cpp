@@ -19,7 +19,7 @@ BlockEntity::BlockEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices
 		 widthX, -heightY,  1.0f,
 		-widthX, -heightY,  1.0f,
 	};
-	createAndAdd(posX, posY, posZ, frontFace, VERTICAL_X);
+	createAndAdd(posX, posY, posZ, &frontFace[0], VERTICAL_X);
 
 	GLfloat backFace[12] = {
 		-widthX,  heightY, -1.0f,
@@ -27,7 +27,7 @@ BlockEntity::BlockEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices
 		 widthX, -heightY, -1.0f,
 		-widthX, -heightY, -1.0f,
 	};
-	createAndAdd(posX, posY, posZ, backFace, VERTICAL_X);
+	createAndAdd(posX, posY, posZ, &backFace[0], VERTICAL_X);
 
 	GLfloat topFace[12] = {
 		-widthX,  1.0f,  lengthZ,
@@ -35,7 +35,7 @@ BlockEntity::BlockEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices
 		 widthX,  1.0f, -lengthZ,
 		-widthX,  1.0f, -lengthZ,
 	};
-	createAndAdd(posX, posY, posZ, topFace, HORIZONTAL);
+	createAndAdd(posX, posY, posZ, &topFace[0], HORIZONTAL);
 
 	GLfloat bottomFace[12] = {
 		-widthX, -1.0f,  lengthZ,
@@ -43,7 +43,7 @@ BlockEntity::BlockEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices
 		 widthX, -1.0f, -lengthZ,
 		-widthX, -1.0f, -lengthZ,
 	};
-	createAndAdd(posX, posY, posZ, topFace, HORIZONTAL);
+	createAndAdd(posX, posY, posZ, &topFace[0], HORIZONTAL);
 
 	GLfloat rightFace[12] = {
 		 1.0f, -heightY,  lengthZ,
@@ -51,7 +51,7 @@ BlockEntity::BlockEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices
 		 1.0f,  heightY, -lengthZ,
 		 1.0f, -heightY, -lengthZ,
 	};
-	createAndAdd(posX, posY, posZ, rightFace, VERTICAL_Z);
+	createAndAdd(posX, posY, posZ, &rightFace[0], VERTICAL_Z);
 
 	GLfloat leftFace[12] = {
 		-1.0f, -heightY,  lengthZ,
@@ -59,7 +59,7 @@ BlockEntity::BlockEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices
 		-1.0f,  heightY, -lengthZ,
 		-1.0f, -heightY, -lengthZ,
 	};
-	createAndAdd(posX, posY, posZ, leftFace, VERTICAL_Z);
+	createAndAdd(posX, posY, posZ, &leftFace[0], VERTICAL_Z);
 }
 
 BlockEntity::~BlockEntity(void) {
@@ -67,7 +67,7 @@ BlockEntity::~BlockEntity(void) {
 }
 
 void BlockEntity::createAndAdd(float x, float y, float z, GLfloat* vertices, Orientation orientation) {
-	planes->add(new PlaneEntity(new Vector(x, y, z), texture, vertices, orientation));
+	planes->add(new PlaneEntity(new Vector(x, y, z), texture, &vertices[0], orientation));
 }
 
 bool BlockEntity::hasCollided(Entity* otherEntity) {

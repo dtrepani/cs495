@@ -154,7 +154,7 @@ void pollEventsAndDraw() {
 		 1.0, -1.0,  0,
 		 1.0,  1.0,  0,
 		-1.0,  1.0,  0};
-	Entity* tmpModel = createEntity("1", NULL, modelVert, 0, 1.0f, -10.0f);
+	Entity* tmpModel = createEntity("1", NULL, &modelVert[0], 0, 1.0f, -10.0f);
 	tmpModel->addCollider(0, 0, 0, 0);
 	tmpModel->incrementYOf(ROTATION, 20.0f);
 
@@ -163,7 +163,7 @@ void pollEventsAndDraw() {
 		 3.0, 0.0,  40.0,
 		 3.0, 0.0, -40.0,
 		-3.0, 0.0, -40.0};
-	PlaneEntity* tmpFloor = createPlaneEntity("2", NULL, HORIZONTAL, floorVert, 0, 0, 0);
+	PlaneEntity* tmpFloor = createPlaneEntity("2", NULL, HORIZONTAL, &floorVert[0], 0, 0, 0);
 
 	GLuint* wallTex = createTexture("3");
 	GLfloat wallVert[12] = { 
@@ -171,8 +171,8 @@ void pollEventsAndDraw() {
 		0.0, 10.0,  30.0,
 		0.0, 10.0, -40.0,
 		0.0, 0.0, -40.0};
-	PlaneEntity* tmpWall1 = createPlaneEntity("", wallTex, VERTICAL_Z, wallVert, -3.0f, 0, 0);
-	PlaneEntity* tmpWall2 = createPlaneEntity("", wallTex, VERTICAL_Z, wallVert, 3.0f, 0, 0);
+	PlaneEntity* tmpWall1 = createPlaneEntity("", wallTex, VERTICAL_Z, &wallVert[0], -3.0f, 0, 0);
+	PlaneEntity* tmpWall2 = createPlaneEntity("", wallTex, VERTICAL_Z, &wallVert[0], 3.0f, 0, 0);
 	
 	GLuint* stepTex = createTexture("4");
 	GLfloat floorVert2[12] = { 

@@ -8,7 +8,7 @@ LinkedList::~LinkedList(void) {
 	delete head;
 }
 
-void LinkedList::add(Entity *anEntity) {
+void LinkedList::add(Entity* anEntity) {
 	head = new Node(anEntity, head);
 }
 

@@ -8,8 +8,11 @@ Entity::Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices) {
 	velocity = new Vector(0.0, 0.0, 0.0);
 	texture = aTexture;
 	opacity = 0;
-	vertices = aVertices;
 	colliders = new ColliderLinkedList();
+
+	if(aVertices) {
+		memcpy(&vertices[0], &aVertices[0], sizeof(vertices));
+	}
 }
 
 Entity::~Entity(void) {

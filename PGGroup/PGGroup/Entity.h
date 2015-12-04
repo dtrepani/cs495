@@ -28,7 +28,7 @@ protected:
 	Vector* velocity;
 	float opacity;
 	GLuint* texture;
-	GLfloat* vertices;
+	GLfloat vertices[12];
 	ColliderLinkedList* colliders; // REMEMBER: Colliders should be relative to the position of the entity
 	
 	Vector* getCorrespondingVector(LocationInfo locationInfo);
