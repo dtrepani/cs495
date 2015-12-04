@@ -59,7 +59,7 @@ bool PlaneEntity::hasCollided(Entity* otherEntity) {
 	} else if(orientation == VERTICAL_Z) {
 		return (abs(position->getX() - otherPosition->getX()) < SENSITIVITY * 3.0f);
 	} else if(orientation == HORIZONTAL) {
-		return (abs(position->getY() - otherPosition->getY()) < SENSITIVITY * 5.0f);
+		return (abs(position->getY() - otherPosition->getY()) < SENSITIVITY * 4.0f);
 	} else {
 		return false;
 	}

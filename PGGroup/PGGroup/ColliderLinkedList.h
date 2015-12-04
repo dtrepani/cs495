@@ -11,9 +11,10 @@ private:
 public:
 	ColliderLinkedList(void);
 	~ColliderLinkedList(void);
-	bool hasCollided(ColliderLinkedList* otherColliders);
 	void add(ColliderEntity* head);
 	ColliderNode* getHead();
+	bool hasCollided(ColliderLinkedList* otherColliders);
+	bool withinPlaneBoundaries(Orientation orientation, float biggestPositionVal1, float smallestPositionVal1, float biggestPositionVal2, float smallestPositionVal2);
 };
 
 #endif

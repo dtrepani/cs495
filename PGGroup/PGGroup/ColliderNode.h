@@ -3,6 +3,7 @@
 
 #include "Node.h"
 #include "ColliderEntity.h"
+#include "PlaneEntity.h"
 
 class ColliderNode : public Node {
 private:
@@ -17,6 +18,7 @@ public:
 	ColliderNode(ColliderEntity* anEntity, ColliderNode* aNext);
 	~ColliderNode(void);
 	bool hasCollidedWhileIteratingThroughThisList(ColliderNode* otherColliderHead);
+	bool withinPlaneBoundaries(Orientation orientation, float biggestPositionVal1, float smallestPositionVal1, float biggestPositionVal2, float smallestPositionVal2);
 	ColliderNode* getNext();
 	ColliderEntity* getEntity();
 };

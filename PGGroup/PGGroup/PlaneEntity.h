@@ -3,10 +3,6 @@
 
 #include "Entity.h"
 
-#define X 0
-#define Y 1
-#define Z 2
-
 typedef enum {
 	BLOCK,
 	VERTICAL_X,

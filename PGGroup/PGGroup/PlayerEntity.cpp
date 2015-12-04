@@ -102,14 +102,14 @@ void PlayerEntity::checkTurn180() {
 
 // Adjusts the camera to the player's position and rotation.
 // Translation is negative because player's position is opposite what other entities' would be due to the rotation above.
+// The Y translation is adjusted slightly to make the camera act as if it's out of the eyes of a person (off-center), while
+// maintaining the actual center of the player.
 void PlayerEntity::drawSelf(GLfloat (&matrix)[16], LinkedList* entities) {
 	glLoadMatrixf(matrix);
 
 	checkJump();
 	checkTurn180();
 
-	// TO-DO: Check for collisions HERE!!! Not main!
-	//		  When collided with floor, state = STANDING
 	if(entities->checkForCollision(this)) {
 		state = STANDING;
 	}
@@ -120,7 +120,7 @@ void PlayerEntity::drawSelf(GLfloat (&matrix)[16], LinkedList* entities) {
 	delete tmp;
 
 	glRotatef( rotation->getY(), 0, 1, 0 );
-	glTranslatef(-position->getX(), -position->getY(), -position->getZ()); 
+	glTranslatef(-position->getX(), -position->getY()-0.3f, -position->getZ()); 
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 }

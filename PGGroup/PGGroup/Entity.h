@@ -10,6 +10,9 @@
 #include "Vector.h"
 using namespace std;
 
+#define X 0
+#define Y 1
+#define Z 2
 #define SENSITIVITY 0.2f
 
 typedef enum {

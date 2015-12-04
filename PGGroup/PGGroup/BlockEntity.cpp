@@ -14,50 +14,50 @@ BlockEntity::BlockEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices
 	lengthZ /= 2;
 
 	GLfloat frontFace[12] = {
-		-widthX,  heightY,  1.0f,
-		 widthX,  heightY,  1.0f,
-		 widthX, -heightY,  1.0f,
-		-widthX, -heightY,  1.0f,
+		 widthX, -heightY,  lengthZ,
+		-widthX, -heightY,  lengthZ,
+		-widthX,  heightY,  lengthZ,
+		 widthX,  heightY,  lengthZ,
 	};
 	createAndAdd(posX, posY, posZ, &frontFace[0], VERTICAL_X);
 
 	GLfloat backFace[12] = {
-		-widthX,  heightY, -1.0f,
-		 widthX,  heightY, -1.0f,
-		 widthX, -heightY, -1.0f,
-		-widthX, -heightY, -1.0f,
+		 widthX, -heightY, -lengthZ,
+		-widthX, -heightY, -lengthZ,
+		-widthX,  heightY, -lengthZ,
+		 widthX,  heightY, -lengthZ,
 	};
 	createAndAdd(posX, posY, posZ, &backFace[0], VERTICAL_X);
 
 	GLfloat topFace[12] = {
-		-widthX,  1.0f,  lengthZ,
-		 widthX,  1.0f,  lengthZ,
-		 widthX,  1.0f, -lengthZ,
-		-widthX,  1.0f, -lengthZ,
+		-widthX,  heightY,  lengthZ,
+		 widthX,  heightY,  lengthZ,
+		 widthX,  heightY, -lengthZ,
+		-widthX,  heightY, -lengthZ,
 	};
 	createAndAdd(posX, posY, posZ, &topFace[0], HORIZONTAL);
 
 	GLfloat bottomFace[12] = {
-		-widthX, -1.0f,  lengthZ,
-		 widthX, -1.0f,  lengthZ,
-		 widthX, -1.0f, -lengthZ,
-		-widthX, -1.0f, -lengthZ,
+		-widthX, -heightY,  lengthZ,
+		 widthX, -heightY,  lengthZ,
+		 widthX, -heightY, -lengthZ,
+		-widthX, -heightY, -lengthZ,
 	};
-	createAndAdd(posX, posY, posZ, &topFace[0], HORIZONTAL);
+	createAndAdd(posX, posY, posZ, &bottomFace[0], HORIZONTAL);
 
 	GLfloat rightFace[12] = {
-		 1.0f, -heightY,  lengthZ,
-		 1.0f,  heightY,  lengthZ,
-		 1.0f,  heightY, -lengthZ,
-		 1.0f, -heightY, -lengthZ,
+		 widthX, -heightY, -lengthZ,
+		 widthX, -heightY,  lengthZ,
+		 widthX,  heightY,  lengthZ,
+		 widthX,  heightY, -lengthZ,
 	};
 	createAndAdd(posX, posY, posZ, &rightFace[0], VERTICAL_Z);
 
 	GLfloat leftFace[12] = {
-		-1.0f, -heightY,  lengthZ,
-		-1.0f,  heightY,  lengthZ,
-		-1.0f,  heightY, -lengthZ,
-		-1.0f, -heightY, -lengthZ,
+		-widthX, -heightY, -lengthZ,
+		-widthX, -heightY,  lengthZ,
+		-widthX,  heightY,  lengthZ,
+		-widthX,  heightY, -lengthZ,
 	};
 	createAndAdd(posX, posY, posZ, &leftFace[0], VERTICAL_Z);
 }

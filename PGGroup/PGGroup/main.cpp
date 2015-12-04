@@ -180,23 +180,22 @@ void pollEventsAndDraw() {
 		 1.0, 0.0,  3.0,
 		 1.0, 0.0, -3.0,
 		-1.0, 0.0, -3.0};
-	//PlaneEntity* tmpFloor2 = createPlaneEntity("", stepTex, HORIZONTAL, floorVert2, 0, 2.0f, -7.0f);
+	PlaneEntity* tmpFloor2 = createPlaneEntity("", stepTex, HORIZONTAL, floorVert2, 0, 2.0f, -7.0f);
 	GLfloat floorVert3[12] = { 
 		-1.0, 2.0,  0.0,
 		 1.0, 2.0,  0.0,
 		 1.0, -2.0, 0.0,
 		-1.0, -2.0, 0.0};
-	//PlaneEntity* tmpFloor3 = createPlaneEntity("", stepTex, VERTICAL_X, floorVert3, 0, 0.0f, -4.0f);
+	PlaneEntity* tmpFloor3 = createPlaneEntity("", stepTex, VERTICAL_X, floorVert3, 0, 0.0f, -4.0f);
 
-	BlockEntity* tmpBlock = createBlockEntity("", stepTex, 0.0f, 0.0f, -7.0f, 3.0f, 3.0f, 5.0f);
+	BlockEntity* tmpBlock = createBlockEntity("", stepTex, 0.0f, 0.25f, 7.0f, 2.0f, 0.5f, 5.0f);
 
-	
 	//entities->add(tmpModel);
 	entities->add(tmpWall1);
 	entities->add(tmpWall2);
 	entities->add(tmpFloor);
-	//entities->add(tmpFloor2);
-	//entities->add(tmpFloor3);
+	entities->add(tmpFloor2);
+	entities->add(tmpFloor3);
 	entities->add(tmpBlock);
 
 	PlayerEntity* player = createPlayerEntity(0, 1.0f, 0);

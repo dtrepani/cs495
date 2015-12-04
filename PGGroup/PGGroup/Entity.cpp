@@ -87,10 +87,10 @@ void Entity::drawSelf() {
 	rotateEntity();
 
 	glBegin(GL_QUADS);
-		glTexCoord2f(0, 1);	glVertex3f(vertices[0], vertices[1], vertices[2]);
-		glTexCoord2f(1, 1);	glVertex3f(vertices[3], vertices[4], vertices[5]);
-		glTexCoord2f(1, 0);	glVertex3f(vertices[6], vertices[7], vertices[8]);
-		glTexCoord2f(0, 0);	glVertex3f(vertices[9], vertices[10], vertices[11]);
+		glTexCoord2f(0, 1.0f);		glVertex3f(vertices[0], vertices[1], vertices[2]);
+		glTexCoord2f(1.0f, 1.0f);	glVertex3f(vertices[3], vertices[4], vertices[5]);
+		glTexCoord2f(1.0f, 0);		glVertex3f(vertices[6], vertices[7], vertices[8]);
+		glTexCoord2f(0, 0);			glVertex3f(vertices[9], vertices[10], vertices[11]);
 	glEnd();
 	glPopMatrix();
 }
