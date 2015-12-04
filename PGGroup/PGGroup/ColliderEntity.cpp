@@ -1,7 +1,7 @@
 #include "ColliderEntity.h"
 
 // If aRadius is 0, will use a default value.
-ColliderEntity::ColliderEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius, Vector *anEntityPosition, bool aIsPlayer)
+ColliderEntity::ColliderEntity(Vector* aPosition, GLuint* aTexture, GLfloat* aVertices, float aRadius, Vector* anEntityPosition, bool aIsPlayer)
 : Entity(aPosition, aTexture, aVertices) {
 	radius = ((aRadius == 0.0) ? 0.8f : aRadius);
 	entityPosition = anEntityPosition;

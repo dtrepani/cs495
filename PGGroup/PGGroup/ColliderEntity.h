@@ -10,7 +10,7 @@ private:
 	bool isPlayer;
 
 public:
-	ColliderEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius, Vector *anEntityPosition, bool aIsPlayer);
+	ColliderEntity(Vector* aPosition, GLuint* aTexture, GLfloat* aVertices, float aRadius, Vector* anEntityPosition, bool aIsPlayer);
 	~ColliderEntity(void);
 	float getRadius();
 	Vector* getPosition();

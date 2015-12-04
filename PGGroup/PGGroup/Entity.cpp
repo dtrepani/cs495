@@ -2,6 +2,8 @@
 #include "ColliderLinkedList.h"
 #include "PlaneEntity.h"
 
+int cntTmpI = 0; // TO-DO: remove
+
 Entity::Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices) {
 	position = aPosition;
 	rotation = new Vector(0.0, 0.0, 0.0);
@@ -12,7 +14,13 @@ Entity::Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices) {
 
 	if(aVertices) {
 		memcpy(&vertices[0], &aVertices[0], sizeof(vertices));
+	} else {
+		GLfloat vertZero[12] = { 0 };
+		memcpy(&vertices[0], &vertZero[0], sizeof(vertices));
 	}
+
+	tmpi = cntTmpI;
+	cntTmpI++;
 }
 
 Entity::~Entity(void) {

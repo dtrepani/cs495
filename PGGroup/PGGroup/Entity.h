@@ -33,6 +33,7 @@ protected:
 	GLuint* texture;
 	GLfloat vertices[12];
 	ColliderLinkedList* colliders; // REMEMBER: Colliders should be relative to the position of the entity
+	int tmpi; // TO-DO: remove
 	
 	Vector* getCorrespondingVector(LocationInfo locationInfo);
 	void rotateEntity();

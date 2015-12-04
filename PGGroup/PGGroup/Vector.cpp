@@ -14,7 +14,7 @@ float Vector::distanceTo(Vector* otherEntity) {
 void Vector::zero() { x = 0; y = 0; z = 0; }
 
 // Various vector math
-float Vector::dotProduct(Vector* other) { return (x * other->getX(), y * other->getY(), z * other->getZ()); }
+float Vector::dotProduct(Vector* other) { return (x * other->getX() + y * other->getY() + z * other->getZ()); }
 
 Vector* Vector::add(Vector* other) { return new Vector(x + other->getX(), y + other->getY(), z + other->getZ()); }
 Vector* Vector::subtract(Vector* other) { return new Vector(x - other->getX(), y - other->getY(), z - other->getZ()); }

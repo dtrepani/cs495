@@ -1,11 +1,24 @@
 #include "PlaneEntity.h"
+#include <cstdlib>
+#include <time.h>
+
 
 PlaneEntity::PlaneEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, Orientation aOrientation)
 : Entity(aPosition, aTexture, aVertices) {
+	srand (time(NULL));
 	orientation = aOrientation;
+	pointOnPlane = new Vector( getRandValOnPlane(X), getRandValOnPlane(Y), getRandValOnPlane(Z) );
 }
 
 PlaneEntity::~PlaneEntity(void) {}
+
+// Get a random point on the plane for an axis.
+float PlaneEntity::getRandValOnPlane(int axis) {
+	float min = getMin(axis);
+	float max = getMax(axis);
+    float randVal = (float)rand() / RAND_MAX;
+    return min + randVal * (max - min);
+}
 
 // Find the smallest value of an axis to determine the lower boundary for the plane.
 float PlaneEntity::getMin(int axis) {
@@ -48,10 +61,10 @@ bool PlaneEntity::entityWithinPlaneBoundaries(Vector* otherPosition) {
 // Each plane orientation has their own axis to check if an entity has collided with it or not.
 // Planes must also check if the entity is within its boundaries or else their other checks would be an infinite field.
 bool PlaneEntity::hasCollided(Entity* otherEntity) {
-	/*
 	Vector* otherPosition = otherEntity->getPosition();
 
 	if(!(otherEntity->withinPlaneBoundaries(this))) {
+	//if(!(entityWithinPlaneBoundaries(otherPosition))) {
 		return false;
 	}
 
@@ -63,16 +76,15 @@ bool PlaneEntity::hasCollided(Entity* otherEntity) {
 		return (abs(position->getY() - otherPosition->getY()) < SENSITIVITY * 4.0f);
 	} else {
 		return false;
-	}*/
+	}
 
 	/*
-Distance = Sphere.Center Dot Plane.Normal + Plane.D
-if Distance >= Sphere.Radius
-	Result = false
-Else
-	Result = true*/
-
-	//float distance = ( ((otherEntity->getPosition())->dotProduct( position->normalize() ) )->add( position->normalize() );
+	Vector* otherPosition = otherEntity->getPosition();
+	Vector* planeNormal = position->normalize();
+	float distFromOrigin = planeNormal->distanceTo(pointOnPlane);
+	float distance = planeNormal->dotProduct( otherPosition ) + distFromOrigin;
+	if( abs(distance) <= 1.0f ) return true; // TO-DO: tmp value
+	else return false;*/
 }
 
 // Each plane orientation has their own axis to check if an entity is moving toward it or not.

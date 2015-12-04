@@ -13,7 +13,8 @@ typedef enum {
 class PlaneEntity : public Entity {
 private:
 	Orientation orientation;
-
+	Vector* pointOnPlane;
+	float getRandValOnPlane(int axis);
 	bool entityWithinPlaneBoundaries(Vector* otherPosition);
 
 public:

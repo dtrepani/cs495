@@ -149,6 +149,9 @@ void pollEventsAndDraw() {
 	bool collision[5] = {false};
 	LinkedList* entities = new LinkedList();
 
+	PlayerEntity* player = createPlayerEntity(0, 1.0f, 0);
+	player->addCollider(0, 0, 0, 0);
+
 	GLfloat modelVert[12] = {
 		-1.0, -1.0,  0,
 		 1.0, -1.0,  0,
@@ -197,8 +200,6 @@ void pollEventsAndDraw() {
 	entities->add(tmpFloor2);
 	entities->add(tmpFloor3);
 	entities->add(tmpBlock);
-
-	PlayerEntity* player = createPlayerEntity(0, 1.0f, 0);
 	// ========== END TEST ========== //
 
 	while( running ) {
