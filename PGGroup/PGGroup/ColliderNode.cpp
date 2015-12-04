@@ -42,22 +42,23 @@ float ColliderNode::sumOfRadii(ColliderNode* otherCollider) {
 
 
 bool ColliderNode::withinPlaneBoundaries(Orientation orientation, float biggestPositionVal1, float smallestPositionVal1, float biggestPositionVal2, float smallestPositionVal2) {
-	//(otherPosition->getX() < getBiggestPositionValFor(X) && otherPosition->getX() > getSmallestPositionValFor(X)) && // TO-DO: should consider other entity's collider's radius
-			//	 (otherPosition->getY() < getBiggestPositionValFor(Y) && otherPosition->getY() > getSmallestPositionValFor(Y))
 	bool within = false;
 	Vector* colliderPos = entity->getPosition();
 	float colliderRadius = entity->getRadius();
 
 	if(next) within = next->withinPlaneBoundaries(orientation, biggestPositionVal1, smallestPositionVal1, biggestPositionVal2, smallestPositionVal2);
-	if(orientation == VERTICAL_X) {
-		return ( (colliderPos->getX()+colliderRadius < biggestPositionVal1 && colliderPos->getX()-colliderRadius > smallestPositionVal1) &&
-				 (colliderPos->getY()+colliderRadius < biggestPositionVal2 && colliderPos->getY()-colliderRadius > smallestPositionVal2) );
-	} else if (orientation == VERTICAL_Z) {
-		return ( (colliderPos->getY()+colliderRadius < biggestPositionVal1 && colliderPos->getY()-colliderRadius > smallestPositionVal1) &&
-				 (colliderPos->getZ()+colliderRadius < biggestPositionVal2 && colliderPos->getZ()-colliderRadius > smallestPositionVal2) );
-	} else if (orientation == HORIZONTAL) {
-		return ( (colliderPos->getX()+colliderRadius < biggestPositionVal1 && colliderPos->getX()-colliderRadius > smallestPositionVal1) &&
-				 (colliderPos->getZ()+colliderRadius < biggestPositionVal2 && colliderPos->getZ()-colliderRadius > smallestPositionVal2) );
+	if( (orientation == VERTICAL_X) &&
+				(colliderPos->getX()+colliderRadius < biggestPositionVal1 && colliderPos->getX()-colliderRadius > smallestPositionVal1) &&
+				(colliderPos->getY()+colliderRadius < biggestPositionVal2 && colliderPos->getY()-colliderRadius > smallestPositionVal2) ) {
+					within = true;
+	} else if ( (orientation == VERTICAL_Z) &&
+				(colliderPos->getY()+colliderRadius < biggestPositionVal1 && colliderPos->getY()-colliderRadius > smallestPositionVal1) &&
+				(colliderPos->getZ()+colliderRadius < biggestPositionVal2 && colliderPos->getZ()-colliderRadius > smallestPositionVal2) ) {
+					within = true;
+	} else if ( (orientation == HORIZONTAL) &&
+				(colliderPos->getX()+colliderRadius < biggestPositionVal1 && colliderPos->getX()-colliderRadius > smallestPositionVal1) &&
+				(colliderPos->getZ()+colliderRadius < biggestPositionVal2 && colliderPos->getZ()-colliderRadius > smallestPositionVal2) ) {
+					within = true;
 	}
 
 	return within;
