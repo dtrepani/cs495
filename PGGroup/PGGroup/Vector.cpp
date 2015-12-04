@@ -14,13 +14,14 @@ float Vector::distanceTo(Vector* otherEntity) {
 void Vector::zero() { x = 0; y = 0; z = 0; }
 
 // Various vector math
+float Vector::dotProduct(Vector* other) { return (x * other->getX(), y * other->getY(), z * other->getZ()); }
+
 Vector* Vector::add(Vector* other) { return new Vector(x + other->getX(), y + other->getY(), z + other->getZ()); }
 Vector* Vector::subtract(Vector* other) { return new Vector(x - other->getX(), y - other->getY(), z - other->getZ()); }
-Vector* Vector::dotProduct(Vector* other) { return new Vector(x * other->getX(), y * other->getY(), z * other->getZ()); }
 Vector* Vector::scalarMultiply(float scalar) {	return new Vector(scalar*x, scalar*y, scalar*z); }
 
 Vector* Vector::normalize() {
-    float magnitude = sqrt((x*x) + (y*y) + (z*z));
+    float magnitude = sqrt(dotProduct(this));
  
     if (magnitude != 0) {
 		return new Vector(x/magnitude, y/magnitude, z/magnitude);

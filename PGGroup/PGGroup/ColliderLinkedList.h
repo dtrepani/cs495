@@ -14,7 +14,7 @@ public:
 	void add(ColliderEntity* head);
 	ColliderNode* getHead();
 	bool hasCollided(ColliderLinkedList* otherColliders);
-	bool withinPlaneBoundaries(Orientation orientation, float biggestPositionVal1, float smallestPositionVal1, float biggestPositionVal2, float smallestPositionVal2);
+	bool withinPlaneBoundaries(PlaneEntity* plane);
 };
 
 #endif

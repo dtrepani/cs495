@@ -41,23 +41,24 @@ float ColliderNode::sumOfRadii(ColliderNode* otherCollider) {
 }
 
 
-bool ColliderNode::withinPlaneBoundaries(Orientation orientation, float biggestPositionVal1, float smallestPositionVal1, float biggestPositionVal2, float smallestPositionVal2) {
+bool ColliderNode::withinPlaneBoundaries(PlaneEntity* plane) {
 	bool within = false;
+	Orientation planeOrientation = plane->getOrientation();
 	Vector* colliderPos = entity->getPosition();
 	float colliderRadius = entity->getRadius();
 
-	if(next) within = next->withinPlaneBoundaries(orientation, biggestPositionVal1, smallestPositionVal1, biggestPositionVal2, smallestPositionVal2);
-	if( (orientation == VERTICAL_X) &&
-				(colliderPos->getX()+colliderRadius < biggestPositionVal1 && colliderPos->getX()-colliderRadius > smallestPositionVal1) &&
-				(colliderPos->getY()+colliderRadius < biggestPositionVal2 && colliderPos->getY()-colliderRadius > smallestPositionVal2) ) {
+	if(next) within = next->withinPlaneBoundaries(plane);
+	if( (planeOrientation == VERTICAL_X) &&
+				(colliderPos->getX()-colliderRadius < plane->getMax(X) && colliderPos->getX()+colliderRadius > plane->getMin(X)) &&
+				(colliderPos->getY()+colliderRadius < plane->getMax(Y) && colliderPos->getY()-colliderRadius > plane->getMin(Y)) ) {
 					within = true;
-	} else if ( (orientation == VERTICAL_Z) &&
-				(colliderPos->getY()+colliderRadius < biggestPositionVal1 && colliderPos->getY()-colliderRadius > smallestPositionVal1) &&
-				(colliderPos->getZ()+colliderRadius < biggestPositionVal2 && colliderPos->getZ()-colliderRadius > smallestPositionVal2) ) {
+	} else if ( (planeOrientation == VERTICAL_Z) &&
+				(colliderPos->getY()+colliderRadius < plane->getMax(Y) && colliderPos->getY()-colliderRadius > plane->getMin(Y)) &&
+				(colliderPos->getZ()+colliderRadius < plane->getMax(Z) && colliderPos->getZ()-colliderRadius > plane->getMin(Z)) ) {
 					within = true;
-	} else if ( (orientation == HORIZONTAL) &&
-				(colliderPos->getX()+colliderRadius < biggestPositionVal1 && colliderPos->getX()-colliderRadius > smallestPositionVal1) &&
-				(colliderPos->getZ()+colliderRadius < biggestPositionVal2 && colliderPos->getZ()-colliderRadius > smallestPositionVal2) ) {
+	} else if ( (planeOrientation == HORIZONTAL) &&
+				(colliderPos->getX()+colliderRadius < plane->getMax(X) && colliderPos->getX()-colliderRadius > plane->getMin(X)) &&
+				(colliderPos->getZ()+colliderRadius < plane->getMax(Z) && colliderPos->getZ()-colliderRadius > plane->getMin(Z)) ) {
 					within = true;
 	}
 

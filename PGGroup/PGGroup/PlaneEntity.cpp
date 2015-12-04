@@ -8,7 +8,7 @@ PlaneEntity::PlaneEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices
 PlaneEntity::~PlaneEntity(void) {}
 
 // Find the smallest value of an axis to determine the lower boundary for the plane.
-float PlaneEntity::getSmallestPositionValFor(int axis) {
+float PlaneEntity::getMin(int axis) {
 	float smallest = vertices[axis];
 	for(int i = 1; i < 4; i++) {
 		if(vertices[i*3 + axis] < smallest) {
@@ -19,7 +19,7 @@ float PlaneEntity::getSmallestPositionValFor(int axis) {
 }
 
 // Find the biggest value of an axis to determine the upper boundary for the plane.
-float PlaneEntity::getBiggestPositionValFor(int axis) {
+float PlaneEntity::getMax(int axis) {
 	float greatest = vertices[axis];
 	for(int i = 1; i < 4; i++) {
 		if(vertices[i*3 + axis] > greatest) {
@@ -32,14 +32,14 @@ float PlaneEntity::getBiggestPositionValFor(int axis) {
 // Check if an entity is within the plane's boundaries. Without this, a plane is considered infinite when checking for collisions.
 bool PlaneEntity::entityWithinPlaneBoundaries(Vector* otherPosition) {
 	if(orientation == VERTICAL_X) {
-		return ( (otherPosition->getX() < getBiggestPositionValFor(X) && otherPosition->getX() > getSmallestPositionValFor(X)) && // TO-DO: should consider other entity's collider's radius
-				 (otherPosition->getY() < getBiggestPositionValFor(Y) && otherPosition->getY() > getSmallestPositionValFor(Y)) );
+		return ( (otherPosition->getX() < getMax(X) && otherPosition->getX() > getMin(X)) && // TO-DO: should consider other entity's collider's radius
+				 (otherPosition->getY() < getMax(Y) && otherPosition->getY() > getMin(Y)) );
 	} else if(orientation == VERTICAL_Z) {
-		return ( (otherPosition->getY() < getBiggestPositionValFor(Y) && otherPosition->getY() > getSmallestPositionValFor(Y)) &&
-				 (otherPosition->getZ() < getBiggestPositionValFor(Z) && otherPosition->getZ() > getSmallestPositionValFor(Z)) );
+		return ( (otherPosition->getY() < getMax(Y) && otherPosition->getY() > getMin(Y)) &&
+				 (otherPosition->getZ() < getMax(Z) && otherPosition->getZ() > getMin(Z)) );
 	} else if(orientation == HORIZONTAL) {
-		return ( (otherPosition->getX() < getBiggestPositionValFor(X) && otherPosition->getX() > getSmallestPositionValFor(X)) &&
-				 (otherPosition->getZ() < getBiggestPositionValFor(Z) && otherPosition->getZ() > getSmallestPositionValFor(Z)) );
+		return ( (otherPosition->getX() < getMax(X) && otherPosition->getX() > getMin(X)) &&
+				 (otherPosition->getZ() < getMax(Z) && otherPosition->getZ() > getMin(Z)) );
 	} else {
 		return false;
 	}
@@ -48,9 +48,10 @@ bool PlaneEntity::entityWithinPlaneBoundaries(Vector* otherPosition) {
 // Each plane orientation has their own axis to check if an entity has collided with it or not.
 // Planes must also check if the entity is within its boundaries or else their other checks would be an infinite field.
 bool PlaneEntity::hasCollided(Entity* otherEntity) {
+	/*
 	Vector* otherPosition = otherEntity->getPosition();
 
-	if(!entityWithinPlaneBoundaries(otherPosition)) {
+	if(!(otherEntity->withinPlaneBoundaries(this))) {
 		return false;
 	}
 
@@ -62,7 +63,16 @@ bool PlaneEntity::hasCollided(Entity* otherEntity) {
 		return (abs(position->getY() - otherPosition->getY()) < SENSITIVITY * 4.0f);
 	} else {
 		return false;
-	}
+	}*/
+
+	/*
+Distance = Sphere.Center Dot Plane.Normal + Plane.D
+if Distance >= Sphere.Radius
+	Result = false
+Else
+	Result = true*/
+
+	//float distance = ( ((otherEntity->getPosition())->dotProduct( position->normalize() ) )->add( position->normalize() );
 }
 
 // Each plane orientation has their own axis to check if an entity is moving toward it or not.
@@ -96,3 +106,5 @@ bool PlaneEntity::checkForCollision(Entity* otherEntity) {
 	}
 	return collisionAndMovingToward;
 }
+
+Orientation PlaneEntity::getOrientation() { return orientation; }

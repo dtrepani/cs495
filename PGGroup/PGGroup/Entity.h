@@ -51,6 +51,7 @@ public:
 	bool hasCollided(PlaneEntity* otherEntity);
 	bool checkForCollision(PlaneEntity* otherEntity);
 	bool isMovingToward(PlaneEntity* otherEntity);
+	bool withinPlaneBoundaries(PlaneEntity* plane);
 	void incrementXOf(LocationInfo locInfo, float x);
 	void incrementYOf(LocationInfo locInfo, float y);
 	void incrementZOf(LocationInfo locInfo, float z);

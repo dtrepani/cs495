@@ -62,6 +62,9 @@ void Entity::rotateEntity() {
 bool Entity::isMovingToward(Entity* otherEntity) { return (position->distanceTo(otherEntity->getPosition()) > ((position->add(velocity))->distanceTo(otherEntity->getPosition())) ); }
 bool Entity::isMovingToward(PlaneEntity* otherEntity) { return otherEntity->isMovingToward(this); }
 
+// Check if this entity is within a plane's boundaries by comparing the colliders to the plane.
+bool Entity::withinPlaneBoundaries(PlaneEntity* plane) { return colliders->withinPlaneBoundaries(plane); }
+
 // Return the Vector location information based on its corresponding enum.
 Vector* Entity::getCorrespondingVector(LocationInfo locationInfo) {
 	return (locationInfo == POSITION) ? position 

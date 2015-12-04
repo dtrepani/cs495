@@ -13,10 +13,10 @@ public:
 
 	float distanceTo(Vector* otherEntity);
 	void zero();
+	float dotProduct(Vector* other);
 
 	Vector* add(Vector* other);
 	Vector* subtract(Vector* other);
-	Vector* dotProduct(Vector* other);
 	Vector* scalarMultiply(float scalar);
 	Vector* normalize();
 	Vector* crossProduct(Vector* other);
