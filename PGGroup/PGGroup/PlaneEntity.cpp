@@ -69,11 +69,11 @@ bool PlaneEntity::hasCollided(Entity* otherEntity) {
 	}
 
 	if(orientation == VERTICAL_X) {
-		return (abs(position->getZ() - otherPosition->getZ()) < SENSITIVITY * 3.0f); // TO-DO: Fix this filthy hack that's for the player entity only (should consider other entity's collider's radius)
+		return (abs(position->getZ() - otherPosition->getZ()) < otherEntity->getRadius());
 	} else if(orientation == VERTICAL_Z) {
-		return (abs(position->getX() - otherPosition->getX()) < SENSITIVITY * 3.0f);
+		return (abs(position->getX() - otherPosition->getX()) < otherEntity->getRadius());
 	} else if(orientation == HORIZONTAL) {
-		return (abs(position->getY() - otherPosition->getY()) < SENSITIVITY * 4.0f);
+		return (abs(position->getY() - otherPosition->getY()) < otherEntity->getRadius());
 	} else {
 		return false;
 	}

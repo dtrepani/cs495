@@ -30,6 +30,7 @@ protected:
 	Vector* rotation;
 	Vector* velocity;
 	float opacity;
+	float colliderRadius;
 	GLuint* texture;
 	GLfloat vertices[12];
 	ColliderLinkedList* colliders; // REMEMBER: Colliders should be relative to the position of the entity
@@ -60,6 +61,7 @@ public:
 	Vector* getRotation();
 	Vector* getVelocity();
 	ColliderLinkedList* getColliders();
+	float getRadius();
 };
 
 #endif

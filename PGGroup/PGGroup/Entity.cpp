@@ -10,6 +10,7 @@ Entity::Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices) {
 	velocity = new Vector(0.0, 0.0, 0.0);
 	texture = aTexture;
 	opacity = 0;
+	colliderRadius = 0.8f; // TO-DO: Add radius param
 	colliders = new ColliderLinkedList();
 
 	if(aVertices) {
@@ -34,7 +35,9 @@ Entity::~Entity(void) {
 void Entity::addCollider(float x, float y, float z, float radius) { colliders->add(new ColliderEntity(new Vector(x, y, z), NULL, NULL, radius, position, false)); }
 
 // Check if this entity has collided with another entity by comparing their colliders.
-bool Entity::hasCollided(Entity* otherEntity) {	return colliders->hasCollided(otherEntity->getColliders()); }
+bool Entity::hasCollided(Entity* otherEntity) {	
+	return (position->distanceTo(otherEntity->getPosition()) <= (colliderRadius + otherEntity->getRadius()));
+}
 
 // Check if this entity has collided with a plane entity.
 // The plane entity doesn't use colliders, but has its own implementation of hasCollided so let it handle checking
@@ -71,7 +74,24 @@ bool Entity::isMovingToward(Entity* otherEntity) { return (position->distanceTo(
 bool Entity::isMovingToward(PlaneEntity* otherEntity) { return otherEntity->isMovingToward(this); }
 
 // Check if this entity is within a plane's boundaries by comparing the colliders to the plane.
-bool Entity::withinPlaneBoundaries(PlaneEntity* plane) { return colliders->withinPlaneBoundaries(plane); }
+//bool Entity::withinPlaneBoundaries(PlaneEntity* plane) { return colliders->withinPlaneBoundaries(plane); }
+bool Entity::withinPlaneBoundaries(PlaneEntity* plane) {
+	Orientation planeOrientation = plane->getOrientation();
+
+	if(planeOrientation == VERTICAL_X) {
+		return ( (position->getX()-colliderRadius < plane->getMax(X) && position->getX()+colliderRadius > plane->getMin(X)) &&
+				 (position->getY()-colliderRadius < plane->getMax(Y) && position->getY()+colliderRadius > plane->getMin(Y)) );
+	} else if (planeOrientation == VERTICAL_Z) {
+		return ( (position->getY()-colliderRadius < plane->getMax(Y) && position->getY()+colliderRadius > plane->getMin(Y)) &&
+				 (position->getZ()-colliderRadius < plane->getMax(Z) && position->getZ()+colliderRadius > plane->getMin(Z)) );
+	} else if (planeOrientation == HORIZONTAL) {
+		return ( (position->getX() < plane->getMax(X) && position->getX() > plane->getMin(X)) &&
+				 (position->getZ() < plane->getMax(Z) && position->getZ() > plane->getMin(Z)) );
+	} else {
+		return false;
+	}
+}
+
 
 // Return the Vector location information based on its corresponding enum.
 Vector* Entity::getCorrespondingVector(LocationInfo locationInfo) {
@@ -88,6 +108,8 @@ Vector* Entity::getPosition() { return position; }
 Vector* Entity::getRotation() { return rotation; }
 Vector* Entity::getVelocity() { return velocity; }
 ColliderLinkedList* Entity::getColliders() { return colliders; }
+
+float Entity::getRadius() { return colliderRadius; }
 
 // The entity knows how to draw itself and where to draw itself.
 void Entity::drawSelf() {
