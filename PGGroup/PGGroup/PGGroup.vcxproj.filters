@@ -36,9 +36,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ColliderEntity.cpp">
-      <Filter>Source Files\Entities</Filter>
-    </ClCompile>
     <ClCompile Include="Entity.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
@@ -49,12 +46,6 @@
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
     <ClCompile Include="LinkedList.cpp">
-      <Filter>Source Files\Structures\Linked Lists</Filter>
-    </ClCompile>
-    <ClCompile Include="ColliderLinkedList.cpp">
-      <Filter>Source Files\Structures\Linked Lists</Filter>
-    </ClCompile>
-    <ClCompile Include="ColliderNode.cpp">
       <Filter>Source Files\Structures\Linked Lists</Filter>
     </ClCompile>
     <ClCompile Include="Node.cpp">
@@ -83,9 +74,6 @@
     <ClInclude Include="main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ColliderEntity.h">
-      <Filter>Header Files\Entities</Filter>
-    </ClInclude>
     <ClInclude Include="Entity.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
@@ -99,12 +87,6 @@
       <Filter>Header Files\Structures\Linked Lists</Filter>
     </ClInclude>
     <ClInclude Include="Node.h">
-      <Filter>Header Files\Structures\Linked Lists</Filter>
-    </ClInclude>
-    <ClInclude Include="ColliderLinkedList.h">
-      <Filter>Header Files\Structures\Linked Lists</Filter>
-    </ClInclude>
-    <ClInclude Include="ColliderNode.h">
       <Filter>Header Files\Structures\Linked Lists</Filter>
     </ClInclude>
     <ClInclude Include="InteractableEntity.h">

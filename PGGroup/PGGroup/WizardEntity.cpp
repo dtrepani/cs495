@@ -1,7 +1,7 @@
 #include "WizardEntity.h"
 
-WizardEntity::WizardEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices)
-: Entity(aPosition, aTexture, aVertices) {
+WizardEntity::WizardEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius)
+: Entity(aPosition, aTexture, aVertices, aRadius) {
 	state = FLOATING;
 	health = 100;
 }

@@ -15,7 +15,7 @@ private:
 	Status state;
 
 public:
-	WizardEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices);
+	WizardEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius);
 	~WizardEntity(void);
 	void pain(int hurt);
 };

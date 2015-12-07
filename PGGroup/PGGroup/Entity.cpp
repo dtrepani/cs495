@@ -1,17 +1,13 @@
 #include "Entity.h"
-#include "ColliderLinkedList.h"
 #include "PlaneEntity.h"
 
-int cntTmpI = 0; // TO-DO: remove
-
-Entity::Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices) {
+Entity::Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius) {
 	position = aPosition;
 	rotation = new Vector(0.0, 0.0, 0.0);
 	velocity = new Vector(0.0, 0.0, 0.0);
 	texture = aTexture;
 	opacity = 0;
-	colliderRadius = 0.8f; // TO-DO: Add radius param
-	colliders = new ColliderLinkedList();
+	radius = ((aRadius == NULL) ? 0.8f : aRadius);
 
 	if(aVertices) {
 		memcpy(&vertices[0], &aVertices[0], sizeof(vertices));
@@ -19,24 +15,17 @@ Entity::Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices) {
 		GLfloat vertZero[12] = { 0 };
 		memcpy(&vertices[0], &vertZero[0], sizeof(vertices));
 	}
-
-	tmpi = cntTmpI;
-	cntTmpI++;
 }
 
 Entity::~Entity(void) {
 	delete position;
 	delete rotation;
 	delete velocity;
-	delete colliders;
 }
-
-// Add a collider entity to the list of colliders
-void Entity::addCollider(float x, float y, float z, float radius) { colliders->add(new ColliderEntity(new Vector(x, y, z), NULL, NULL, radius, position, false)); }
 
 // Check if this entity has collided with another entity by comparing their colliders.
 bool Entity::hasCollided(Entity* otherEntity) {	
-	return (position->distanceTo(otherEntity->getPosition()) <= (colliderRadius + otherEntity->getRadius()));
+	return (position->distanceTo(otherEntity->getPosition()) <= (radius + otherEntity->getRadius()));
 }
 
 // Check if this entity has collided with a plane entity.
@@ -73,17 +62,16 @@ void Entity::rotateEntity() {
 bool Entity::isMovingToward(Entity* otherEntity) { return (position->distanceTo(otherEntity->getPosition()) > ((position->add(velocity))->distanceTo(otherEntity->getPosition())) ); }
 bool Entity::isMovingToward(PlaneEntity* otherEntity) { return otherEntity->isMovingToward(this); }
 
-// Check if this entity is within a plane's boundaries by comparing the colliders to the plane.
-//bool Entity::withinPlaneBoundaries(PlaneEntity* plane) { return colliders->withinPlaneBoundaries(plane); }
+// Check if an entity is within the plane's boundaries. Without this, a plane is considered infinite when checking for collisions.
 bool Entity::withinPlaneBoundaries(PlaneEntity* plane) {
 	Orientation planeOrientation = plane->getOrientation();
 
 	if(planeOrientation == VERTICAL_X) {
-		return ( (position->getX()-colliderRadius < plane->getMax(X) && position->getX()+colliderRadius > plane->getMin(X)) &&
-				 (position->getY()-colliderRadius < plane->getMax(Y) && position->getY()+colliderRadius > plane->getMin(Y)) );
+		return ( (position->getX()-radius < plane->getMax(X) && position->getX()+radius > plane->getMin(X)) &&
+				 (position->getY()-radius < plane->getMax(Y) && position->getY()+radius > plane->getMin(Y)) );
 	} else if (planeOrientation == VERTICAL_Z) {
-		return ( (position->getY()-colliderRadius < plane->getMax(Y) && position->getY()+colliderRadius > plane->getMin(Y)) &&
-				 (position->getZ()-colliderRadius < plane->getMax(Z) && position->getZ()+colliderRadius > plane->getMin(Z)) );
+		return ( (position->getY()-radius < plane->getMax(Y) && position->getY()+radius > plane->getMin(Y)) &&
+				 (position->getZ()-radius < plane->getMax(Z) && position->getZ()+radius > plane->getMin(Z)) );
 	} else if (planeOrientation == HORIZONTAL) {
 		return ( (position->getX() < plane->getMax(X) && position->getX() > plane->getMin(X)) &&
 				 (position->getZ() < plane->getMax(Z) && position->getZ() > plane->getMin(Z)) );
@@ -107,9 +95,7 @@ void Entity::incrementZOf(LocationInfo locInfo, float z) { getCorrespondingVecto
 Vector* Entity::getPosition() { return position; }
 Vector* Entity::getRotation() { return rotation; }
 Vector* Entity::getVelocity() { return velocity; }
-ColliderLinkedList* Entity::getColliders() { return colliders; }
-
-float Entity::getRadius() { return colliderRadius; }
+float Entity::getRadius() { return radius; }
 
 // The entity knows how to draw itself and where to draw itself.
 void Entity::drawSelf() {

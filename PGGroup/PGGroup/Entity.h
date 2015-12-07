@@ -22,31 +22,26 @@ typedef enum {
 } LocationInfo;
 
 class PlaneEntity;
-class ColliderEntity;
-class ColliderLinkedList;
 class Entity {
 protected:
 	Vector* position;
 	Vector* rotation;
 	Vector* velocity;
 	float opacity;
-	float colliderRadius;
+	float radius;
 	GLuint* texture;
 	GLfloat vertices[12];
-	ColliderLinkedList* colliders; // REMEMBER: Colliders should be relative to the position of the entity
-	int tmpi; // TO-DO: remove
 	
 	Vector* getCorrespondingVector(LocationInfo locationInfo);
 	void rotateEntity();
 
 public:
-	Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices);
+	Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius);
 	~Entity(void);
 
 	virtual bool hasCollided(Entity* otherEntity);
 	virtual bool checkForCollision(Entity* otherEntity);
 	virtual bool isMovingToward(Entity* otherEntity);
-	virtual void addCollider(float x, float y, float z, float radius);
 	virtual void drawSelf();
 
 	void move(float gravity);
@@ -60,7 +55,6 @@ public:
 	Vector* getPosition();
 	Vector* getRotation();
 	Vector* getVelocity();
-	ColliderLinkedList* getColliders();
 	float getRadius();
 };
 

@@ -1,16 +1,14 @@
 #include "PlayerEntity.h"
-#include "ColliderEntity.h"
-#include "ColliderLinkedList.h"
+#include "LinkedList.h"
 
 #define PI 3.1415926535897932384626433832795
 
-PlayerEntity::PlayerEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices)
-: Entity(aPosition, aTexture, aVertices) {
+PlayerEntity::PlayerEntity(Vector* aPosition, float aRadius)
+: Entity(aPosition, NULL, NULL, aRadius) {
 	state = STANDING;
 	isTurning = false;
 	interact = false;
 	health = 100; // can change later if wanted ?
-	addCollider(0, 0, 0, 0);
 	sensitivityRotation = 1.5f;
 }
 
@@ -45,9 +43,6 @@ void PlayerEntity::turn180(){
 		initialTurnDegree = rotation->getY();
 	}
 }
-
-// Add a collider entity to the list of colliders
-void PlayerEntity::addCollider(float x, float y, float z, float radius) { colliders->add(new ColliderEntity(new Vector(x, y, z), NULL, NULL, radius, position, true)); }
 
 // Player moves forwards or backwards based on the direction they're currently facing.
 void PlayerEntity::moveForward(bool forward) {

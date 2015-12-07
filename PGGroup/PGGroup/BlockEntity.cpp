@@ -1,8 +1,8 @@
 #include "BlockEntity.h"
 #include "LinkedList.h"
 
-BlockEntity::BlockEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, Orientation aOrientation, float widthX, float heightY, float lengthZ)
-: PlaneEntity(aPosition, aTexture, aVertices, aOrientation) {
+BlockEntity::BlockEntity(Vector* aPosition, GLuint *aTexture, float widthX, float heightY, float lengthZ)
+: PlaneEntity(aPosition, aTexture, NULL, BLOCK) {
 	float posX = aPosition->getX(),
 		  posY = aPosition->getY(),
 		  posZ = aPosition->getZ();

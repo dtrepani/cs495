@@ -23,13 +23,12 @@ private:
 	float sensitivityRotation;
 
 public:
-	PlayerEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices);
+	PlayerEntity(Vector* aPosition, float aRadius);
 	~PlayerEntity(void);
 	void pain(int hurt);
 	void toggleInteract();
 	void jump();
 	void turn180();
-	void addCollider(float x, float y, float z, float radius);
 	void moveForward(bool forward);
 	void strafe(bool left);
 	void rotate(bool left);

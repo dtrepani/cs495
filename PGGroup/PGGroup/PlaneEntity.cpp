@@ -4,16 +4,16 @@
 
 
 PlaneEntity::PlaneEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, Orientation aOrientation)
-: Entity(aPosition, aTexture, aVertices) {
+: Entity(aPosition, aTexture, aVertices, 0) {
 	srand (time(NULL));
 	orientation = aOrientation;
-	pointOnPlane = new Vector( getRandValOnPlane(X), getRandValOnPlane(Y), getRandValOnPlane(Z) );
+	pointOnPlane = new Vector( getRandValOnPlane(X), getRandValOnPlane(Y), getRandValOnPlane(Z) ); // TO-DO: Likely obsolete
 }
 
 PlaneEntity::~PlaneEntity(void) {}
 
 // Get a random point on the plane for an axis.
-float PlaneEntity::getRandValOnPlane(int axis) {
+float PlaneEntity::getRandValOnPlane(int axis) { // TO-DO: Likely obsolete
 	float min = getMin(axis);
 	float max = getMax(axis);
     float randVal = (float)rand() / RAND_MAX;
@@ -40,22 +40,6 @@ float PlaneEntity::getMax(int axis) {
 		}
 	}
 	return greatest + ( (axis == 0) ? position->getX() : (axis == 1) ? position->getY() : position->getZ() );
-}
-
-// Check if an entity is within the plane's boundaries. Without this, a plane is considered infinite when checking for collisions.
-bool PlaneEntity::entityWithinPlaneBoundaries(Vector* otherPosition) {
-	if(orientation == VERTICAL_X) {
-		return ( (otherPosition->getX() < getMax(X) && otherPosition->getX() > getMin(X)) && // TO-DO: should consider other entity's collider's radius
-				 (otherPosition->getY() < getMax(Y) && otherPosition->getY() > getMin(Y)) );
-	} else if(orientation == VERTICAL_Z) {
-		return ( (otherPosition->getY() < getMax(Y) && otherPosition->getY() > getMin(Y)) &&
-				 (otherPosition->getZ() < getMax(Z) && otherPosition->getZ() > getMin(Z)) );
-	} else if(orientation == HORIZONTAL) {
-		return ( (otherPosition->getX() < getMax(X) && otherPosition->getX() > getMin(X)) &&
-				 (otherPosition->getZ() < getMax(Z) && otherPosition->getZ() > getMin(Z)) );
-	} else {
-		return false;
-	}
 }
 
 // Each plane orientation has their own axis to check if an entity has collided with it or not.

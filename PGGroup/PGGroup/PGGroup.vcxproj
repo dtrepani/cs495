@@ -70,9 +70,6 @@
   <ItemGroup>
     <ClCompile Include="BlockEntity.cpp" />
     <ClCompile Include="CoinInteractableEntity.cpp" />
-    <ClCompile Include="ColliderEntity.cpp" />
-    <ClCompile Include="ColliderLinkedList.cpp" />
-    <ClCompile Include="ColliderNode.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="glQuaternion.cpp" />
     <ClCompile Include="InteractableEntity.cpp" />
@@ -87,9 +84,6 @@
   <ItemGroup>
     <ClInclude Include="BlockEntity.h" />
     <ClInclude Include="CoinInteractableEntity.h" />
-    <ClInclude Include="ColliderEntity.h" />
-    <ClInclude Include="ColliderLinkedList.h" />
-    <ClInclude Include="ColliderNode.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="glQuaternion.h" />
     <ClInclude Include="InteractableEntity.h" />

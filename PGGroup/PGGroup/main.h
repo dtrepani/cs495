@@ -24,12 +24,12 @@ using namespace std;
 //			And a separate list for the level's planes (walls, floors, etc)
 // Below methods better suited in a level superclass
 #include "LinkedList.h"
-Entity* createEntity(string name, GLuint* texture, GLfloat* vertices, float x, float y, float z);
+Entity* createEntity(string name, GLuint* texture, GLfloat* vertices, float radius, float x, float y, float z);
 PlaneEntity* createPlaneEntity(string name, GLuint* texture, Orientation orientation, GLfloat* vertices, float x, float y, float z);
 BlockEntity* createBlockEntity(string name, GLuint* texture, float x, float y, float z, float widthX, float heightY, float lengthZ);
-InteractableEntity* createInteractableEntity(string name, GLuint* texture, GLfloat* vertices, float x, float y, float z);
-PlayerEntity* createPlayerEntity(float x, float y, float z);
-WizardEntity* createWizardEntity(string name, GLfloat* vertices, float x, float y, float z);
+InteractableEntity* createInteractableEntity(string name, GLuint* texture, GLfloat* vertices, float radius, float x, float y, float z);
+PlayerEntity* createPlayerEntity(float x, float y, float z, float radius);
+WizardEntity* createWizardEntity(string name, GLfloat* vertices, float radius, float x, float y, float z);
 
 int main(int argc, char **argv);
 void init();
