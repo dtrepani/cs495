@@ -5,9 +5,10 @@ Entity::Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aR
 	position = aPosition;
 	rotation = new Vector(0.0, 0.0, 0.0);
 	velocity = new Vector(0.0, 0.0, 0.0);
+	scale = new Vector(1.0f, 1.0f, 1.0f);
 	texture = aTexture;
-	opacity = 0;
 	radius = ((aRadius == NULL) ? 0.8f : aRadius);
+	opacity = 1.0f;
 
 	if(aVertices) {
 		memcpy(&vertices[0], &aVertices[0], sizeof(vertices));
@@ -21,6 +22,7 @@ Entity::~Entity(void) {
 	delete position;
 	delete rotation;
 	delete velocity;
+	delete scale;
 }
 
 // Check if this entity has collided with another entity by comparing their colliders.
@@ -62,29 +64,17 @@ void Entity::rotateEntity() {
 bool Entity::isMovingToward(Entity* otherEntity) { return (position->distanceTo(otherEntity->getPosition()) > ((position->add(velocity))->distanceTo(otherEntity->getPosition())) ); }
 bool Entity::isMovingToward(PlaneEntity* otherEntity) { return otherEntity->isMovingToward(this); }
 
-// Check if an entity is within the plane's boundaries. Without this, a plane is considered infinite when checking for collisions.
-bool Entity::withinPlaneBoundaries(PlaneEntity* plane) {
-	Orientation planeOrientation = plane->getOrientation();
-
-	if(planeOrientation == VERTICAL_X) {
-		return ( (position->getX()-radius < plane->getMax(X) && position->getX()+radius > plane->getMin(X)) &&
-				 (position->getY()-radius < plane->getMax(Y) && position->getY()+radius > plane->getMin(Y)) );
-	} else if (planeOrientation == VERTICAL_Z) {
-		return ( (position->getY()-radius < plane->getMax(Y) && position->getY()+radius > plane->getMin(Y)) &&
-				 (position->getZ()-radius < plane->getMax(Z) && position->getZ()+radius > plane->getMin(Z)) );
-	} else if (planeOrientation == HORIZONTAL) {
-		return ( (position->getX() < plane->getMax(X) && position->getX() > plane->getMin(X)) &&
-				 (position->getZ() < plane->getMax(Z) && position->getZ() > plane->getMin(Z)) );
-	} else {
-		return false;
-	}
+// Adds the velocity to the entity's position and reset velocity.
+void Entity::addVelocityToPosition() {
+	Vector* tmp = position;
+	position = position->add(velocity);
+	velocity->zero();
+	delete tmp;
 }
-
 
 // Return the Vector location information based on its corresponding enum.
 Vector* Entity::getCorrespondingVector(LocationInfo locationInfo) {
-	return (locationInfo == POSITION) ? position 
-									  : (locationInfo == ROTATION) ? rotation : velocity;
+	return (locationInfo == POSITION) ? position : (locationInfo == ROTATION) ? rotation : (locationInfo == VELOCITY) ? velocity : scale;
 }
 
 // Increment the values for use in creating fluid movement.
@@ -95,15 +85,20 @@ void Entity::incrementZOf(LocationInfo locInfo, float z) { getCorrespondingVecto
 Vector* Entity::getPosition() { return position; }
 Vector* Entity::getRotation() { return rotation; }
 Vector* Entity::getVelocity() { return velocity; }
+Vector* Entity::getScale() { return scale; }
 float Entity::getRadius() { return radius; }
 
 // The entity knows how to draw itself and where to draw itself.
 void Entity::drawSelf() {
 	glPushMatrix();
+	glColor4f(1.0, 1.0, 1.0, opacity);
 	glBindTexture( GL_TEXTURE_2D, *texture );
 	
+	addVelocityToPosition();
+
 	glTranslatef(position->getX(), position->getY(), position->getZ());
 	rotateEntity();
+	glScalef(scale->getX(), scale->getY(), scale->getZ());
 
 	glBegin(GL_QUADS);
 		glTexCoord2f(0, 1.0f);		glVertex3f(vertices[0], vertices[1], vertices[2]);

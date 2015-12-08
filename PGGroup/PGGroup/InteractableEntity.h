@@ -9,7 +9,6 @@ private:
 public:
 	InteractableEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius);
 	~InteractableEntity(void);
-	//virtual void interactedWith();
 };
 
 #endif

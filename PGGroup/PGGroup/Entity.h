@@ -8,6 +8,7 @@
 #include <SDL_opengl.h>
 #include <SDL_image.h>
 #include "Vector.h"
+#include "glQuaternion.h"
 using namespace std;
 
 #define X 0
@@ -18,7 +19,8 @@ using namespace std;
 typedef enum {
 	POSITION,
 	ROTATION,
-	VELOCITY
+	VELOCITY,
+	SCALE
 } LocationInfo;
 
 class PlaneEntity;
@@ -27,13 +29,14 @@ protected:
 	Vector* position;
 	Vector* rotation;
 	Vector* velocity;
-	float opacity;
-	float radius;
+	Vector* scale;
+	float	opacity, radius;
 	GLuint* texture;
 	GLfloat vertices[12];
 	
 	Vector* getCorrespondingVector(LocationInfo locationInfo);
 	void rotateEntity();
+	void addVelocityToPosition();
 
 public:
 	Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius);
@@ -48,13 +51,13 @@ public:
 	bool hasCollided(PlaneEntity* otherEntity);
 	bool checkForCollision(PlaneEntity* otherEntity);
 	bool isMovingToward(PlaneEntity* otherEntity);
-	bool withinPlaneBoundaries(PlaneEntity* plane);
 	void incrementXOf(LocationInfo locInfo, float x);
 	void incrementYOf(LocationInfo locInfo, float y);
 	void incrementZOf(LocationInfo locInfo, float z);
 	Vector* getPosition();
 	Vector* getRotation();
 	Vector* getVelocity();
+	Vector* getScale();
 	float getRadius();
 };
 

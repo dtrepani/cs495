@@ -5,3 +5,4 @@ InteractableEntity::InteractableEntity(Vector* aPosition, GLuint *aTexture, GLfl
 }
 
 InteractableEntity::~InteractableEntity(void) {}
+

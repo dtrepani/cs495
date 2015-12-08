@@ -73,11 +73,13 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="glQuaternion.cpp" />
     <ClCompile Include="InteractableEntity.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="LinkedList.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="PlaneEntity.cpp" />
     <ClCompile Include="PlayerEntity.cpp" />
+    <ClCompile Include="SkyboxEntity.cpp" />
     <ClCompile Include="Vector.cpp" />
     <ClCompile Include="WizardEntity.cpp" />
   </ItemGroup>
@@ -87,11 +89,13 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="glQuaternion.h" />
     <ClInclude Include="InteractableEntity.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="PlaneEntity.h" />
     <ClInclude Include="PlayerEntity.h" />
+    <ClInclude Include="SkyboxEntity.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="WizardEntity.h" />
   </ItemGroup>

@@ -1,8 +1,6 @@
 #include "PlayerEntity.h"
 #include "LinkedList.h"
 
-#define PI 3.1415926535897932384626433832795
-
 PlayerEntity::PlayerEntity(Vector* aPosition, float aRadius)
 : Entity(aPosition, NULL, NULL, aRadius) {
 	state = STANDING;
@@ -109,10 +107,7 @@ void PlayerEntity::drawSelf(GLfloat (&matrix)[16], LinkedList* entities) {
 		state = STANDING;
 	}
 
-	Vector* tmp = position;
-	position = position->add(velocity);
-	velocity->zero();
-	delete tmp;
+	addVelocityToPosition();
 
 	glRotatef( rotation->getY(), 0, 1, 0 );
 	glTranslatef(-position->getX(), -position->getY()-0.3f, -position->getZ()); 

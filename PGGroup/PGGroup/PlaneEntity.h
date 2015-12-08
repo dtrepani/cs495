@@ -15,7 +15,7 @@ private:
 	Orientation orientation;
 	Vector* pointOnPlane;
 	float getRandValOnPlane(int axis);
-	bool entityWithinPlaneBoundaries(Vector* otherPosition);
+	bool withinPlaneBoundaries(Entity* otherEntity);
 
 public:
 	PlaneEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, Orientation aOrientation);
@@ -26,6 +26,7 @@ public:
 	bool isMovingToward(Entity* otherEntity);
 	bool checkForCollision(Entity* otherEntity);
 	Orientation getOrientation();
+	void drawSelf(); // TO-DO: Remove. Testing tiles.
 };
 
 #endif

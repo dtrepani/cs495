@@ -2,12 +2,12 @@
 #define _BLOCKENTITY_
 
 #include "PlaneEntity.h"
+#include "LinkedList.h"
 
-class LinkedList;
 class BlockEntity : public PlaneEntity {
-private:
+protected:
 	LinkedList* planes;
-	void createAndAdd(float x, float y, float z, GLfloat* vertices, Orientation orientation);
+	virtual void createAndAdd(float x, float y, float z, GLfloat* vertices, Orientation orientation);
 
 public:
 	BlockEntity(Vector* aPosition, GLuint *aTexture, float widthX, float heightY, float lengthZ);

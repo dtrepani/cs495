@@ -1,5 +1,4 @@
 #include "BlockEntity.h"
-#include "LinkedList.h"
 
 BlockEntity::BlockEntity(Vector* aPosition, GLuint *aTexture, float widthX, float heightY, float lengthZ)
 : PlaneEntity(aPosition, aTexture, NULL, BLOCK) {

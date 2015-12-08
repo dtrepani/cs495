@@ -45,7 +45,8 @@ void initOpenGL() {
 	double ratio = ((double)WIDTH) / ((double)HEIGHT);
 
 	glShadeModel(GL_SMOOTH);
-	glClearColor(1, 1, 1, 1);
+	//glClearColor(1, 1, 1, 1);
+	glClearColor(0.35f, 0.6f, 1, 1);
 	glClearDepth(1);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_DEPTH_TEST);
@@ -59,6 +60,10 @@ void initOpenGL() {
 				-tan( 45.0/360*PI ) * 0.1,
 				 tan( 45.0/360*PI ) * 0.1,
 				0.1, 100 );
+
+	// Enable blending
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 }
 
 // Better suited in the level superclass
@@ -83,26 +88,36 @@ WizardEntity* createWizardEntity(string name, GLfloat* vertices, float radius, f
 	return new WizardEntity(new Vector(x, y, z), createTexture(name), vertices, radius); 
 }
 
-// Each texture being created goes through the same method calls and is named with a number, referenced by index.
+// Each texture being created goes through the same method calls and is in png format.
 GLuint* createTexture(string name) {
+	int mode;
 	GLuint* texture = new GLuint;
-	SDL_Surface* textureSurface = SDL_LoadBMP( ("resources\\" + name + ".bmp").c_str() );
-	if(textureSurface == NULL) cout << "SDL_LoadBMP: " << SDL_GetError() << endl;
+	SDL_Surface* textureSurface = IMG_Load( ("resources\\" + name + ".png").c_str() );
+	if(textureSurface == NULL) cout << "IMG_Load: " << SDL_GetError() << endl;
+
+	switch (textureSurface->format->BytesPerPixel) {
+        case 4:
+            if (textureSurface->format->Rmask == 0x000000ff)
+                mode = GL_RGBA;
+            else
+                mode = GL_BGRA;
+            break;
+        case 3:
+            if (textureSurface->format->Rmask == 0x000000ff)
+                mode = GL_RGB;
+            else
+                mode = GL_BGR;
+            break;
+	}
 
 	glGenTextures(1, texture);
 	glBindTexture(GL_TEXTURE_2D, *texture);
-	glTexImage2D(	GL_TEXTURE_2D, 0, 3,
-					textureSurface->w, textureSurface->h, 0,
-					GL_BGR, GL_UNSIGNED_BYTE, textureSurface->pixels );
-	glTexParameteri( GL_TEXTURE_2D,
-						GL_TEXTURE_MIN_FILTER,
-						GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_2D,
-						GL_TEXTURE_MAG_FILTER,
-						GL_LINEAR );
+	glTexImage2D( GL_TEXTURE_2D, 0, textureSurface->format->BytesPerPixel, textureSurface->w, textureSurface->h, 0, mode, GL_UNSIGNED_BYTE, textureSurface->pixels );
+	glTexParameteri( GL_TEXTURE_2D,	GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
 	SDL_FreeSurface( textureSurface );
-
 	return texture;
 }
 
@@ -114,59 +129,29 @@ void pollEventsAndDraw() {
 	bool keys[282] = { false };
 	
 	// ========== START TEST ========== //
-#ifdef cubeVertNotes
-	GLfloat cube[72] = { // Front face
--1.0, -1.0,  1.0,
- 1.0, -1.0,  1.0,
- 1.0,  1.0,  1.0,
--1.0,  1.0,  1.0,
-// Back face
--1.0, -1.0, -1.0,
--1.0,  1.0, -1.0,
- 1.0,  1.0, -1.0,
- 1.0, -1.0, -1.0,
-// Top face
--1.0,  1.0, -1.0,
--1.0,  1.0,  1.0,
- 1.0,  1.0,  1.0,
- 1.0,  1.0, -1.0,
-// Bottom face
--1.0, -1.0, -1.0,
- 1.0, -1.0, -1.0,
- 1.0, -1.0,  1.0,
--1.0, -1.0,  1.0,
-// Right face
- 1.0, -1.0, -1.0,
- 1.0,  1.0, -1.0,
- 1.0,  1.0,  1.0,
- 1.0, -1.0,  1.0,
-// Left face
--1.0, -1.0, -1.0,
--1.0, -1.0,  1.0,
--1.0,  1.0,  1.0,
--1.0,  1.0, -1.0}; // default cube
-#endif
 	bool collision[5] = {false};
 	LinkedList* entities = new LinkedList();
 
+	// NPCs
 	PlayerEntity* player = createPlayerEntity(0, 1.0f, 0, NULL);
-
+	//SkyboxBlockEntity* skybox = new SkyboxBlockEntity();
 	GLfloat modelVert[12] = {
-		-1.0, -1.0,  0,
-		 1.0, -1.0,  0,
-		 1.0,  1.0,  0,
-		-1.0,  1.0,  0};
-	Entity* tmpModel = createEntity("1", NULL, &modelVert[0], 0, 1.0f, -10.0f, NULL);
-	tmpModel->incrementYOf(ROTATION, 20.0f);
+		-0.5f, -850.0f/400.0f*0.5f,  0,
+		 0.5f, -850.0f/400.0f*0.5f,  0,
+		 0.5f,  850.0f/400.0f*0.5f,  0,
+		-0.5f,  850.0f/400.0f*0.5f,  0};
+	WizardEntity* wizard = createWizardEntity("wizard", &modelVert[0], NULL, 0, 1.5f, -7.0f);
 
+	// FLOOR
 	GLfloat floorVert[12] = { 
 		-6.0, 0.0,  40.0,
 		 6.0, 0.0,  40.0,
 		 6.0, 0.0, -40.0,
 		-6.0, 0.0, -40.0};
-	PlaneEntity* tmpFloor = createPlaneEntity("2", NULL, HORIZONTAL, &floorVert[0], 0, 0, 0);
+	PlaneEntity* tmpFloor = createPlaneEntity("spaceship_floor", NULL, HORIZONTAL, &floorVert[0], 0, 0, 0);
 
-	GLuint* wallTex = createTexture("3");
+	// WALLS
+	GLuint* wallTex = createTexture("spaceship_wall");
 	GLfloat wallVert[12] = { 
 		0.0, 0.0,  30.0,
 		0.0, 10.0,  30.0,
@@ -175,6 +160,30 @@ void pollEventsAndDraw() {
 	PlaneEntity* tmpWall1 = createPlaneEntity("", wallTex, VERTICAL_Z, &wallVert[0], -6.0f, 0, 0);
 	PlaneEntity* tmpWall2 = createPlaneEntity("", wallTex, VERTICAL_Z, &wallVert[0], 6.0f, 0, 0);
 	
+	// INTERACTABLES
+	GLfloat coinVert[12] = { 
+		-0.25f, -25.0f/75.0f*0.25f,  0.0,
+		 0.25f, -25.0f/75.0f*0.25f,  0.0,
+		 0.25f, 25.0f/75.0f*0.25f, 0.0,
+		-0.25f, 25.0f/75.0f*0.25f, 0.0};
+	CoinInteractableEntity* tmpCoin = new CoinInteractableEntity(new Vector(0, 0.1f, -5.0f), createTexture("coin"), coinVert, 2.0f);
+	
+	GLfloat shipVert[12] = { 
+		-2.0f, -800.0f/360.0f*2.0f,  0.0,
+		 2.0f, -800.0f/360.0f*2.0f,  0.0,
+		 2.0f, 800.0f/360.0f*2.0f, 0.0,
+		-2.0f, 800.0f/360.0f*2.0f, 0.0};
+	InteractableEntity* tmpShip = new InteractableEntity(new Vector(0, 4.2f, -15.0f), createTexture("spaceship"), shipVert, 2.0f);
+
+	GLfloat gumballMachineVert[12] = { 
+		-0.3f, -2.4f*0.3f,  0.0,
+		 0.3f, -2.4f*0.3f,  0.0,
+		 0.3f, 2.4f*0.3f, 0.0,
+		-0.3f, 2.4f*0.3f, 0.0};
+	InteractableEntity* tmpGumballMachine = new InteractableEntity(new Vector(3.0f, 0.65f, -10.0f), createTexture("gumballmachine"), gumballMachineVert, NULL);
+
+	// MISC
+		// "Step" with planes
 	GLuint* stepTex = createTexture("4");
 	GLfloat floorVert2[12] = { 
 		-1.0, 0.0,  3.0,
@@ -189,15 +198,20 @@ void pollEventsAndDraw() {
 		-1.0, -2.0, 0.0};
 	PlaneEntity* tmpFloor3 = createPlaneEntity("", stepTex, VERTICAL_X, floorVert3, 0, 0.0f, -4.0f);
 
+		// Block
 	BlockEntity* tmpBlock = createBlockEntity("", stepTex, 0.0f, 0.25f, 7.0f, 4.0f, 0.5f, 5.0f);
 
 	//entities->add(tmpModel);
 	entities->add(tmpWall1);
 	entities->add(tmpWall2);
 	entities->add(tmpFloor);
-	entities->add(tmpFloor2);
-	entities->add(tmpFloor3);
+	//entities->add(tmpFloor2);
+	//entities->add(tmpFloor3);
 	entities->add(tmpBlock);
+	entities->add(tmpShip);
+	entities->add(wizard);
+	entities->add(tmpCoin);
+	entities->add(tmpGumballMachine);
 	// ========== END TEST ========== //
 
 	while( running ) {
@@ -215,7 +229,7 @@ void pollEventsAndDraw() {
 		movePlayer(keys, player);
 
 		// ========== START TEST ========== //
-		player->incrementYOf(VELOCITY, -0.2f); // gravity hack
+		player->incrementYOf(VELOCITY, -0.2f); // gravity
 
 			// Must be  in level superclass: ******
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -227,9 +241,9 @@ void pollEventsAndDraw() {
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 
 #ifndef COLLIDED_CONSOLE_HERE
-		if(player->hasCollided(tmpModel)) {
+		if(player->hasCollided(tmpCoin)) {
 			if(!collision[0]) {
-				cout << "Collision: Model" << endl;
+				cout << "Collision: Coin" << endl;
 				collision[0] = true;
 			}
 		} else if(collision[0] == true) collision[0] = false;
@@ -259,7 +273,9 @@ void pollEventsAndDraw() {
 		player->drawSelf(matrix, entities); // Used to adjust camera based on player position
 		glLoadMatrixf(matrix);
 
+		//skybox->drawSelf();
 		entities->drawSelf();
+
 			// ******************************* //
 		// ========== END TEST ========== //
 		
@@ -269,11 +285,16 @@ void pollEventsAndDraw() {
 	}
 	
 		// ========== START TEST ========== //
-	// Remember to delete all models (should be entity linked list) when done!
-	delete tmpModel;
+	delete entities;
 	delete tmpWall1;
 	delete tmpWall2;
 	delete tmpFloor;
+	delete tmpBlock;
+	delete tmpShip;
+	delete tmpCoin;
+	delete tmpGumballMachine;
+
+	delete wizard;
 	delete player;
 		// ========== END TEST ========== //
 }

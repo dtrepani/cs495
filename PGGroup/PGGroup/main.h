@@ -7,12 +7,11 @@
 #define _MAIN_
 
 #include <cmath>
-#include "Entity.h"
-#include "PlaneEntity.h"
 #include "BlockEntity.h"
-#include "InteractableEntity.h"
+#include "CoinInteractableEntity.h"
 #include "PlayerEntity.h"
 #include "WizardEntity.h"
+#include "SkyboxEntity.h"
 #include "glQuaternion.h"
 using namespace std;
 
