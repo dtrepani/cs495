@@ -69,9 +69,6 @@
     <ClCompile Include="Level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SkyboxEntity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CoinInteractableEntity.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
@@ -111,9 +108,6 @@
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="Level.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SkyboxEntity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CoinInteractableEntity.h">

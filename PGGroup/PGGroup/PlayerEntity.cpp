@@ -1,31 +1,47 @@
 #include "PlayerEntity.h"
 #include "LinkedList.h"
+#include "InteractableEntity.h"
 
 PlayerEntity::PlayerEntity(Vector* aPosition, float aRadius)
 : Entity(aPosition, NULL, NULL, aRadius) {
 	state = STANDING;
 	isTurning = false;
-	interact = false;
-	health = 100; // can change later if wanted ?
-	sensitivityRotation = 1.5f;
+	passable = true;
+	interact = NULL;
+	health = 100;
 }
 
 PlayerEntity::~PlayerEntity(void) {}
 
 void PlayerEntity::pain(int hurt){
 	health -= hurt;
-	if (health <= 0)
-		state = DEAD;
+	if (health <= 0) { // TO-DO: enable actual death rather than just position reset
+		//state = DEAD;
+		position->setX(0);
+		position->setY(1.0f);
+		position->setZ(0);
+		rotation->zero();
+	}
 }
 
-void PlayerEntity::toggleInteract(){
-	interact = !interact;
+void PlayerEntity::interactWith() {
+	if(interact) interact->interactWith(this);
+}
+
+// The entity sending the interaction set must be sent as a parameter to ensure that only the intertactable entity the player
+// is currently collided with can change the interact variable. This is necessary because an interactable entity will always
+// call this when checking for collisions (will pass in NULL if no collision).
+// Does not support stacked interactable collisions.
+void PlayerEntity::setInteract(InteractableEntity* src, InteractableEntity* anInteractableEntity) {
+	if(!interact || src == interact) {
+		interact = anInteractableEntity;
+	}
 }
 
 // Player jumps.
 // The animation will be gradual and take place over ~200ms, so the initial time that space was pressed must be recorded.
 void PlayerEntity::jump(){
-	if(state != JUMPING) {
+	if(state != JUMPING && state != FALLING) { // TO-DO: re-add condition when done testing
 		state = JUMPING;
 		initialJumpTime = SDL_GetTicks();
 	}
@@ -42,30 +58,6 @@ void PlayerEntity::turn180(){
 	}
 }
 
-// Player moves forwards or backwards based on the direction they're currently facing.
-void PlayerEntity::moveForward(bool forward) {
-	float sensitivity = forward ? -SENSITIVITY : SENSITIVITY;
-	float yaw = rotation->getY() * (PI / 180);
-	//float pitch = rotation->getX() * (PI / 180);
-	
-	velocity->setX( -sin(yaw) * sensitivity );
-	//position->incrementY( sin(pitch) * sensitivity );
-	velocity->setZ( cos(yaw) * sensitivity );
-}
-
-// Player strafes left or right based on the direction they're currently facing.
-void PlayerEntity::strafe(bool left) {
-	float sensitivity = left ? -SENSITIVITY : SENSITIVITY;
-	float yaw = rotation->getY() * (PI / 180);
-	
-	velocity->setX( cos(yaw) * sensitivity/2 );
-	velocity->setZ( sin(yaw) * sensitivity/2 );
-}
-
-// Rotates player left or right
-void PlayerEntity::rotate(bool left) {
-	incrementYOf(ROTATION, left ? -sensitivityRotation : sensitivityRotation);
-}
 
 // The animation for jumping, if it is occurring.
 // Takes place over 200 ms and will set the player's state to falling when done.
@@ -103,11 +95,18 @@ void PlayerEntity::drawSelf(GLfloat (&matrix)[16], LinkedList* entities) {
 	checkJump();
 	checkTurn180();
 
-	if(entities->checkForCollision(this)) {
-		state = STANDING;
+	// Check for collisions and set the player's state accordingly.
+	bool collision = entities->checkForCollision(this);
+	if(state != JUMPING) {
+		if(collision)
+			state = STANDING;
+		else
+			state = FALLING;
 	}
 
 	addVelocityToPosition();
+
+	if(position->getY() < Y_DEATH) pain(999); // Player instantly dies if past the Y_DEATH point.
 
 	glRotatef( rotation->getY(), 0, 1, 0 );
 	glTranslatef(-position->getX(), -position->getY()-0.3f, -position->getZ()); 

@@ -69,16 +69,46 @@ void BlockEntity::createAndAdd(float x, float y, float z, GLfloat* vertices, Ori
 	planes->add(new PlaneEntity(new Vector(x, y, z), texture, &vertices[0], orientation));
 }
 
-bool BlockEntity::hasCollided(Entity* otherEntity) {
-	return planes->hasCollided(otherEntity);
+bool BlockEntity::hasCollided(Entity* otherEntity) { 
+	Vector* otherPosition = otherEntity->getPosition();
+	Vector* min = new Vector(planes->getMin(X), planes->getMin(Y), planes->getMin(Z));
+	Vector* max = new Vector(planes->getMax(X), planes->getMax(Y), planes->getMax(Z));
+	float dist = 0;
+	
+	if(otherPosition->getX() < min->getX())
+		dist += (float)pow(min->getX() - otherPosition->getX(), 2);
+	else if(otherPosition->getX() > max->getX())
+		dist += (float)pow(otherPosition->getX() - max->getX(), 2);
+
+	if(otherPosition->getY() < min->getY())
+		dist += (float)pow(min->getY() - otherPosition->getY(), 2);
+	else if(otherPosition->getY() > max->getY())
+		dist += (float)pow(otherPosition->getY() - max->getY(), 2);
+	
+	if(otherPosition->getZ() < min->getZ())
+		dist += (float)pow(min->getZ() - otherPosition->getZ(), 2);
+	else if(otherPosition->getZ() > max->getZ())
+		dist += (float)pow(otherPosition->getZ() - max->getZ(), 2);
+
+	return dist <= (float)pow(otherEntity->getRadius(), 2);
 }
 
 bool BlockEntity::isMovingToward(Entity* otherEntity) {
-	return planes->isMovingToward(otherEntity);
+	Vector* otherPosition = otherEntity->getPosition();
+	return (otherPosition->distanceTo(position) > ((otherPosition->add(otherEntity->getVelocity()))->distanceTo(position)) );
 }
 
 bool BlockEntity::checkForCollision(Entity* otherEntity) {
-	return planes->checkForCollision(otherEntity);
+	if(hasCollided(otherEntity) && isMovingToward(otherEntity)) {
+		if((otherEntity->getPosition()->getY() > planes->getMax(Y)) || (otherEntity->getPosition()->getY() < planes->getMin(Y))) {
+			otherEntity->getVelocity()->setY(0);
+		} else {
+			otherEntity->getVelocity()->setX(0);
+			otherEntity->getVelocity()->setZ(0);
+		}
+		return true;
+	}
+	return false;
 }
 
 void BlockEntity::drawSelf() {

@@ -9,7 +9,7 @@ private:
 public:
 	CoinInteractableEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius);
 	~CoinInteractableEntity(void);
-	void interactedWith();
+	void interactWith(PlayerEntity* player);
 };
 
 #endif

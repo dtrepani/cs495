@@ -79,7 +79,6 @@
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="PlaneEntity.cpp" />
     <ClCompile Include="PlayerEntity.cpp" />
-    <ClCompile Include="SkyboxEntity.cpp" />
     <ClCompile Include="Vector.cpp" />
     <ClCompile Include="WizardEntity.cpp" />
   </ItemGroup>
@@ -95,7 +94,6 @@
     <ClInclude Include="Node.h" />
     <ClInclude Include="PlaneEntity.h" />
     <ClInclude Include="PlayerEntity.h" />
-    <ClInclude Include="SkyboxEntity.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="WizardEntity.h" />
   </ItemGroup>

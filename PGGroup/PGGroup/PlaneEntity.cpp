@@ -6,18 +6,9 @@ PlaneEntity::PlaneEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices
 : Entity(aPosition, aTexture, aVertices, 0) {
 	srand (time(NULL));
 	orientation = aOrientation;
-	pointOnPlane = new Vector( getRandValOnPlane(X), getRandValOnPlane(Y), getRandValOnPlane(Z) ); // TO-DO: Likely obsolete
 }
 
 PlaneEntity::~PlaneEntity(void) {}
-
-// Get a random point on the plane for an axis.
-float PlaneEntity::getRandValOnPlane(int axis) { // TO-DO: Likely obsolete
-	float min = getMin(axis);
-	float max = getMax(axis);
-    float randVal = (float)rand() / RAND_MAX;
-    return min + randVal * (max - min);
-}
 
 // Find the smallest value of an axis to determine the lower boundary for the plane.
 float PlaneEntity::getMin(int axis) {
@@ -47,11 +38,11 @@ bool PlaneEntity::withinPlaneBoundaries(Entity* otherEntity) {
 	float otherRadius = otherEntity->getRadius();
 
 	if(orientation == VERTICAL_X) {
-		return ( (otherPosition->getX()-otherRadius < getMax(X) && otherPosition->getX()+otherRadius > getMin(X)) &&
-				 (otherPosition->getY()-otherRadius < getMax(Y) && otherPosition->getY()+otherRadius > getMin(Y)) );
+		return ( (otherPosition->getX() < getMax(X) && otherPosition->getX() > getMin(X)) &&
+				 (otherPosition->getY() < getMax(Y) && otherPosition->getY() > getMin(Y)) );
 	} else if (orientation == VERTICAL_Z) {
-		return ( (otherPosition->getY()-otherRadius < getMax(Y) && otherPosition->getY()+otherRadius > getMin(Y)) &&
-				 (otherPosition->getZ()-otherRadius < getMax(Z) && otherPosition->getZ()+otherRadius > getMin(Z)) );
+		return ( (otherPosition->getY() < getMax(Y) && otherPosition->getY() > getMin(Y)) &&
+				 (otherPosition->getZ() < getMax(Z) && otherPosition->getZ() > getMin(Z)) );
 	} else if (orientation == HORIZONTAL) {
 		return ( (otherPosition->getX() < getMax(X) && otherPosition->getX() > getMin(X)) &&
 				 (otherPosition->getZ() < getMax(Z) && otherPosition->getZ() > getMin(Z)) );
@@ -65,28 +56,19 @@ bool PlaneEntity::withinPlaneBoundaries(Entity* otherEntity) {
 bool PlaneEntity::hasCollided(Entity* otherEntity) {
 	Vector* otherPosition = otherEntity->getPosition();
 
-	//if(!(otherEntity->withinPlaneBoundaries(this))) {
 	if(!(withinPlaneBoundaries(otherEntity))) {
 		return false;
 	}
 
 	if(orientation == VERTICAL_X) {
-		return (abs(position->getZ() - otherPosition->getZ()) < otherEntity->getRadius());
+		return (abs(position->getZ() - otherPosition->getZ()) <= otherEntity->getRadius());
 	} else if(orientation == VERTICAL_Z) {
-		return (abs(position->getX() - otherPosition->getX()) < otherEntity->getRadius());
+		return (abs(position->getX() - otherPosition->getX()) <= otherEntity->getRadius());
 	} else if(orientation == HORIZONTAL) {
-		return (abs(position->getY() - otherPosition->getY()) < otherEntity->getRadius());
+		return (abs(position->getY() - otherPosition->getY()) <= otherEntity->getRadius());
 	} else {
 		return false;
 	}
-
-	/*
-	Vector* otherPosition = otherEntity->getPosition();
-	Vector* planeNormal = position->normalize();
-	float distFromOrigin = planeNormal->distanceTo(pointOnPlane);
-	float distance = planeNormal->dotProduct( otherPosition ) + distFromOrigin;
-	if( abs(distance) <= 1.0f ) return true; // TO-DO: tmp value
-	else return false;*/
 }
 
 // Each plane orientation has their own axis to check if an entity is moving toward it or not.

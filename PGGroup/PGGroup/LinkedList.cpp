@@ -32,3 +32,13 @@ bool LinkedList::checkForCollision(Entity* otherEntity) {
 void LinkedList::drawSelf() {
 	if(head) head->drawSelf();
 }
+
+float LinkedList::getMin(int axis) {
+	if(head) return head->getMin(axis);
+	return 9999.9f;
+}
+
+float LinkedList::getMax(int axis) {
+	if(head) return head->getMax(axis);
+	return -9999.9f;
+}

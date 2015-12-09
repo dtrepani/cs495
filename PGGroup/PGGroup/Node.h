@@ -16,6 +16,8 @@ public:
 	bool isMovingToward(Entity* otherEntity);
 	bool checkForCollision(Entity* otherEntity);
 	void drawSelf();
+	float getMin(int axis);
+	float getMax(int axis);
 };
 
 #endif

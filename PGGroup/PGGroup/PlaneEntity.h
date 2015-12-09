@@ -13,15 +13,13 @@ typedef enum {
 class PlaneEntity : public Entity {
 private:
 	Orientation orientation;
-	Vector* pointOnPlane;
-	float getRandValOnPlane(int axis);
 	bool withinPlaneBoundaries(Entity* otherEntity);
 
 public:
 	PlaneEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, Orientation aOrientation);
 	~PlaneEntity(void);
-	float getMin(int axis);
-	float getMax(int axis);
+	virtual float getMin(int axis);
+	virtual float getMax(int axis);
 	bool hasCollided(Entity* otherEntity);
 	bool isMovingToward(Entity* otherEntity);
 	bool checkForCollision(Entity* otherEntity);

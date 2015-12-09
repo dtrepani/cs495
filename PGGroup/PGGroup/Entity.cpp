@@ -9,6 +9,7 @@ Entity::Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aR
 	texture = aTexture;
 	radius = ((aRadius == NULL) ? 0.8f : aRadius);
 	opacity = 1.0f;
+	passable = false;
 
 	if(aVertices) {
 		memcpy(&vertices[0], &aVertices[0], sizeof(vertices));
@@ -30,26 +31,14 @@ bool Entity::hasCollided(Entity* otherEntity) {
 	return (position->distanceTo(otherEntity->getPosition()) <= (radius + otherEntity->getRadius()));
 }
 
-// Check if this entity has collided with a plane entity.
-// The plane entity doesn't use colliders, but has its own implementation of hasCollided so let it handle checking
-// if it's collided with this entity.
-bool Entity::hasCollided(PlaneEntity* otherEntity) { return otherEntity->hasCollided(this); }
-
-// Check if entity has collided with another entity and stop further velocity if it has.
-// If the entity is not moving toward it (i.e., trying to get away), allow it to move.
+// Check if the other entity has collided with this entity and stop further velocity if it has.
+// If the entity is not moving toward it (i.e., trying to get away) or is passable, allow it to move.
 bool Entity::checkForCollision(Entity* otherEntity) {
 	bool collisionAndMovingToward = hasCollided(otherEntity) && isMovingToward(otherEntity);
-	if(collisionAndMovingToward) {
-		velocity->zero();
+	if(collisionAndMovingToward && !passable) {
+		otherEntity->getVelocity()->zero();
 	}
 	return collisionAndMovingToward;
-}
-
-// Check if entity has collided with a plane entity and stop further velocity if it has.
-// The plane entity doesn't use colliders, but has its own implementation of checkForCollisions so let it handle checking
-// if it's collided with this entity.
-bool Entity::checkForCollision(PlaneEntity* otherEntity) {
-	return otherEntity->checkForCollision(this);
 }
 
 // Rotate the entity according to its rotation variables.
@@ -59,10 +48,12 @@ void Entity::rotateEntity() {
 	glRotatef(rotation->getZ(), 0, 0, 1);
 }
 
-// Check if this entity is moving toward another by comparing the distance to the other entity at its current position to the
-// distance to the other entity at its new position. If the latter is less than the first, its moving toward the other entity.
-bool Entity::isMovingToward(Entity* otherEntity) { return (position->distanceTo(otherEntity->getPosition()) > ((position->add(velocity))->distanceTo(otherEntity->getPosition())) ); }
-bool Entity::isMovingToward(PlaneEntity* otherEntity) { return otherEntity->isMovingToward(this); }
+// Check if the other entity is moving toward this one by comparing the distance to this entity at the other's current position to the
+// distance to this at the other's new position. If the latter is less than the first, its moving toward the other entity.
+bool Entity::isMovingToward(Entity* otherEntity) {
+	Vector* otherPosition = otherEntity->getPosition();
+	return (otherPosition->distanceTo(position) > ((otherPosition->add(otherEntity->getVelocity()))->distanceTo(position)) );
+}
 
 // Adds the velocity to the entity's position and reset velocity.
 void Entity::addVelocityToPosition() {
@@ -70,6 +61,31 @@ void Entity::addVelocityToPosition() {
 	position = position->add(velocity);
 	velocity->zero();
 	delete tmp;
+}
+
+// Entity moves forwards or backwards based on the direction they're currently facing.
+void Entity::moveForward(bool forward) {
+	float sensitivity = forward ? -SENSITIVITY : SENSITIVITY;
+	float yaw = rotation->getY() * (PI / 180);
+	float pitch = rotation->getX() * (PI / 180);
+	
+	incrementXOf(VELOCITY, -sin(yaw) * sensitivity );
+	incrementYOf(VELOCITY, sin(pitch) * sensitivity );
+	incrementZOf(VELOCITY, cos(yaw) * sensitivity );
+}
+
+// Entity strafes left or right based on the direction they're currently facing.
+void Entity::strafe(bool left) {
+	float sensitivity = left ? -SENSITIVITY : SENSITIVITY;
+	float yaw = rotation->getY() * (PI / 180);
+	
+	incrementXOf(VELOCITY, cos(yaw) * sensitivity/2 );
+	incrementZOf(VELOCITY, sin(yaw) * sensitivity/2 );
+}
+
+// Rotates entity left or right
+void Entity::rotate(bool left) {
+	incrementYOf(ROTATION, left ? -SENSITIVITY_ROTATION : SENSITIVITY_ROTATION);
 }
 
 // Return the Vector location information based on its corresponding enum.

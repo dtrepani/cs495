@@ -11,16 +11,22 @@ private:
 		DEAD
 	} Status;
 
-	int health;
+	int health, frame;
 	float floatingAngle;
+	GLint initialAnimTime;
 	Status state;
 
-	void floating();
+	void animate();
+	void animFloat();
+	void animDeath();
+	void animCast();
+	bool timePassedGreaterThan(int ms);
 
 public:
 	WizardEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius);
 	~WizardEntity(void);
 	void pain(int hurt);
+	bool checkForCollision(Entity* otherEntity);
 	void drawSelf();
 };
 
