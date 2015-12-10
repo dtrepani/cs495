@@ -7,7 +7,8 @@
 class BlockEntity : public PlaneEntity {
 protected:
 	LinkedList* planes;
-	virtual void createAndAdd(float x, float y, float z, GLfloat* vertices, Orientation orientation);
+	void createAndAdd(float x, float y, float z, GLfloat* vertices, Orientation orientation);
+	float getDist(Vector* otherPosition);
 
 public:
 	BlockEntity(Vector* aPosition, GLuint *aTexture, float widthX, float heightY, float lengthZ);

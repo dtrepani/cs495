@@ -12,6 +12,7 @@ public:
 	~Vector(void);
 
 	float distanceTo(Vector* otherEntity);
+	bool equalsWithError(Vector* other, float errorThreshold);
 	void zero();
 	float dotProduct(Vector* other);
 
@@ -20,7 +21,6 @@ public:
 	Vector* scalarMultiply(float scalar);
 	Vector* normalize();
 	Vector* crossProduct(Vector* other);
-	Vector* Reflect (double *v, double *p1, double *p2, double *p3); // TO-DO: Translate to vector
 
 	void incrementX(float anX);
 	void incrementY(float aY);

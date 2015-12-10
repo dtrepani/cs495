@@ -9,6 +9,7 @@ Node::Node(Entity* anEntity, Node* aNext) {
 
 Node::~Node(void) {
 	delete next;
+	delete entity;
 }
 
 Node* Node::getNext() { return next; }

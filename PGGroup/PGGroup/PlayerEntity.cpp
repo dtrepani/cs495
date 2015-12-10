@@ -41,10 +41,10 @@ void PlayerEntity::setInteract(InteractableEntity* src, InteractableEntity* anIn
 // Player jumps.
 // The animation will be gradual and take place over ~200ms, so the initial time that space was pressed must be recorded.
 void PlayerEntity::jump(){
-	if(state != JUMPING && state != FALLING) { // TO-DO: re-add condition when done testing
+	//if(state != JUMPING && state != FALLING) { // TO-DO: re-add condition when done testing
 		state = JUMPING;
 		initialJumpTime = SDL_GetTicks();
-	}
+	//}
 }
 
 // Player rotates to the opposite direction. 
@@ -105,6 +105,8 @@ void PlayerEntity::drawSelf(GLfloat (&matrix)[16], LinkedList* entities) {
 	}
 
 	addVelocityToPosition();
+
+	//printf("(%f, %f, %f)\n", position->getX(), position->getY(), position->getZ());
 
 	if(position->getY() < Y_DEATH) pain(999); // Player instantly dies if past the Y_DEATH point.
 

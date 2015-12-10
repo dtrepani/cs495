@@ -24,7 +24,7 @@ public:
 	bool isMovingToward(Entity* otherEntity);
 	bool checkForCollision(Entity* otherEntity);
 	Orientation getOrientation();
-	void drawSelf(); // TO-DO: Remove. Testing tiles.
+	//void drawSelf(); // TO-DO: Remove. Testing tiles.
 };
 
 #endif

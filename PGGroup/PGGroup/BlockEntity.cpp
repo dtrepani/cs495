@@ -66,11 +66,12 @@ BlockEntity::~BlockEntity(void) {
 }
 
 void BlockEntity::createAndAdd(float x, float y, float z, GLfloat* vertices, Orientation orientation) {
-	planes->add(new PlaneEntity(new Vector(x, y, z), texture, &vertices[0], orientation));
+	PlaneEntity* plane = new PlaneEntity(new Vector(0, 0, 0), texture, &vertices[0], orientation);
+	plane->setParent(this);
+	planes->add(plane);
 }
 
-bool BlockEntity::hasCollided(Entity* otherEntity) { 
-	Vector* otherPosition = otherEntity->getPosition();
+float BlockEntity::getDist(Vector* otherPosition) {
 	Vector* min = new Vector(planes->getMin(X), planes->getMin(Y), planes->getMin(Z));
 	Vector* max = new Vector(planes->getMax(X), planes->getMax(Y), planes->getMax(Z));
 	float dist = 0;
@@ -90,12 +91,16 @@ bool BlockEntity::hasCollided(Entity* otherEntity) {
 	else if(otherPosition->getZ() > max->getZ())
 		dist += (float)pow(otherPosition->getZ() - max->getZ(), 2);
 
-	return dist <= (float)pow(otherEntity->getRadius(), 2);
+	return dist;
+}
+
+bool BlockEntity::hasCollided(Entity* otherEntity) { 
+	return getDist(otherEntity->getPosition()) <= (float)pow(otherEntity->getRadius(), 2);
 }
 
 bool BlockEntity::isMovingToward(Entity* otherEntity) {
-	Vector* otherPosition = otherEntity->getPosition();
-	return (otherPosition->distanceTo(position) > ((otherPosition->add(otherEntity->getVelocity()))->distanceTo(position)) );
+	if(getDist(otherEntity->getPosition()) > getDist( (otherEntity->getPosition())->add(otherEntity->getVelocity()) )) return true;
+	return false;
 }
 
 bool BlockEntity::checkForCollision(Entity* otherEntity) {

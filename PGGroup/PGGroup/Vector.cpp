@@ -10,6 +10,10 @@ float Vector::distanceTo(Vector* otherEntity) {
 	return sqrt( pow((otherEntity->getX()-x), 2) + pow((otherEntity->getY()-y), 2) + pow((otherEntity->getZ()-z), 2) );
 }
 
+bool Vector::equalsWithError(Vector* other, float errorThreshold) {
+	return ( (abs(x - other->getX()) <= errorThreshold) && (abs(y - other->getY()) <= errorThreshold) && (abs(z - other->getZ()) <= errorThreshold) );
+}
+
 // Zeroes out the vector
 void Vector::zero() { x = 0; y = 0; z = 0; }
 
@@ -31,28 +35,10 @@ Vector* Vector::normalize() {
 }
 
 Vector* Vector::crossProduct(Vector* other) {
-	return new Vector( y*other->getZ() - z*other->getY(),
+	return new Vector(	  y*other->getZ() - z*other->getY(),
 						  z*other->getX() - x*other->getZ(),
 						  x*other->getY() - y*other->getX() );
 	
-}
-
-Vector* Vector::Reflect (double *v, double *p1, double *p2, double *p3) {
-	//computes and returns the reflected vector when vector v bounces off a
-	//plane containing the points p1, p2, p3
-	/*
-	 double *vec1 = Subtract (p2,p1);
-	 double *vec2 = Subtract (p3,p1);
-	 double *n = Cross (vec1,vec2);
-	 delete[] vec1;
-	 delete[] vec2;
-	 double ns = Dot (n,n);
-	 double vn = Dot (v,n);
-	 double *P  = ScaMult (2*vn/ns,n);
-	 double *R = Subtract (v,P);
-	 delete[] P;
-	 return R;*/
-	return 0;
 }
 
 // Increment the values. Used for fluid movement.

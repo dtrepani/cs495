@@ -1,32 +1,69 @@
 #include "WizardEntity.h"
+#include "PlayerEntity.h"
 
-WizardEntity::WizardEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius)
+WizardEntity::WizardEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius, PlayerEntity* aPlayer)
 : Entity(aPosition, aTexture, aVertices, aRadius) {
 	state = FLOATING;
 	health = 100;
 	floatingAngle = 0;
+	initialAnimTime = initialAnimLocTime = 0;
+	animLocI = 1;
 	frame = 1;
-	initialAnimTime = 0;
 	passable = true;
+	player = aPlayer;
+	
+	animLocs[0] = new Vector(0,	1.5f,	-7.0f); // Spawn point
+	animLocs[1] = new Vector(0,	1.5f,	-27.0f); // Before cast to destroy ship
+	animLocs[2] = new Vector(0,	4.0f,	-27.0f); // Rising up as casting to destroy ship
+	animLocs[3] = new Vector(0,	1.5f,	-82.0f); // Other side of destroyed gap
+	animLocs[4] = new Vector(0,	1.5f,	-115.0f); // Before rising up to get away
+	animLocs[5] = new Vector(0,	10.0f,	-115.0f); // Got away
+
+	position = animLocs[0];
 }
 
-WizardEntity::~WizardEntity(void) {}
+WizardEntity::~WizardEntity(void) {
+}
 
 // Reduce the wizard's health. Upon death, setup the death animation and fall to the floor.
 void WizardEntity::pain(int hurt){
 	health -= hurt;
-	if (health <= 0) {
+	if (health <= 0 && state != DEAD) {
 		state = DEAD;
-		position->setY(0.9f);
+		position->setY(1.1f);
 		frame = 4;
 		initialAnimTime = SDL_GetTicks();
 	}
+}
+
+void WizardEntity::setCast() {
+	state = CASTING;
+	frame = 2;
+	initialAnimTime = SDL_GetTicks();
 }
 
 void WizardEntity::animate() {
 	animFloat();
 	animCast();
 	animDeath();
+	animMovement();
+}
+
+// Animate the movement of the wizard throughout the wizard.
+// The wizard will not move further if he is dead or if the player is more than 30.0f away.
+// He casts a spell to break the ship apart at at animLoc 1 and casts a normal spell at animLoc 3.
+void WizardEntity::animMovement() {
+	if( (state != DEAD) && ((SDL_GetTicks() - initialAnimLocTime) >= ((animLocI == 2) ? 500 : (animLocI == 3) ? 2000 : 1000)) && (position->distanceTo(player->getPosition()) < 30.0f)) {
+		if(position->equalsWithError(animLocs[animLocI], 0.5f)) {
+			if(animLocI == 1 || animLocI == 3) setCast();
+			if(animLocI < 5) {
+				animLocI++;
+				initialAnimLocTime = SDL_GetTicks();
+			}
+		} else {
+			velocity = ( ((animLocs[animLocI])->subtract(position))->normalize() )->scalarMultiply( (animLocI == 4 || animLocI == 5) ? 0.05 : 0.1f);
+		}
+	}
 }
 
 // Animates the wizard floating.

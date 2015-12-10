@@ -1,5 +1,7 @@
 #include "Entity.h"
 #include "PlaneEntity.h"
+#include <cstdlib>
+#include <time.h>
 
 Entity::Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius) {
 	position = aPosition;
@@ -10,9 +12,11 @@ Entity::Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aR
 	radius = ((aRadius == NULL) ? 0.8f : aRadius);
 	opacity = 1.0f;
 	passable = false;
+	parent = NULL;
 
 	if(aVertices) {
 		memcpy(&vertices[0], &aVertices[0], sizeof(vertices));
+		//delete[] aVertices;
 	} else {
 		GLfloat vertZero[12] = { 0 };
 		memcpy(&vertices[0], &vertZero[0], sizeof(vertices));
@@ -43,9 +47,11 @@ bool Entity::checkForCollision(Entity* otherEntity) {
 
 // Rotate the entity according to its rotation variables.
 void Entity::rotateEntity() {
-	glRotatef(rotation->getX(), 1, 0, 0);
-	glRotatef(rotation->getY(), 0, 1, 0);
-	glRotatef(rotation->getZ(), 0, 0, 1);
+	Vector* rotate = parent ? rotation->add(parent->getRotation()) : rotation;
+	glRotatef(rotate->getX(), 1, 0, 0);
+	glRotatef(rotate->getY(), 0, 1, 0);
+	glRotatef(rotate->getZ(), 0, 0, 1);
+	if(parent) delete rotate;
 }
 
 // Check if the other entity is moving toward this one by comparing the distance to this entity at the other's current position to the
@@ -93,16 +99,37 @@ Vector* Entity::getCorrespondingVector(LocationInfo locationInfo) {
 	return (locationInfo == POSITION) ? position : (locationInfo == ROTATION) ? rotation : (locationInfo == VELOCITY) ? velocity : scale;
 }
 
+// Random rotation for each axis from -5.0f to 5.0f
+void Entity::setRandomRotation() {
+	srand (time(NULL));
+
+	float x = (10.0f*((float)rand()/(float)RAND_MAX)-5.0f);
+	float y = (10.0f*((float)rand()/(float)RAND_MAX)-5.0f);
+	float z = (10.0f*((float)rand()/(float)RAND_MAX)-5.0f);
+
+	set(ROTATION, x, y, z);
+}
+
+// Set the values of a vector at once
+void Entity::set(LocationInfo locInfo, float x, float y, float z) {
+	Vector* vec = getCorrespondingVector(locInfo);
+	vec->setX(x);
+	vec->setY(y);
+	vec->setZ(z);
+}
+
 // Increment the values for use in creating fluid movement.
 void Entity::incrementXOf(LocationInfo locInfo, float x) { getCorrespondingVector(locInfo)->incrementX(x); }
 void Entity::incrementYOf(LocationInfo locInfo, float y) { getCorrespondingVector(locInfo)->incrementY(y); }
 void Entity::incrementZOf(LocationInfo locInfo, float z) { getCorrespondingVector(locInfo)->incrementZ(z); }
 
-Vector* Entity::getPosition() { return position; }
-Vector* Entity::getRotation() { return rotation; }
+Vector* Entity::getPosition() { return parent ? position->add(parent->getPosition()) : position; }
+Vector* Entity::getRotation() { return parent ? rotation->add(parent->getRotation()) : rotation; }
 Vector* Entity::getVelocity() { return velocity; }
 Vector* Entity::getScale() { return scale; }
 float Entity::getRadius() { return radius; }
+
+void Entity::setParent(Entity* aParent) { parent = aParent; }
 
 // The entity knows how to draw itself and where to draw itself.
 void Entity::drawSelf() {
@@ -112,7 +139,9 @@ void Entity::drawSelf() {
 	
 	addVelocityToPosition();
 
-	glTranslatef(position->getX(), position->getY(), position->getZ());
+	Vector* pos = parent ? position->add(parent->getPosition()) : position;
+	glTranslatef(pos->getX(), pos->getY(), pos->getZ());
+	if(parent) delete pos;
 	rotateEntity();
 	glScalef(scale->getX(), scale->getY(), scale->getZ());
 

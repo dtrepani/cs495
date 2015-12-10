@@ -26,7 +26,7 @@ PlaneEntity* createPlaneEntity(string name, GLuint* texture, Orientation orienta
 BlockEntity* createBlockEntity(string name, GLuint* texture, float x, float y, float z, float widthX, float heightY, float lengthZ);
 InteractableEntity* createInteractableEntity(string name, GLuint* texture, GLfloat* vertices, float radius, float x, float y, float z);
 PlayerEntity* createPlayerEntity(float x, float y, float z, float radius);
-WizardEntity* createWizardEntity(string name, GLfloat* vertices, float radius, float x, float y, float z);
+WizardEntity* createWizardEntity(string name, GLfloat* vertices, float radius, PlayerEntity* player, float x, float y, float z);
 
 int main(int argc, char **argv);
 void init();
