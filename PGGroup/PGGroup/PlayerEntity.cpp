@@ -1,38 +1,65 @@
 #include "PlayerEntity.h"
 #include "LinkedList.h"
-#include "InteractableEntity.h"
+#include "CoinInteractableEntity.h"
+#include "PlaneEntity.h"
+#include "Level.h"
 
 PlayerEntity::PlayerEntity(Vector* aPosition, float aRadius)
 : Entity(aPosition, NULL, NULL, aRadius) {
 	state = STANDING;
-	isTurning = false;
+	isTurning = shipDestroyed = pickedUpCoin = false;
+	initialJumpTime = initialTurnTime = initialGumballTime = 0;
 	passable = true;
-	interact = NULL;
 	health = 100;
+	wizardSpawned = new LinkedList();
+	interact = NULL;
+	coin = NULL;
+
+	GLfloat gumballVert[12] = { 
+		-1.0f, -0.75f,  0.0,
+		 1.0f, -0.75f,  0.0,
+		 1.0f, 0.75f, 0.0,
+		-1.0f, 0.75f, 0.0};
+	gumball = new PlaneEntity(new Vector(0, 0, -1.0f), Level::createTexture("gumball"), gumballVert, VERTICAL_X);
+	showGumball(false);
 }
 
-PlayerEntity::~PlayerEntity(void) {}
+PlayerEntity::~PlayerEntity(void) {
+	delete gumball;
+}
 
 void PlayerEntity::pain(int hurt){
 	health -= hurt;
-	if (health <= 0) { // TO-DO: enable actual death rather than just position reset
+	if (health <= 0) {
+		resetPos();
 		state = DEAD;
 		health = 100;
-		reset();
+		initialJumpTime = initialTurnTime = initialGumballTime = 0;
+		isTurning = shipDestroyed = pickedUpCoin = false;
+		interact = NULL;
+		wizardSpawned = new LinkedList();
+		coin = NULL;
+		showGumball(false);
 	}
 }
 
-void PlayerEntity::reset() {
+void PlayerEntity::resetPos() {
 	position->setX(0);
 	position->setY(1.0f);
 	position->setZ(0);
 	rotation->zero();
 }
 
-bool PlayerEntity::isDead() { return (state == DEAD); }
-
 void PlayerEntity::interactWith() {
 	if(interact) interact->interactWith(this);
+}
+
+void PlayerEntity::addWizardSpawnedEntity(Entity* entity) {
+	wizardSpawned->add(entity);
+}
+
+void PlayerEntity::addCoin(CoinInteractableEntity* aCoin) {
+	coin = aCoin;
 }
 
 // The entity sending the interaction set must be sent as a parameter to ensure that only the intertactable entity the player
@@ -65,7 +92,6 @@ void PlayerEntity::turn180(){
 	}
 }
 
-
 // The animation for jumping, if it is occurring.
 // Takes place over 200 ms and will set the player's state to falling when done.
 void PlayerEntity::checkJump() {
@@ -92,20 +118,43 @@ void PlayerEntity::checkTurn180() {
 	}
 }
 
+bool PlayerEntity::isDead() { return (state == DEAD); }
+bool PlayerEntity::hasPickedUpCoin() { return pickedUpCoin; }
+void PlayerEntity::pickUpCoin() { pickedUpCoin = true; }
+
+void PlayerEntity::showGumball(bool show) { 
+	gumball->setOpacity( show ? 1.0f : 0.0f ); 
+	if(show) initialGumballTime = SDL_GetTicks();
+}
+
+void PlayerEntity::animateGumball() {
+	if(initialGumballTime != 0) {
+		if(SDL_GetTicks() - initialGumballTime > 10000) {
+			pain(999);
+		} else if(SDL_GetTicks() - initialGumballTime > 500) {
+			gumball->incrementXOf(SCALE, 0.01f);
+			gumball->incrementYOf(SCALE, 0.01f);
+			gumball->incrementZOf(SCALE, 0.01f);
+		}
+	}
+}
+
 // Adjusts the camera to the player's position and rotation.
 // Translation is negative because player's position is opposite what other entities' would be due to the rotation above.
 // The Y translation is adjusted slightly to make the camera act as if it's out of the eyes of a person (off-center), while
 // maintaining the actual center of the player.
 void PlayerEntity::drawSelf(GLfloat (&matrix)[16], LinkedList* entities, LinkedList* platforms) {
+	if(gumball->getOpacity() == 1.0f) gumball->drawSelf();
+
 	glLoadMatrixf(matrix);
 
 	checkJump();
 	checkTurn180();
 
 	// Check for collisions and set the player's state accordingly.
-	bool collision = (entities->checkForCollision(this) || platforms->checkForCollision(this));
+	bool collision[4] = { entities->checkForCollision(this), platforms->checkForCollision(this), wizardSpawned->checkForCollision(this), (coin && coin->checkForCollision(this)) };
 	if(state != JUMPING) {
-		if(collision)
+		if(collision[0] || collision[1] || collision[2] || collision[3])
 			state = STANDING;
 		else
 			state = FALLING;
@@ -116,11 +165,12 @@ void PlayerEntity::drawSelf(GLfloat (&matrix)[16], LinkedList* entities, LinkedL
 	// Player gets hurt and resets position if past the Y_DEATH point.
 	if(position->getY() < Y_DEATH) {
 		pain(10); 
-		reset();
+		resetPos();
 	}
 
 	glRotatef( rotation->getY(), 0, 1, 0 );
 	glTranslatef(-position->getX(), -position->getY()-0.3f, -position->getZ()); 
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+	animateGumball();
 }

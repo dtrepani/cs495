@@ -10,6 +10,7 @@
 #include "LinkedList.h"
 #include "BlockEntity.h"
 #include "CoinInteractableEntity.h"
+#include "GumballMachineInteractableEntity.h"
 #include "PlayerEntity.h"
 #include "WizardEntity.h"
 using namespace std;

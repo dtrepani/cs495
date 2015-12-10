@@ -1,12 +1,16 @@
 #include "WizardEntity.h"
 #include "PlayerEntity.h"
 #include "LinkedList.h"
+#include "CoinInteractableEntity.h"
+#include "Level.h"
 
 WizardEntity::WizardEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius, PlayerEntity* aPlayer, LinkedList* aCovers, LinkedList* aPlatforms)
 : Entity(aPosition, aTexture, aVertices, aRadius) {
 	player = aPlayer;
 	covers = aCovers;
 	platforms = aPlatforms;
+	wizardSpawned = new LinkedList();
+	coin = NULL;
 	
 	animLocs[0] = new Vector(0,	1.5f,	-7.0f); // Spawn point
 	animLocs[1] = new Vector(0,	1.5f,	-27.0f); // Before cast to destroy ship
@@ -18,7 +22,10 @@ WizardEntity::WizardEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertic
 	reset();
 }
 
-WizardEntity::~WizardEntity(void) {}
+WizardEntity::~WizardEntity(void) {
+	delete coin;
+	delete wizardSpawned;
+}
 
 void WizardEntity::reset() {
 	position->setEqualTo(animLocs[0]);
@@ -28,8 +35,13 @@ void WizardEntity::reset() {
 	initialAnimTime = initialAnimLocTime = 0;
 	animLocI = 1;
 	frame = 1;
+	opacity = 1.0f;
 	passable = true;
 	shipDestroyed = false;
+	delete wizardSpawned;
+	wizardSpawned = new LinkedList();
+	delete coin;
+	coin = NULL;
 }
 
 // Reduce the wizard's health. Upon death, setup the death animation and fall to the floor.
@@ -93,6 +105,16 @@ void WizardEntity::animFloat() {
 void WizardEntity::animDeath() {
 	if((frame == 4) && timePassedGreaterThan(5000)) {
 		frame++;
+		initialAnimTime = SDL_GetTicks();
+	} else if((frame == 5) && timePassedGreaterThan(2000)) {
+		GLfloat coinVert[12] = { 
+			-0.25f, -25.0f/75.0f*0.25f,  0.0,
+			 0.25f, -25.0f/75.0f*0.25f,  0.0,
+			 0.25f, 25.0f/75.0f*0.25f, 0.0,
+			-0.25f, 25.0f/75.0f*0.25f, 0.0};
+		coin = new CoinInteractableEntity(new Vector(position->getX(), 0.3f, position->getZ()), Level::createTexture("coin"), coinVert, 1.5f);
+		player->addCoin(coin);
+		opacity = 0;
 		initialAnimTime = 0;
 	}
 }
@@ -123,25 +145,32 @@ bool WizardEntity::timePassedGreaterThan(int ms) {
 bool WizardEntity::checkForCollision(Entity* otherEntity) {
 	bool collisionAndMovingToward = hasCollided(otherEntity) && isMovingToward(otherEntity);
 	if(collisionAndMovingToward && (position->getY() <= otherEntity->getPosition()->getY())) {
-			pain(10);
+			pain(15);
 			for(int i = 0; i < 30; i++)
 				otherEntity->moveForward(false);
 	}
 	return collisionAndMovingToward;
 }
 
-// The wizard needs to account for various animations (i.e., floating) and the destruction of the spaceship, thus needs his own version of the draw method.
-void WizardEntity::drawSelf() {
+void WizardEntity::drawOtherEntities() {
+	wizardSpawned->drawSelf();
+	if(coin && !player->hasPickedUpCoin()) coin->drawSelf();
+
 	if(shipDestroyed) {
 		platforms->drawSelf();
 	} else {
 		// Player can't pass wizard before the ship is destroyed
-		if( abs(position->getZ() - player->getPosition()->getZ()) < 1.0f ) {
+		if( abs(position->getZ() - player->getPosition()->getZ()) < 0.5f ) {
 			for(int i = 0; i < 30; i++)
 				player->moveForward(false);
 		}
 		covers->drawSelf();
 	}
+}
+
+// The wizard needs to account for various animations (i.e., floating) and the destruction of the spaceship, thus needs his own version of the draw method.
+void WizardEntity::drawSelf() {
+	drawOtherEntities();
 
 	glPushMatrix();
 	glColor4f(1.0, 1.0, 1.0, opacity);

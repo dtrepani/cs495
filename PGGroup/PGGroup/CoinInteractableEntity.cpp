@@ -1,4 +1,5 @@
 #include "CoinInteractableEntity.h"
+#include "PlayerEntity.h"
 
 CoinInteractableEntity::CoinInteractableEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius)
 : InteractableEntity(aPosition, aTexture, aVertices, aRadius) {
@@ -8,5 +9,5 @@ CoinInteractableEntity::CoinInteractableEntity(Vector* aPosition, GLuint *aTextu
 CoinInteractableEntity::~CoinInteractableEntity(void) {}
 
 void CoinInteractableEntity::interactWith(PlayerEntity* player) {
-	cout << "Interacting with coin!" << endl;
+	player->pickUpCoin();
 }

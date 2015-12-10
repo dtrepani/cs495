@@ -15,7 +15,7 @@ using namespace std;
 #define Y 1
 #define Z 2
 #define SENSITIVITY 0.2f
-#define SENSITIVITY_ROTATION 1.5f
+#define SENSITIVITY_ROTATION 2.0f
 
 typedef enum {
 	POSITION,
@@ -62,8 +62,10 @@ public:
 	Vector* getRotation();
 	Vector* getVelocity();
 	Vector* getScale();
+	float getOpacity();
 	float getRadius();
 	void setParent(Entity* aParent);
+	void setOpacity(float anOpacity);
 };
 
 #endif

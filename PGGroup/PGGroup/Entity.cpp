@@ -126,9 +126,11 @@ Vector* Entity::getPosition() { return parent ? position->add(parent->getPositio
 Vector* Entity::getRotation() { return parent ? rotation->add(parent->getRotation()) : rotation; }
 Vector* Entity::getVelocity() { return velocity; }
 Vector* Entity::getScale() { return scale; }
+float Entity::getOpacity() { return opacity; }
 float Entity::getRadius() { return radius; }
 
 void Entity::setParent(Entity* aParent) { parent = aParent; }
+void Entity::setOpacity(float anOpacity) { opacity = anOpacity; }
 
 // The entity knows how to draw itself and where to draw itself.
 void Entity::drawSelf() {

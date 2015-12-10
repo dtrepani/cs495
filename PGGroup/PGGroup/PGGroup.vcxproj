@@ -72,6 +72,7 @@
     <ClCompile Include="CoinInteractableEntity.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="glQuaternion.cpp" />
+    <ClCompile Include="GumballMachineInteractableEntity.cpp" />
     <ClCompile Include="InteractableEntity.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="LinkedList.cpp" />
@@ -87,6 +88,7 @@
     <ClInclude Include="CoinInteractableEntity.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="glQuaternion.h" />
+    <ClInclude Include="GumballMachineInteractableEntity.h" />
     <ClInclude Include="InteractableEntity.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LinkedList.h" />

@@ -248,7 +248,7 @@ void pollEventsAndDraw() {
 		 0.3f, -2.4f*0.3f,  0.0,
 		 0.3f, 2.4f*0.3f, 0.0,
 		-0.3f, 2.4f*0.3f, 0.0};
-	InteractableEntity* gumballMachine = new InteractableEntity(new Vector(0, 0.65f, lvlLength[2]+lvlLength[3]+2.0f), createTexture("gumballmachine"), gumballMachineVert, NULL);
+	GumballMachineInteractableEntity* gumballMachine = new GumballMachineInteractableEntity(new Vector(0, 0.65f, lvlLength[2]+lvlLength[3]+2.0f), createTexture("gumballmachine"), gumballMachineVert, NULL);
 	entities->add(gumballMachine);
 
 	GLfloat wizardVert[12] = {
@@ -257,14 +257,6 @@ void pollEventsAndDraw() {
 		 0.4f,  850.0f/400.0f*0.4f,  0,
 		-0.4f,  850.0f/400.0f*0.4f,  0};
 	WizardEntity* wizard = createWizardEntity("wizard", &wizardVert[0], 0.0f, player, 0, 1.5f, -7.0f, covers, platforms);
-
-	GLfloat coinVert[12] = { 
-		-0.25f, -25.0f/75.0f*0.25f,  0.0,
-		 0.25f, -25.0f/75.0f*0.25f,  0.0,
-		 0.25f, 25.0f/75.0f*0.25f, 0.0,
-		-0.25f, 25.0f/75.0f*0.25f, 0.0};
-	CoinInteractableEntity* coin = new CoinInteractableEntity(new Vector(0, 0.1f, -5.0f), createTexture("coin"), coinVert, 1.5f);
-	entities->add(coin);
 	
 	
 	// ========== END LEVEL ========== //

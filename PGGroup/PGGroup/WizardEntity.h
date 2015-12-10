@@ -5,6 +5,7 @@
 
 class LinkedList;
 class PlayerEntity;
+class CoinInteractableEntity;
 class WizardEntity : public Entity {
 private:
 	typedef enum {
@@ -22,6 +23,9 @@ private:
 	Vector* animLocs[6]; // Used to store the locations that the wizard will move toward throughout the battle.
 	LinkedList* covers; // Covers to the jumping puzzle
 	LinkedList* platforms; // The jp itself
+	// Created by wizard and shared with player
+	CoinInteractableEntity* coin;
+	LinkedList* wizardSpawned;
 	
 	void setCast();
 	void animate();
@@ -30,6 +34,7 @@ private:
 	void animDeath();
 	void animCast();
 	bool timePassedGreaterThan(int ms);
+	void drawOtherEntities();
 
 public:
 	WizardEntity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aRadius, PlayerEntity* aPlayer, LinkedList* aCovers, LinkedList* aPlatforms);
