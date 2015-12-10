@@ -10,6 +10,11 @@ LinkedList* entities, platforms;
 
 int main(int argc, char **argv) {
 	init();
+	
+	printf("You want a gumball. The wizard has a quarter. And a conveniently placed gumball machine on his spaceship. Kill him by jumping on him.\n");
+	printf("=== CONTROLS ===\n");
+	printf("space\tjump \nwasd\tmove \nf\tinteract\n");
+
 	pollEventsAndDraw();
 	SDL_DestroyWindow(mainWindow);
 	SDL_Quit();

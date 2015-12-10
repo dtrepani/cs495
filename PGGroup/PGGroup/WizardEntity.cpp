@@ -32,8 +32,8 @@ void WizardEntity::reset() {
 	state = FLOATING;
 	health = 100;
 	floatingAngle = 0;
-	initialAnimTime = initialAnimLocTime = 0;
-	animLocI = 1;
+	initialAnimTime = 0;
+	animLocI = 0;
 	frame = 1;
 	opacity = 1.0f;
 	passable = true;
@@ -42,6 +42,7 @@ void WizardEntity::reset() {
 	wizardSpawned = new LinkedList();
 	delete coin;
 	coin = NULL;
+	initialAnimLocTime = SDL_GetTicks();
 }
 
 // Reduce the wizard's health. Upon death, setup the death animation and fall to the floor.
@@ -74,7 +75,7 @@ void WizardEntity::animate() {
 // He moves incredibly fast across the gap and slow-ish otherwise.
 void WizardEntity::animMovement() {
 	if( (state != DEAD) 
-		&& ((SDL_GetTicks() - initialAnimLocTime) >= ((animLocI == 2) ? 500 : (animLocI == 3) ? 2000 : 1000)) 
+		&& ((SDL_GetTicks() - initialAnimLocTime) >= ((animLocI == 0) ? 3000 : (animLocI == 2) ? 500 : (animLocI == 3) ? 2000 : 1000)) 
 		&& (position->distanceTo(player->getPosition()) < ((animLocI == 4) ? 10.0f : 50.0f))) {
 		if(position->equalsWithError(animLocs[animLocI], 0.5f)) {
 			if(animLocI == 1 || animLocI == 3) setCast();
