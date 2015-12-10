@@ -13,6 +13,7 @@ public:
 
 	float distanceTo(Vector* otherEntity);
 	bool equalsWithError(Vector* other, float errorThreshold);
+	void setEqualTo(Vector* other);
 	void zero();
 	float dotProduct(Vector* other);
 

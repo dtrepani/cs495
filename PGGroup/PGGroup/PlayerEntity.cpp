@@ -16,13 +16,20 @@ PlayerEntity::~PlayerEntity(void) {}
 void PlayerEntity::pain(int hurt){
 	health -= hurt;
 	if (health <= 0) { // TO-DO: enable actual death rather than just position reset
-		//state = DEAD;
-		position->setX(0);
-		position->setY(1.0f);
-		position->setZ(0);
-		rotation->zero();
+		state = DEAD;
+		health = 100;
+		reset();
 	}
 }
+
+void PlayerEntity::reset() {
+	position->setX(0);
+	position->setY(1.0f);
+	position->setZ(0);
+	rotation->zero();
+}
+
+bool PlayerEntity::isDead() { return (state == DEAD); }
 
 void PlayerEntity::interactWith() {
 	if(interact) interact->interactWith(this);
@@ -41,10 +48,10 @@ void PlayerEntity::setInteract(InteractableEntity* src, InteractableEntity* anIn
 // Player jumps.
 // The animation will be gradual and take place over ~200ms, so the initial time that space was pressed must be recorded.
 void PlayerEntity::jump(){
-	//if(state != JUMPING && state != FALLING) { // TO-DO: re-add condition when done testing
+	if(state != JUMPING && state != FALLING) {
 		state = JUMPING;
 		initialJumpTime = SDL_GetTicks();
-	//}
+	}
 }
 
 // Player rotates to the opposite direction. 
@@ -89,14 +96,14 @@ void PlayerEntity::checkTurn180() {
 // Translation is negative because player's position is opposite what other entities' would be due to the rotation above.
 // The Y translation is adjusted slightly to make the camera act as if it's out of the eyes of a person (off-center), while
 // maintaining the actual center of the player.
-void PlayerEntity::drawSelf(GLfloat (&matrix)[16], LinkedList* entities) {
+void PlayerEntity::drawSelf(GLfloat (&matrix)[16], LinkedList* entities, LinkedList* platforms) {
 	glLoadMatrixf(matrix);
 
 	checkJump();
 	checkTurn180();
 
 	// Check for collisions and set the player's state accordingly.
-	bool collision = entities->checkForCollision(this);
+	bool collision = (entities->checkForCollision(this) || platforms->checkForCollision(this));
 	if(state != JUMPING) {
 		if(collision)
 			state = STANDING;
@@ -106,9 +113,11 @@ void PlayerEntity::drawSelf(GLfloat (&matrix)[16], LinkedList* entities) {
 
 	addVelocityToPosition();
 
-	//printf("(%f, %f, %f)\n", position->getX(), position->getY(), position->getZ());
-
-	if(position->getY() < Y_DEATH) pain(999); // Player instantly dies if past the Y_DEATH point.
+	// Player gets hurt and resets position if past the Y_DEATH point.
+	if(position->getY() < Y_DEATH) {
+		pain(10); 
+		reset();
+	}
 
 	glRotatef( rotation->getY(), 0, 1, 0 );
 	glTranslatef(-position->getX(), -position->getY()-0.3f, -position->getZ()); 

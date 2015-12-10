@@ -14,6 +14,12 @@ bool Vector::equalsWithError(Vector* other, float errorThreshold) {
 	return ( (abs(x - other->getX()) <= errorThreshold) && (abs(y - other->getY()) <= errorThreshold) && (abs(z - other->getZ()) <= errorThreshold) );
 }
 
+void Vector::setEqualTo(Vector* other) {
+	x = other->getX();
+	y = other->getY();
+	z = other->getZ();
+}
+
 // Zeroes out the vector
 void Vector::zero() { x = 0; y = 0; z = 0; }
 

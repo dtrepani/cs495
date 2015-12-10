@@ -16,7 +16,6 @@ Entity::Entity(Vector* aPosition, GLuint *aTexture, GLfloat* aVertices, float aR
 
 	if(aVertices) {
 		memcpy(&vertices[0], &aVertices[0], sizeof(vertices));
-		//delete[] aVertices;
 	} else {
 		GLfloat vertZero[12] = { 0 };
 		memcpy(&vertices[0], &vertZero[0], sizeof(vertices));
